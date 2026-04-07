@@ -16,51 +16,9 @@ export const metadata: Metadata = {
   },
 };
 
+import { CALCULATORS } from "@/lib/constants";
+
 export default function HomePage() {
-  const calculators = [
-    { 
-      href: "/profit-calculator", 
-      title: "수익률 계산기", 
-      desc: "현재가 또는 목표가로 손익 및 수익률(%) 자동 계산", 
-      badge: "수익 실현" 
-    },
-    { 
-      href: "/average-price-calculator", 
-      title: "물타기 평단가 계산기", 
-      desc: "추가 매입 시 최종 평단가 시뮬레이션", 
-      badge: "포지션 조절" 
-    },
-    { 
-      href: "/stop-loss-calculator", 
-      title: "손절가 계산기", 
-      desc: "지정한 손실 비율에 따른 기계적 방어 라인 구축", 
-      badge: "리스크 관리" 
-    },
-    { 
-      href: "/target-price-calculator", 
-      title: "목표가 계산기", 
-      desc: "도달하고자 하는 목표 수익률의 정확한 매도 가격 산출", 
-      badge: "수익 실현" 
-    },
-    { 
-      href: "/break-even-calculator", 
-      title: "본전 회복 계산기", 
-      desc: "현재 손실에서 원금을 복구하기 위한 필요 반등 퍼센테이지 계산", 
-      badge: "리스크 관리" 
-    },
-    { 
-      href: "/risk-reward-calculator", 
-      title: "손익비 계산기", 
-      desc: "잃을 금액과 얻을 금액의 손익비 및 필요 트레이딩 승률 계산", 
-      badge: "전략 검증" 
-    },
-    { 
-      href: "/position-size-calculator", 
-      title: "포지션 사이즈 계산기", 
-      desc: "최대 손실 1% 통제를 위한 기계적이고 안전한 권장 매수 수량 산출", 
-      badge: "자금 관리" 
-    }
-  ];
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
@@ -81,11 +39,11 @@ export default function HomePage() {
       <div className="mx-auto max-w-5xl px-6 py-16 md:px-8">
         {/* Calculator Grid */}
         <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 mb-24">
-          {calculators.map((calc, idx) => (
+          {CALCULATORS.map((calc, idx) => (
             <Link
               key={calc.href}
               href={calc.href}
-              className={`group flex flex-col justify-start rounded-[24px] bg-white p-8 border border-slate-200 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-slate-300 ${idx === calculators.length - 1 ? 'sm:col-span-2 lg:col-span-2 text-center items-center' : ''}`}
+              className={`group flex flex-col justify-start rounded-[24px] bg-white p-8 border border-slate-200 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-slate-300 ${idx === CALCULATORS.length - 1 ? 'sm:col-span-2 lg:col-span-2 text-center items-center' : ''}`}
             >
               <div className="flex w-full items-center justify-between mb-6">
                 <span className="inline-flex rounded-full bg-slate-50 border border-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">

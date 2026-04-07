@@ -1,25 +1,15 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL, CALCULATORS, POLICY_ROUTES } from "@/lib/constants";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://주식계산기.kr";
-
   const routes = [
     "",
-    "/average-price-calculator",
-    "/stop-loss-calculator",
-    "/profit-calculator",
-    "/target-price-calculator",
-    "/break-even-calculator",
-    "/risk-reward-calculator",
-    "/position-size-calculator",
-    "/about",
-    "/contact",
-    "/privacy",
-    "/terms"
+    ...CALCULATORS.map(c => c.href),
+    ...POLICY_ROUTES.map(p => p.href)
   ];
 
   return routes.map((route) => ({
-    url: `${baseUrl}${route}`,
+    url: `${SITE_URL}${route}`,
     lastModified: new Date(),
     changeFrequency: "weekly",
     priority: route === "" ? 1 : 0.8,

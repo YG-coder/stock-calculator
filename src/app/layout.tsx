@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { CALCULATORS, POLICY_ROUTES } from "@/lib/constants";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -59,15 +60,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const calculators = [
-    { href: "/profit-calculator", label: "수익률 계산기" },
-    { href: "/average-price-calculator", label: "평단가 계산기" },
-    { href: "/target-price-calculator", label: "목표가 계산기" },
-    { href: "/stop-loss-calculator", label: "손절가 계산기" },
-    { href: "/break-even-calculator", label: "본전 회복 계산기" },
-    { href: "/risk-reward-calculator", label: "손익비 계산기" },
-    { href: "/position-size-calculator", label: "포지션 사이즈 계산기" },
-  ];
+
 
   return (
     <html lang="ko">
@@ -91,7 +84,7 @@ export default function RootLayout({
             </Link>
 
             <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-semibold text-slate-600">
-              {calculators.map((calc) => (
+              {CALCULATORS.map((calc) => (
                 <Link
                   key={calc.href}
                   href={calc.href}
@@ -109,18 +102,11 @@ export default function RootLayout({
         <footer className="border-t border-slate-200 bg-white py-12 text-center text-sm text-slate-500">
           <div className="mx-auto max-w-5xl px-6">
             <div className="flex flex-wrap justify-center gap-4 md:gap-8 mb-8 font-medium">
-              <Link href="/about" className="hover:text-slate-900 transition">
-                사이트 소개
-              </Link>
-              <Link href="/contact" className="hover:text-slate-900 transition">
-                문의하기
-              </Link>
-              <Link href="/privacy" className="hover:text-slate-900 transition">
-                개인정보처리방침
-              </Link>
-              <Link href="/terms" className="hover:text-slate-900 transition">
-                이용약관
-              </Link>
+              {POLICY_ROUTES.map((policy) => (
+                <Link key={policy.href} href={policy.href} className="hover:text-slate-900 transition">
+                  {policy.label}
+                </Link>
+              ))}
             </div>
             <p>
               본 사이트에서 제공하는 계산 결과는 참고용이며, 투자 권유를 의미하지 않습니다.
