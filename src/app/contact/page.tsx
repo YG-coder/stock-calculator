@@ -1,28 +1,38 @@
 import type { Metadata } from "next";
+import { PageHeader, SectionCard, Article } from "@/components/ui/Shared";
 
 export const metadata: Metadata = {
   title: "문의하기",
-  description: "주식계산기.kr 문의 페이지입니다.",
+  description: "주식계산기.kr 고객지원 및 문의 페이지입니다.",
 };
 
 export default function ContactPage() {
   return (
-    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "40px 20px" }}>
-      <h1 style={{ fontSize: "34px", fontWeight: 800, marginBottom: "20px" }}>
-        문의하기
-      </h1>
+    <main className="min-h-screen bg-slate-50 text-slate-900 pb-20">
+      <PageHeader 
+        badge="고객지원" 
+        title="문의하기" 
+        description="서비스 이용 중 궁금하신 점이나 추가를 원하시는 기능이 있다면 언제든 문의해 주세요." 
+      />
 
-      <div style={{ color: "#374151", lineHeight: 1.9, fontSize: "16px" }}>
-        <p>
-          사이트 이용 중 오류, 제안, 문의사항이 있으시면 아래 이메일로 연락해 주세요.
-        </p>
-        <p style={{ marginTop: "16px", fontWeight: 700 }}>
-          이메일: hygcorp@gmail.com
-        </p>
-        <p style={{ marginTop: "16px" }}>
-          가능한 범위 내에서 빠르게 확인 후 답변드리겠습니다.
-        </p>
+      <div className="mx-auto max-w-5xl px-6 py-12 md:px-8">
+        <SectionCard>
+          <Article title="이메일 문의">
+            <p>
+              사이트 이용과 관련한 문의 사항(오류 제보, 기능 추가 제안, 제휴 문의 등)은 
+              아래 이메일로 보내주시기 바랍니다.
+            </p>
+            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 text-center my-6">
+              <p className="font-mono text-xl text-slate-800 font-bold tracking-tight">
+                hygcorp0@gmail.com
+              </p>
+            </div>
+            <p>
+              보내주신 의견은 꼼꼼히 확인 후 답변드리겠습니다. (주말 및 공휴일 제외 1~2영업일 소요 예상)
+            </p>
+          </Article>
+        </SectionCard>
       </div>
-    </div>
+    </main>
   );
 }

@@ -1,59 +1,46 @@
 import type { Metadata } from "next";
+import { PageHeader, SectionCard, Article } from "@/components/ui/Shared";
 
 export const metadata: Metadata = {
   title: "이용약관",
-  description: "주식계산기.kr 이용약관입니다.",
+  description: "주식계산기.kr 서비스 이용약관입니다.",
 };
 
 export default function TermsPage() {
   return (
-    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "40px 20px" }}>
-      <h1 style={{ fontSize: "34px", fontWeight: 800, marginBottom: "20px" }}>
-        이용약관
-      </h1>
+    <main className="min-h-screen bg-slate-50 text-slate-900 pb-20">
+      <PageHeader 
+        badge="정책 정보" 
+        title="이용약관" 
+        description="주식계산기.kr의 책임 한계와 서비스 이용 동의 규정입니다." 
+      />
 
-      <div style={{ color: "#374151", lineHeight: 1.9, fontSize: "16px" }}>
-        <h2 style={{ fontSize: "22px", fontWeight: 700, marginTop: "12px" }}>
-          1. 목적
-        </h2>
-        <p>
-          이 약관은 주식계산기.kr이 제공하는 계산 도구 및 관련 서비스의 이용 조건과
-          책임 사항을 규정합니다.
-        </p>
-
-        <h2 style={{ fontSize: "22px", fontWeight: 700, marginTop: "28px" }}>
-          2. 서비스 내용
-        </h2>
-        <p>
-          본 사이트는 주식 투자와 관련된 계산 기능을 제공합니다. 제공되는 정보와
-          계산 결과는 참고용이며, 투자 권유를 의미하지 않습니다.
-        </p>
-
-        <h2 style={{ fontSize: "22px", fontWeight: 700, marginTop: "28px" }}>
-          3. 책임 제한
-        </h2>
-        <p>
-          이용자는 본 사이트의 계산 결과를 참고 자료로만 활용해야 하며, 실제 투자에
-          대한 최종 판단과 책임은 이용자 본인에게 있습니다.
-        </p>
-
-        <h2 style={{ fontSize: "22px", fontWeight: 700, marginTop: "28px" }}>
-          4. 서비스 변경
-        </h2>
-        <p>
-          사이트 운영자는 필요에 따라 서비스 내용을 수정, 추가, 중단할 수 있습니다.
-        </p>
-
-        <h2 style={{ fontSize: "22px", fontWeight: 700, marginTop: "28px" }}>
-          5. 문의
-        </h2>
-        <p>서비스 관련 문의는 아래 이메일로 연락해 주세요.</p>
-        <p style={{ fontWeight: 700 }}>이메일: hygcorp@gmail.com</p>
-
-        <p style={{ marginTop: "28px", color: "#6b7280" }}>
-          시행일: 2026-04-07
-        </p>
+      <div className="mx-auto max-w-5xl px-6 py-12 md:px-8">
+        <SectionCard>
+          <Article title="1. 서비스 목적">
+            <p className="mt-2">
+              주식계산기.kr은 투자 및 재무 활동에서 자주 사용되는 기초적인 수학 계산 결과를 
+              편리하게 조회할 수 있도록 돕는 단순 보조 도구 모음입니다.
+            </p>
+          </Article>
+          
+          <Article title="2. 투자 책임의 부인">
+            <p className="mt-2">
+              본 사이트에서 산출되는 모든 수익률, 단가, 권장 사이즈 등의 결괏값은 참조용이며, 
+              투자 수익을 어떠한 경우에도 보장하지 않습니다. 
+              실제 증권 거래 시 발생하는 수수료, 세금, 슬리피지 등으로 인해 시장 결과와 오차가 발생할 수 있습니다. <br/>
+              <b>최종적인 매매의 결정과 그 결과에 따른 모든 책임은 전적으로 거래를 수행한 투자자 본인에게 있습니다.</b>
+            </p>
+          </Article>
+          
+          <Article title="3. 서비스 중단 및 변경">
+            <p className="mt-2">
+              본 웹사이트의 운영 정책 내지는 관리 측의 사정에 따라 통보 없이 일시적으로 서비스가 중단되거나 
+              수식(공식) 업데이트로 인해 결괏값이 변경될 수 있습니다.
+            </p>
+          </Article>
+        </SectionCard>
       </div>
-    </div>
+    </main>
   );
 }

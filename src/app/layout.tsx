@@ -20,21 +20,23 @@ export const metadata: Metadata = {
     template: "%s | 주식계산기.kr",
   },
   description:
-    "손절가 계산기, 평단가 계산기, 수익률 계산기를 한 번에 사용할 수 있는 주식 계산기 사이트입니다.",
+    "손절가 계산기, 수익률 계산기, 평단가 계산기, 목표가 계산기, 본전 회복 계산기를 포함한 7종의 핵심 기능 주식 계산기 모음 사이트입니다.",
   keywords: [
     "주식 계산기",
     "손절가 계산기",
     "평단가 계산기",
     "수익률 계산기",
-    "주식 수익 계산기",
+    "목표가 계산기",
+    "물타기 계산기",
+    "본전 회복 계산기"
   ],
   alternates: {
     canonical: "https://주식계산기.kr",
   },
   openGraph: {
-    title: "주식 계산기 모음 | 손절가, 평단가, 수익률 계산기",
+    title: "주식 계산기 모음 | 손익, 평단가, 리스크 관리 종합 툴",
     description:
-      "손절가 계산기, 평단가 계산기, 수익률 계산기를 한 번에 사용할 수 있는 주식 계산기 사이트입니다.",
+      "어려운 수식을 엑셀로 만들 필요 없이, 즉각적이고 정확한 증권 계산기 7종으로 투자 안전성을 높이세요.",
     url: "https://주식계산기.kr",
     siteName: "주식계산기.kr",
     locale: "ko_KR",
@@ -51,6 +53,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const calculators = [
+    { href: "/profit-calculator", label: "수익률 계산기" },
+    { href: "/average-price-calculator", label: "평단가 계산기" },
+    { href: "/target-price-calculator", label: "목표가 계산기" },
+    { href: "/stop-loss-calculator", label: "손절가 계산기" },
+    { href: "/break-even-calculator", label: "본전 회복 계산기" },
+    { href: "/risk-reward-calculator", label: "손익비 계산기" },
+    { href: "/position-size-calculator", label: "포지션 사이즈 계산기" },
+  ];
+
   return (
     <html lang="ko">
       <head>
@@ -60,100 +72,41 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <header
-          style={{
-            borderBottom: "1px solid #e5e7eb",
-            backgroundColor: "#ffffff",
-          }}
-        >
-          <div
-            style={{
-              maxWidth: "1100px",
-              margin: "0 auto",
-              padding: "16px 20px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: "16px",
-              flexWrap: "wrap",
-            }}
-          >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 text-slate-900 flex flex-col min-h-screen`}>
+        <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
+          <div className="mx-auto max-w-5xl px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <Link
               href="/"
-              style={{
-                fontSize: "20px",
-                fontWeight: 700,
-                color: "#111827",
-                textDecoration: "none",
-              }}
+              className="text-xl font-extrabold text-slate-900 tracking-tight hover:text-slate-700 transition"
             >
               주식계산기.kr
             </Link>
 
-            <nav
-              style={{
-                display: "flex",
-                gap: "16px",
-                flexWrap: "wrap",
-              }}
-            >
-              <Link href="/" style={{ color: "#374151", textDecoration: "none" }}>
-                홈
-              </Link>
-              <Link
-                href="/average-price-calculator"
-                style={{ color: "#374151", textDecoration: "none" }}
-              >
-                평단가 계산기
-              </Link>
-              <Link
-                href="/stop-loss-calculator"
-                style={{ color: "#374151", textDecoration: "none" }}
-              >
-                손절가 계산기
-              </Link>
-              <Link href="/about" style={{ color: "#374151", textDecoration: "none" }}>
-                사이트 소개
-              </Link>
-              <Link href="/contact" style={{ color: "#374151", textDecoration: "none" }}>
-                문의하기
-              </Link>
-              <Link href="/privacy" style={{ color: "#374151", textDecoration: "none" }}>
-                개인정보처리방침
-              </Link>
-              <Link href="/terms" style={{ color: "#374151", textDecoration: "none" }}>
-                이용약관
-              </Link>
+            <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-semibold text-slate-600">
+              {calculators.map((calc) => (
+                <Link key={calc.href} href={calc.href} className="hover:text-slate-900 transition-colors">
+                  {calc.label}
+                </Link>
+              ))}
             </nav>
           </div>
         </header>
 
-        <main style={{ minHeight: "calc(100vh - 140px)" }}>{children}</main>
+        <div className="flex-grow">
+          {children}
+        </div>
 
-        <footer
-          style={{
-            borderTop: "1px solid #e5e7eb",
-            marginTop: "40px",
-            backgroundColor: "#ffffff",
-          }}
-        >
-          <div
-            style={{
-              maxWidth: "1100px",
-              margin: "0 auto",
-              padding: "24px 20px",
-              color: "#6b7280",
-              fontSize: "14px",
-              lineHeight: 1.7,
-            }}
-          >
-            <p style={{ marginBottom: "8px" }}>
-              주식계산기.kr은 투자 판단을 보조하기 위한 계산 도구를 제공합니다.
-            </p>
-            <p>투자 결과에 대한 책임은 이용자 본인에게 있습니다.</p>
+        <footer className="border-t border-slate-200 bg-white py-12 text-center text-sm text-slate-500">
+          <div className="mx-auto max-w-5xl px-6">
+            <div className="flex flex-wrap justify-center gap-4 md:gap-8 mb-8 font-medium">
+              <Link href="/about" className="hover:text-slate-900 transition">사이트 소개</Link>
+              <Link href="/contact" className="hover:text-slate-900 transition">문의하기</Link>
+              <Link href="/privacy" className="hover:text-slate-900 transition">개인정보처리방침</Link>
+              <Link href="/terms" className="hover:text-slate-900 transition">이용약관</Link>
+            </div>
+            <p className="mb-2"></p>
+            <p>본 사이트에서 제공하는 계산 결과는 참고용이며, 투자 권유를 의미하지 않습니다. 투자에 대한 최종 판단과 책임은 사용자에게 있습니다.</p>
+            <p className="mt-6 text-xs text-slate-400">© {new Date().getFullYear()} 주식계산기.kr All rights reserved.</p>
           </div>
         </footer>
       </body>

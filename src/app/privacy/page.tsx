@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageHeader, SectionCard, Article } from "@/components/ui/Shared";
 
 export const metadata: Metadata = {
   title: "개인정보처리방침",
@@ -7,52 +8,39 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "40px 20px" }}>
-      <h1 style={{ fontSize: "34px", fontWeight: 800, marginBottom: "20px" }}>
-        개인정보처리방침
-      </h1>
+    <main className="min-h-screen bg-slate-50 text-slate-900 pb-20">
+      <PageHeader 
+        badge="정책 정보" 
+        title="개인정보처리방침" 
+        description="주식계산기.kr은 이용자의 개인정보를 안전하게 보호하기 위해 최선을 다하고 있습니다." 
+      />
 
-      <div style={{ color: "#374151", lineHeight: 1.9, fontSize: "16px" }}>
-        <p>
-          주식계산기.kr은 이용자의 개인정보를 중요하게 생각하며, 관련 법령을
-          준수합니다.
-        </p>
-
-        <h2 style={{ fontSize: "22px", fontWeight: 700, marginTop: "28px" }}>
-          1. 수집하는 정보
-        </h2>
-        <p>
-          본 사이트는 별도의 회원가입 기능을 제공하지 않으며, 기본적으로 사용자의
-          이름이나 연락처와 같은 개인정보를 직접 수집하지 않습니다.
-        </p>
-
-        <h2 style={{ fontSize: "22px", fontWeight: 700, marginTop: "28px" }}>
-          2. 자동 수집 정보
-        </h2>
-        <p>
-          사이트 이용 과정에서 브라우저 정보, 접속 시간, IP 주소, 쿠키 등의 정보가
-          자동으로 수집될 수 있습니다. 이는 서비스 운영, 통계 분석, 광고 제공을 위한
-          목적으로 활용될 수 있습니다.
-        </p>
-
-        <h2 style={{ fontSize: "22px", fontWeight: 700, marginTop: "28px" }}>
-          3. 광고 및 쿠키 사용
-        </h2>
-        <p>
-          본 사이트는 Google AdSense와 같은 제3자 광고 서비스를 사용할 수 있으며,
-          광고 제공 과정에서 쿠키가 사용될 수 있습니다.
-        </p>
-
-        <h2 style={{ fontSize: "22px", fontWeight: 700, marginTop: "28px" }}>
-          4. 문의
-        </h2>
-        <p>개인정보 관련 문의는 아래 이메일로 연락해 주세요.</p>
-        <p style={{ fontWeight: 700 }}>이메일: hygcorp@gmail.com</p>
-
-        <p style={{ marginTop: "28px", color: "#6b7280" }}>
-          시행일: 2026-04-07
-        </p>
+      <div className="mx-auto max-w-5xl px-6 py-12 md:px-8">
+        <SectionCard>
+          <Article title="1. 수집하는 개인정보 항목">
+            <p className="mt-2">
+              본 사이트는 계산 기능을 제공하는 데 있어 별도의 회원가입 절차를 요구하지 않으며,
+              개인 식별이 가능한 어떠한 형태의 민감한 개인정보도 수집하지 않습니다.
+            </p>
+          </Article>
+          
+          <Article title="2. 쿠키(Cookie) 및 브라우저 저장소 사용">
+            <p className="mt-2">
+              보다 나은 사용자 경험을 위해 로컬 스토리지(Local Storage) 기능을 사용하여 
+              사용자가 마지막으로 입력한 계산 수치 일부를 사용자 기기에만 기록할 수 있으나, 
+              이는 서버로 전송되거나 제3자에게 제공되지 않습니다.
+            </p>
+          </Article>
+          
+          <Article title="3. 타사 광고 파트너(Google AdSense)">
+            <p className="mt-2">
+              본 사이트는 타사 광고 공급업체(예: Google)가 쿠키를 사용해 귀하가 본 웹사이트 및 
+              웹상의 다른 사이트를 과거에 방문한 내역을 기반으로 광고를 게재할 수 있습니다. 
+              사용자는 Google 광고 설정에서 맞춤 광고를 선택 해제할 수 있습니다.
+            </p>
+          </Article>
+        </SectionCard>
       </div>
-    </div>
+    </main>
   );
 }
