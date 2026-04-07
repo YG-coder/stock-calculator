@@ -27,11 +27,35 @@ export default function HomePage() {
             lineHeight: 1.7,
             color: "#4b5563",
             maxWidth: "800px",
+            marginBottom: "14px",
           }}
         >
           주식 투자에 필요한 핵심 계산을 빠르게 할 수 있도록 만든 계산기 사이트입니다.
           손절가 계산, 평단가 계산, 수익률 계산 등 반복적으로 필요한 계산을 간편하게
           확인할 수 있습니다.
+        </p>
+        <p
+          style={{
+            fontSize: "17px",
+            lineHeight: 1.7,
+            color: "#4b5563",
+            maxWidth: "800px",
+            marginBottom: "14px",
+          }}
+        >
+          초보 투자자도 쉽게 사용할 수 있도록 직관적인 화면으로 구성했으며,
+          복잡한 계산 없이 빠르게 결과를 확인할 수 있습니다.
+        </p>
+        <p
+          style={{
+            fontSize: "17px",
+            lineHeight: 1.7,
+            color: "#4b5563",
+            maxWidth: "800px",
+          }}
+        >
+          실제 투자 판단 전에 필요한 숫자를 빠르게 계산하고,
+          리스크 관리와 매매 전략 수립에 참고 자료로 활용해보세요.
         </p>
       </section>
 
@@ -84,6 +108,76 @@ export default function HomePage() {
 
       <section style={{ marginBottom: "48px" }}>
         <h2 style={{ fontSize: "28px", fontWeight: 800, marginBottom: "16px" }}>
+          주식 계산 가이드
+        </h2>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gap: "20px",
+          }}
+        >
+          <Link
+            href="/average-price-guide"
+            style={{
+              border: "1px solid #e5e7eb",
+              borderRadius: "16px",
+              padding: "24px",
+              textDecoration: "none",
+              color: "#111827",
+              backgroundColor: "#fff",
+            }}
+          >
+            <h3 style={{ fontSize: "20px", fontWeight: 700, marginBottom: "12px" }}>
+              주식 평단가 계산 방법
+            </h3>
+            <p style={{ color: "#4b5563", lineHeight: 1.7 }}>
+              물타기 후 평균 단가가 어떻게 변하는지 계산 공식과 예시로 쉽게 설명합니다.
+            </p>
+          </Link>
+
+          <Link
+            href="/stop-loss-guide"
+            style={{
+              border: "1px solid #e5e7eb",
+              borderRadius: "16px",
+              padding: "24px",
+              textDecoration: "none",
+              color: "#111827",
+              backgroundColor: "#fff",
+            }}
+          >
+            <h3 style={{ fontSize: "20px", fontWeight: 700, marginBottom: "12px" }}>
+              손절가 계산 기준
+            </h3>
+            <p style={{ color: "#4b5563", lineHeight: 1.7 }}>
+              손실 비율 기준으로 손절 가격을 설정하는 방법과 리스크 관리 포인트를 정리했습니다.
+            </p>
+          </Link>
+
+          <Link
+            href="/water-buying-guide"
+            style={{
+              border: "1px solid #e5e7eb",
+              borderRadius: "16px",
+              padding: "24px",
+              textDecoration: "none",
+              color: "#111827",
+              backgroundColor: "#fff",
+            }}
+          >
+            <h3 style={{ fontSize: "20px", fontWeight: 700, marginBottom: "12px" }}>
+              물타기 계산 방법
+            </h3>
+            <p style={{ color: "#4b5563", lineHeight: 1.7 }}>
+              추가 매수 전 반드시 확인해야 할 물타기 계산 방식과 주의점을 알아보세요.
+            </p>
+          </Link>
+        </div>
+      </section>
+
+      <section style={{ marginBottom: "48px" }}>
+        <h2 style={{ fontSize: "28px", fontWeight: 800, marginBottom: "16px" }}>
           이 사이트에서 할 수 있는 것
         </h2>
         <div style={{ color: "#374151", lineHeight: 1.9, fontSize: "16px" }}>
@@ -91,6 +185,7 @@ export default function HomePage() {
           <p>• 손절 기준 가격을 간단하게 확인</p>
           <p>• 투자 판단 전에 필요한 수치를 반복 계산</p>
           <p>• 모바일과 PC에서 모두 간편하게 사용</p>
+          <p>• 투자 초보자를 위한 계산 가이드 확인</p>
         </div>
       </section>
 
