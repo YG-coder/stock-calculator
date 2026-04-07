@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     "수익률 계산기",
     "목표가 계산기",
     "물타기 계산기",
-    "본전 회복 계산기"
+    "본전 회복 계산기",
   ],
   alternates: {
     canonical: "https://주식계산기.kr",
@@ -45,6 +45,12 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+  },
+  verification: {
+    other: {
+      "naver-site-verification":
+        "ce4f0aad0e7935dd7c085660b734744be0894e61",
+    },
   },
 };
 
@@ -72,7 +78,9 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 text-slate-900 flex flex-col min-h-screen`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 text-slate-900 flex flex-col min-h-screen`}
+      >
         <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
           <div className="mx-auto max-w-5xl px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <Link
@@ -84,7 +92,11 @@ export default function RootLayout({
 
             <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-semibold text-slate-600">
               {calculators.map((calc) => (
-                <Link key={calc.href} href={calc.href} className="hover:text-slate-900 transition-colors">
+                <Link
+                  key={calc.href}
+                  href={calc.href}
+                  className="hover:text-slate-900 transition-colors"
+                >
                   {calc.label}
                 </Link>
               ))}
@@ -92,21 +104,31 @@ export default function RootLayout({
           </div>
         </header>
 
-        <div className="flex-grow">
-          {children}
-        </div>
+        <div className="flex-grow">{children}</div>
 
         <footer className="border-t border-slate-200 bg-white py-12 text-center text-sm text-slate-500">
           <div className="mx-auto max-w-5xl px-6">
             <div className="flex flex-wrap justify-center gap-4 md:gap-8 mb-8 font-medium">
-              <Link href="/about" className="hover:text-slate-900 transition">사이트 소개</Link>
-              <Link href="/contact" className="hover:text-slate-900 transition">문의하기</Link>
-              <Link href="/privacy" className="hover:text-slate-900 transition">개인정보처리방침</Link>
-              <Link href="/terms" className="hover:text-slate-900 transition">이용약관</Link>
+              <Link href="/about" className="hover:text-slate-900 transition">
+                사이트 소개
+              </Link>
+              <Link href="/contact" className="hover:text-slate-900 transition">
+                문의하기
+              </Link>
+              <Link href="/privacy" className="hover:text-slate-900 transition">
+                개인정보처리방침
+              </Link>
+              <Link href="/terms" className="hover:text-slate-900 transition">
+                이용약관
+              </Link>
             </div>
-            <p className="mb-2"></p>
-            <p>본 사이트에서 제공하는 계산 결과는 참고용이며, 투자 권유를 의미하지 않습니다. 투자에 대한 최종 판단과 책임은 사용자에게 있습니다.</p>
-            <p className="mt-6 text-xs text-slate-400">© {new Date().getFullYear()} 주식계산기.kr All rights reserved.</p>
+            <p>
+              본 사이트에서 제공하는 계산 결과는 참고용이며, 투자 권유를 의미하지 않습니다.
+              투자에 대한 최종 판단과 책임은 사용자에게 있습니다.
+            </p>
+            <p className="mt-6 text-xs text-slate-400">
+              © {new Date().getFullYear()} 주식계산기.kr All rights reserved.
+            </p>
           </div>
         </footer>
       </body>
