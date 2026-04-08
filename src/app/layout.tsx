@@ -50,9 +50,11 @@ export const metadata: Metadata = {
     follow: true,
   },
   verification: {
+    google: "_UQf8pcWBmQP9bzljNpCHIzFnkC5LzOwoCLCMz6_t9c",
     other: {
       "naver-site-verification":
         "ce4f0aad0e7935dd7c085660b734744be0894e61",
+
     },
   },
 };
