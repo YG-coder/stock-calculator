@@ -2,7 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { formatNumber, parsePositive } from "@/lib/number";
-import { CalculatorLayout, CalculatorCard, ResultCard, ResultHighlight, ResultDetail, InputField } from "@/components/ui/Shared";
+import {
+  CalculatorLayout,
+  CalculatorCard,
+  ResultCard,
+  ResultHighlight,
+  ResultDetail,
+  InputField,
+} from "@/components/ui/Shared";
 
 export default function AveragePriceCalculator() {
   const [price1, setPrice1] = useState("");
@@ -37,17 +44,56 @@ export default function AveragePriceCalculator() {
     <CalculatorLayout>
       <div className="space-y-6">
         <CalculatorCard title="1. 기존 보유" description="기존 매수가와 수량을 입력하세요.">
-          <InputField id="price1" label="기존 매수가 (원)" type="number" placeholder="예: 50000" unit="원" value={price1} onChange={e => setPrice1(e.target.value)} />
-          <InputField id="qty1" label="기존 수량 (주)" type="number" placeholder="예: 100" unit="주" value={qty1} onChange={e => setQty1(e.target.value)} />
+          <InputField
+            id="price1"
+            label="기존 매수가 (원)"
+            type="number"
+            placeholder="예: 50000"
+            unit="원"
+            value={price1}
+            onChange={(e) => setPrice1(e.target.value)}
+          />
+          <InputField
+            id="qty1"
+            label="기존 수량 (주)"
+            type="number"
+            placeholder="예: 100"
+            unit="주"
+            value={qty1}
+            onChange={(e) => setQty1(e.target.value)}
+          />
         </CalculatorCard>
 
-        <CalculatorCard title="2. 추가 매수 (물타기)" description="추가로 매수한 내역을 입력하세요.">
-          <InputField id="price2" label="추가 매수가 (원)" type="number" placeholder="예: 45000" unit="원" value={price2} onChange={e => setPrice2(e.target.value)} />
-          <InputField id="qty2" label="추가 수량 (주)" type="number" placeholder="예: 50" unit="주" value={qty2} onChange={e => setQty2(e.target.value)} />
+        <CalculatorCard
+          title="2. 추가 매수 (물타기)"
+          description="추가로 매수한 내역을 입력하세요."
+        >
+          <InputField
+            id="price2"
+            label="추가 매수가 (원)"
+            type="number"
+            placeholder="예: 45000"
+            unit="원"
+            value={price2}
+            onChange={(e) => setPrice2(e.target.value)}
+          />
+          <InputField
+            id="qty2"
+            label="추가 수량 (주)"
+            type="number"
+            placeholder="예: 50"
+            unit="주"
+            value={qty2}
+            onChange={(e) => setQty2(e.target.value)}
+          />
         </CalculatorCard>
       </div>
 
-      <ResultCard title="평단가 계산 결과" emptyMessage="매수 내역을 입력하시면\n평균 단가가 자동으로 계산됩니다." isValid={result.valid}>
+      <ResultCard
+        title="평단가 계산 결과"
+        emptyMessage="매수 내역을 입력하시면\n평균 단가가 자동으로 계산됩니다."
+        isValid={result.valid}
+      >
         <ResultHighlight
           label="최종 평균 단가"
           value={formatNumber(result.avgPrice)}

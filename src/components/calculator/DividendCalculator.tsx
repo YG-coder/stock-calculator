@@ -140,13 +140,26 @@ export default function DividendCalculator() {
                             label="세후 배당금"
                             value={formatNumber(result.netDividend)}
                             unit="원"
-                            tone="positive"
+                            tone={
+                                result.netDividend > 0
+                                    ? "positive"
+                                    : result.netDividend < 0
+                                        ? "negative"
+                                        : "default"
+                            }
                         />
 
                         <ResultHighlight
                             label="세후 배당수익률"
                             value={formatNumber(result.netYield)}
                             unit="%"
+                            tone={
+                                result.netYield > 0
+                                    ? "positive"
+                                    : result.netYield < 0
+                                        ? "negative"
+                                        : "default"
+                            }
                         />
 
                         <ResultDetail
