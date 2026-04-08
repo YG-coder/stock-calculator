@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s | 주식계산기.kr",
   },
   description:
-    "손절가 계산기, 수익률 계산기, 평단가 계산기, 목표가 계산기, 본전 회복 계산기를 포함한 7종의 핵심 기능 주식 계산기 모음 사이트입니다.",
+    "손절가 계산기, 수익률 계산기, 평단가 계산기, 목표가 계산기, 본전 회복 계산기를 포함한 8종의 핵심 기능 주식 계산기 모음 사이트입니다.",
   keywords: [
     "주식 계산기",
     "손절가 계산기",
@@ -30,6 +30,8 @@ export const metadata: Metadata = {
     "목표가 계산기",
     "물타기 계산기",
     "본전 회복 계산기",
+    "배당 계산기",
+    "배당 수익 계산기"
   ],
   alternates: {
     canonical: "https://주식계산기.kr",
@@ -37,7 +39,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "주식 계산기 모음 | 손익, 평단가, 리스크 관리 종합 툴",
     description:
-      "어려운 수식을 엑셀로 만들 필요 없이, 즉각적이고 정확한 증권 계산기 7종으로 투자 안전성을 높이세요.",
+      "어려운 수식을 엑셀로 만들 필요 없이, 즉각적이고 정확한 주식 계산기 8종으로 투자 안전성을 높이세요.",
     url: "https://주식계산기.kr",
     siteName: "주식계산기.kr",
     locale: "ko_KR",
