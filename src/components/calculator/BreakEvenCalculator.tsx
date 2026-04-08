@@ -34,7 +34,7 @@ export default function BreakEvenCalculator() {
           label="본전 회복 요구 상승률"
           value={`+${result.requiredRate.toFixed(2)}`}
           unit="%"
-          isProfit={true}
+          tone="positive"
         />
         <div className="rounded-xl bg-slate-50 border border-slate-200 p-5 shadow-sm">
           <p className="text-sm font-medium text-slate-700 leading-relaxed">
