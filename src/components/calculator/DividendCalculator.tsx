@@ -1,6 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import {
+    CalculatorCard,
+    CalculatorLayout,
+    InputField,
+    ResultCard,
+    ResultDetail,
+    ResultHighlight,
+} from "@/components/ui/Shared";
 
 function formatNumber(value: number) {
     if (!Number.isFinite(value)) return "0";
@@ -51,36 +59,29 @@ export default function DividendCalculator() {
     }, [price, shares, dividendPerShare, taxRate]);
 
     return (
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-            <div className="mb-6">
-                <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-                    배당 수익 계산기
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                    주가, 보유 수량, 1주당 배당금을 입력하면 세전·세후 배당금과 배당수익률을 계산할 수 있습니다.
-                </p>
-            </div>
+        <CalculatorLayout>
+            <CalculatorCard
+                title="배당 수익 계산기"
+                description="주가, 보유 수량, 1주당 배당금을 입력하면 세전·세후 배당금과 배당수익률을 계산할 수 있습니다."
+            >
+                <div className="grid gap-5 md:grid-cols-2">
+                    <div>
+                        <label className="mb-2 block text-sm font-semibold text-slate-700">
+                            시장 선택
+                        </label>
+                        <select
+                            value={market}
+                            onChange={(e) => setMarket(e.target.value as "kr" | "us")}
+                            className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-slate-500"
+                        >
+                            <option value="kr">국내 주식 (배당소득세 15.4%)</option>
+                            <option value="us">미국 주식 (배당 원천징수 15%)</option>
+                        </select>
+                    </div>
 
-            <div className="grid gap-5 md:grid-cols-2">
-                <div>
-                    <label className="mb-2 block text-sm font-semibold text-slate-700">
-                        시장 선택
-                    </label>
-                    <select
-                        value={market}
-                        onChange={(e) => setMarket(e.target.value as "kr" | "us")}
-                        className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-slate-500"
-                    >
-                        <option value="kr">국내 주식 (배당소득세 15.4%)</option>
-                        <option value="us">미국 주식 (배당 원천징수 15%)</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label className="mb-2 block text-sm font-semibold text-slate-700">
-                        현재 주가
-                    </label>
-                    <input
+                    <InputField
+                        id="price"
+                        label="현재 주가"
                         type="number"
                         inputMode="decimal"
                         min="0"
@@ -88,15 +89,12 @@ export default function DividendCalculator() {
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
                         placeholder="예: 80000"
-                        className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-slate-500"
+                        unit="원"
                     />
-                </div>
 
-                <div>
-                    <label className="mb-2 block text-sm font-semibold text-slate-700">
-                        보유 수량
-                    </label>
-                    <input
+                    <InputField
+                        id="shares"
+                        label="보유 수량"
                         type="number"
                         inputMode="numeric"
                         min="0"
@@ -104,15 +102,12 @@ export default function DividendCalculator() {
                         value={shares}
                         onChange={(e) => setShares(e.target.value)}
                         placeholder="예: 100"
-                        className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-slate-500"
+                        unit="주"
                     />
-                </div>
 
-                <div>
-                    <label className="mb-2 block text-sm font-semibold text-slate-700">
-                        1주당 배당금
-                    </label>
-                    <input
+                    <InputField
+                        id="dividendPerShare"
+                        label="1주당 배당금"
                         type="number"
                         inputMode="decimal"
                         min="0"
@@ -120,71 +115,66 @@ export default function DividendCalculator() {
                         value={dividendPerShare}
                         onChange={(e) => setDividendPerShare(e.target.value)}
                         placeholder="예: 1500"
-                        className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-slate-500"
+                        unit="원"
                     />
                 </div>
-            </div>
 
-            <div className="mt-6 rounded-2xl bg-slate-50 p-4 text-sm leading-relaxed text-slate-600">
-                <p>
-                    국내 주식은 배당소득세 15.4%, 미국 주식은 배당 원천징수 15%를 기준으로 계산합니다.
-                </p>
-                <p className="mt-1">
-                    미국 주식은 일반적인 W-8BEN 제출 기준이며, 실제 세율은 계좌 및 세무 상황에 따라 달라질 수 있습니다.
-                </p>
-            </div>
+                <div className="mt-6 rounded-2xl bg-slate-50 p-4 text-sm leading-relaxed text-slate-600">
+                    <p>
+                        국내 주식은 배당소득세 15.4%, 미국 주식은 배당 원천징수 15%를 기준으로 계산합니다.
+                    </p>
+                    <p className="mt-1">
+                        미국 주식은 일반적인 W-8BEN 제출 기준이며, 실제 세율은 계좌 및 세무 상황에 따라 달라질 수 있습니다.
+                    </p>
+                </div>
+            </CalculatorCard>
 
-            <div className="mt-8">
-                {result ? (
+            <ResultCard
+                title="배당 수익 계산 결과"
+                emptyMessage="값을 입력하면 예상 배당금과 배당수익률이 표시됩니다."
+                isValid={!!result}
+            >
+                {result && (
                     <div className="grid gap-4 md:grid-cols-2">
-                        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-                            <p className="text-sm font-medium text-slate-500">총 투자금</p>
-                            <p className="mt-2 text-2xl font-bold text-slate-900">
-                                {formatNumber(result.totalInvestment)}원
-                            </p>
-                        </div>
+                        <ResultHighlight
+                            label="세후 배당금"
+                            value={formatNumber(result.netDividend)}
+                            unit="원"
+                            tone="positive"
+                        />
 
-                        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-                            <p className="text-sm font-medium text-slate-500">세전 배당금</p>
-                            <p className="mt-2 text-2xl font-bold text-slate-900">
-                                {formatNumber(result.grossDividend)}원
-                            </p>
-                        </div>
+                        <ResultHighlight
+                            label="세후 배당수익률"
+                            value={formatNumber(result.netYield)}
+                            unit="%"
+                        />
 
-                        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-                            <p className="text-sm font-medium text-slate-500">예상 세금</p>
-                            <p className="mt-2 text-2xl font-bold text-blue-600">
-                                {formatNumber(result.taxAmount)}원
-                            </p>
-                        </div>
+                        <ResultDetail
+                            label="총 투자금"
+                            value={formatNumber(result.totalInvestment)}
+                            unit="원"
+                        />
 
-                        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-                            <p className="text-sm font-medium text-slate-500">세후 배당금</p>
-                            <p className="mt-2 text-2xl font-bold text-red-600">
-                                {formatNumber(result.netDividend)}원
-                            </p>
-                        </div>
+                        <ResultDetail
+                            label="세전 배당금"
+                            value={formatNumber(result.grossDividend)}
+                            unit="원"
+                        />
 
-                        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-                            <p className="text-sm font-medium text-slate-500">세전 배당수익률</p>
-                            <p className="mt-2 text-2xl font-bold text-slate-900">
-                                {formatNumber(result.grossYield)}%
-                            </p>
-                        </div>
+                        <ResultDetail
+                            label="예상 세금"
+                            value={formatNumber(result.taxAmount)}
+                            unit="원"
+                        />
 
-                        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-                            <p className="text-sm font-medium text-slate-500">세후 배당수익률</p>
-                            <p className="mt-2 text-2xl font-bold text-slate-900">
-                                {formatNumber(result.netYield)}%
-                            </p>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
-                        값을 입력하면 예상 배당금과 배당수익률이 표시됩니다.
+                        <ResultDetail
+                            label="세전 배당수익률"
+                            value={formatNumber(result.grossYield)}
+                            unit="%"
+                        />
                     </div>
                 )}
-            </div>
-        </section>
+            </ResultCard>
+        </CalculatorLayout>
     );
 }

@@ -26,14 +26,14 @@ export default function BreakEvenCalculator() {
   return (
     <CalculatorLayout>
       <CalculatorCard title="손실률 입력" description="현재 마이너스(-)로 표기된 손실률을 입력하세요.">
-        <InputField id="lossRate" label="현재 손실률 (%)" placeholder="예: 20 (부호 없이 입력)" unit="%" value={lossRate} onChange={e => setLossRate(e.target.value)} max={99} />
+        <InputField id="lossRate" label="현재 손실률 (%)" type="number" placeholder="예: 20 (부호 없이 입력)" unit="%" value={lossRate} onChange={e => setLossRate(e.target.value)} max={99} />
       </CalculatorCard>
 
-      <ResultCard title="본전 회복 계산 결과" emptyMessage="좌측에 현재 손실률을 입력하시면\n본전을 찾기 위해 필요한 상승률이 계산됩니다." isValid={result.valid}>
-        <ResultHighlight 
-          label="본전 회복 요구 상승률" 
-          value={`+${result.requiredRate.toFixed(2)}`} 
-          unit="%" 
+      <ResultCard title="본전 회복 계산 결과" emptyMessage="현재 손실률을 입력하시면\n본전을 찾기 위해 필요한 상승률이 계산됩니다." isValid={result.valid}>
+        <ResultHighlight
+          label="본전 회복 요구 상승률"
+          value={`+${result.requiredRate.toFixed(2)}`}
+          unit="%"
           isProfit={true}
         />
         <div className="rounded-xl bg-slate-50 border border-slate-200 p-5 shadow-sm">
