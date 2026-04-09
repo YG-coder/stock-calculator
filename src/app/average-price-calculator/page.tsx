@@ -35,7 +35,7 @@ export default function AveragePriceCalculatorPage() {
       <PageHeader
         badge="필수 금융 계산기"
         title="주식 평단가 계산기"
-        description="기존 주식을 보유한 상태에서 추가 매수를 할 때 평균 매입 단가(평단가)가 어떻게 변하는지 계산할 수 있습니다. 추가 매수 전 예상 평단을 확인하면 보다 신중하게 매매 전략을 세우는 데 도움이 됩니다."
+        description="주식 평단가 계산기는 추가 매수(물타기) 후 평균 매입 단가가 어떻게 달라지는지 계산하는 도구입니다. 예상 평단가를 미리 확인하면 손익분기점과 매매 전략을 더 정확하게 판단할 수 있습니다."
       />
 
       <div className="mx-auto max-w-5xl px-6 py-12 md:px-8 md:py-16">
@@ -44,8 +44,8 @@ export default function AveragePriceCalculatorPage() {
         <SectionCard>
           <Article title="주식 물타기와 평단가 계산의 중요성">
             <p>
-              물타기란 보유 중인 주식의 가격이 하락했을 때 추가 매수를 통해 평균 매입 단가를 낮추는 방법입니다.
-              평단가가 낮아지면 주가가 일정 수준만 반등해도 손익분기점에 도달할 가능성이 높아집니다.
+              <strong>주식 평단가 계산기</strong>는 여러 번 나눠 매수한 주식의 평균 매입 단가를 계산하는 도구입니다.
+              물타기 전략을 사용할 때 추가 매수 후 예상 평단가를 미리 확인하면, 손익분기점까지 필요한 반등 폭과 이후 매매 전략을 더 현실적으로 판단할 수 있습니다.
             </p>
             <p>
               다만 물타기는 추가 자금이 들어가는 전략이기 때문에, 무조건 유리한 방식은 아닙니다.
@@ -90,13 +90,13 @@ export default function AveragePriceCalculatorPage() {
           links={[
             {
               href: "/profit-calculator",
-              title: "수익률 계산기",
-              desc: "새로운 평단 기준으로 예상 수익률 확인",
+              title: "주식 수익률 계산기",
+              desc: "새로운 평단가 기준으로 예상 수익률과 손익 확인",
             },
             {
               href: "/stop-loss-calculator",
-              title: "손절가 계산기",
-              desc: "리스크 관리를 위한 손절 기준 계산",
+              title: "주식 손절가 계산기",
+              desc: "리스크 관리를 위한 손절 기준 가격 계산",
             },
           ]}
         />

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import ProfitCalculator from "@/components/calculator/ProfitCalculator";
-import { PageHeader, SectionCard, Article, FaqSection, FaqItem, RelatedCalculators , Disclaimer } from "@/components/ui/Shared";
+import { PageHeader, SectionCard, Article, FaqSection, FaqItem, RelatedCalculators, Disclaimer } from "@/components/ui/Shared";
 
 export const metadata: Metadata = {
   title: "주식 수익률 계산기 | 예상 수익률 및 손익 자동 계산",
@@ -19,10 +19,10 @@ export const metadata: Metadata = {
 export default function ProfitCalculatorPage() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
-      <PageHeader 
-        badge="필수 금융 계산기" 
-        title="주식 수익률 계산기" 
-        description="매수한 주식의 정확한 수익률(%)과 1주당 손익을 빠르고 쉽게 계산해보세요. 목표로 하는 매도 가격을 미리 입력하여 기대 수익률을 시뮬레이션하거나, 현재 주가를 입력하여 투자 현황을 직관적으로 확인할 수 있습니다." 
+      <PageHeader
+        badge="필수 금융 계산기"
+        title="주식 수익률 계산기"
+        description="주식 수익률 계산기는 매수가와 현재가 또는 목표가를 기준으로 예상 수익률과 손익을 자동 계산하는 도구입니다. 투자 결과를 퍼센트로 빠르게 확인하고 매매 전략을 점검할 수 있습니다."
       />
 
       <div className="mx-auto max-w-5xl px-6 py-12 md:px-8 md:py-16">
@@ -31,13 +31,13 @@ export default function ProfitCalculatorPage() {
         <SectionCard>
           <Article title="수익률 계산기 설명">
             <p>
-              <strong>주식 수익률 계산기</strong>는 투자자가 매수한 자산의 초기 가격(매수가)과 현재 가치(현재가 또는 목표가)의 
-              차이를 백분율(%)로 환산하여 보여주는 금융 도구입니다. 직관적인 퍼센트 수치로 표시되기 때문에 투자 성과를 단번에 파악하는 데 필수적입니다.
+              <strong>주식 수익률 계산기</strong>는 매수가와 현재가 또는 목표가를 기준으로 실제 수익률과 손익을 계산하는 도구입니다.
+              주식, ETF, 코인 등 다양한 자산의 투자 성과를 퍼센트와 금액으로 확인할 수 있어 현재 수익 상태를 점검하는 데 도움이 됩니다.
             </p>
             <p>
-              주식, ETF, 코인(암호화폐) 등 가격 변동성이 있는 모든 종류의 투자 자산에 동일하게 적용할 수 있습니다. 
-              목표 수익률 대비 도달 가격을 확인하거나, 시장 변동에 따른 현재 계좌의 손익 상태를 냉정하게 객관화하려면 
-              손으로 일일이 계산하기보다는 정확한 수식을 사용하는 계산기를 이용하는 것이 가장 효율적입니다.
+              수익률 계산은 단순히 현재 수익 상태를 확인하는 데서 끝나지 않습니다.
+              목표 수익률에 도달했는지 점검하거나, 손실 구간에서 대응 전략을 세우는 기준으로도 활용할 수 있어
+              매수 이후의 의사결정을 더 객관적으로 만드는 데 도움이 됩니다.
             </p>
           </Article>
 
@@ -49,7 +49,7 @@ export default function ProfitCalculatorPage() {
               </p>
             </div>
             <p>
-              예를 들어 삼성전자를 <strong>70,000원</strong>에 매수했고 현재가가 <strong>80,000원</strong>이 되었다면, 
+              예를 들어 삼성전자를 <strong>70,000원</strong>에 매수했고 현재가가 <strong>80,000원</strong>이 되었다면,
               <code>(80,000 - 70,000) / 70,000 = 0.1428</code>이 되며 100을 곱하여 <strong>약 +14.28%</strong>의 수익률을 계산해 낼 수 있습니다.
             </p>
           </Article>
@@ -61,10 +61,25 @@ export default function ProfitCalculatorPage() {
           <FaqItem question="물타기(추가 매수) 후의 수익률은 어떻게 구하나요?" answer="여러 번에 나뉘어 주식을 매수하신 경우, 먼저 평단가 계산기를 이용하여 정확한 최종 매입 평균 단가를 구하셔야 합니다. 그렇게 계산된 최종 평단가를 이곳 수익률 계산기의 '매수가' 항목에 기입하시면 됩니다." />
         </FaqSection>
 
-        <RelatedCalculators links={[
-          { href: "/average-price-calculator", title: "물타기 평단가 계산기", desc: "추가 매수 시뮬레이션을 통한 평균 매입가 산출" },
-          { href: "/stop-loss-calculator", title: "손절가 계산기", desc: "리스크 관리를 위한 기계적 손절 라인 확인" }
-        ]} />
+        <RelatedCalculators
+          links={[
+            {
+              href: "/average-price-calculator",
+              title: "물타기 평단가 계산기",
+              desc: "추가 매수 후 평균 매입 단가 계산",
+            },
+            {
+              href: "/stop-loss-calculator",
+              title: "주식 손절가 계산기",
+              desc: "손실 제한을 위한 손절 기준 가격 계산",
+            },
+            {
+              href: "/dividend-calculator",
+              title: "배당 수익 계산기",
+              desc: "배당금 기준 실제 수익률 확인",
+            },
+          ]}
+        />
         <Disclaimer />
       </div>
     </main>
