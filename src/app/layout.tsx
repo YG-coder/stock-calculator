@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
-import { CALCULATORS, POLICY_ROUTES } from "@/lib/constants";
+import { HEADER_CALCULATORS, POLICY_ROUTES } from "@/lib/constants";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s | 주식계산기.kr",
   },
   description:
-    "손절가 계산기, 수익률 계산기, 평단가 계산기, 목표가 계산기, 본전 회복 계산기를 포함한 8종의 핵심 기능 주식 계산기 모음 사이트입니다.",
+    "손절가 계산기, 수익률 계산기, 평단가 계산기, 목표가 계산기, 본전 회복 계산기, 배당 수익 계산기를 포함한 8종의 핵심 기능 주식 계산기 모음 사이트입니다.",
   keywords: [
     "주식 계산기",
     "손절가 계산기",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     "물타기 계산기",
     "본전 회복 계산기",
     "배당 계산기",
-    "배당 수익 계산기"
+    "배당 수익 계산기",
   ],
   alternates: {
     canonical: "https://주식계산기.kr",
@@ -54,7 +54,6 @@ export const metadata: Metadata = {
     other: {
       "naver-site-verification":
         "ce4f0aad0e7935dd7c085660b734744be0894e61",
-
     },
   },
 };
@@ -64,8 +63,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-
   return (
     <html lang="ko">
       <head>
@@ -79,22 +76,24 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 text-slate-900 flex flex-col min-h-screen`}
       >
         <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
-          <div className="mx-auto max-w-5xl px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <Link
-              href="/"
-              className="text-xl font-extrabold text-slate-900 tracking-tight hover:text-slate-700 transition"
-            >
-              주식계산기.kr
-            </Link>
+          <div className="mx-auto max-w-6xl px-4 py-4 md:px-6">
+            <div className="flex justify-center md:justify-start">
+              <Link
+                href="/"
+                className="whitespace-nowrap text-2xl font-extrabold tracking-tight text-slate-900 hover:text-slate-700 transition"
+              >
+                주식계산기.kr
+              </Link>
+            </div>
 
-            <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-semibold text-slate-600">
-              {CALCULATORS.map((calc) => (
+            <nav className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-semibold text-slate-600">
+              {HEADER_CALCULATORS.map((item) => (
                 <Link
-                  key={calc.href}
-                  href={calc.href}
-                  className="hover:text-slate-900 transition-colors"
+                  key={item.href}
+                  href={item.href}
+                  className="whitespace-nowrap hover:text-slate-900 transition-colors"
                 >
-                  {calc.label}
+                  {item.label}
                 </Link>
               ))}
             </nav>
@@ -105,9 +104,13 @@ export default function RootLayout({
 
         <footer className="border-t border-slate-200 bg-white py-12 text-center text-sm text-slate-500">
           <div className="mx-auto max-w-5xl px-6">
-            <div className="flex flex-wrap justify-center gap-4 md:gap-8 mb-8 font-medium">
+            <div className="mb-8 flex flex-wrap justify-center gap-4 font-medium md:gap-8">
               {POLICY_ROUTES.map((policy) => (
-                <Link key={policy.href} href={policy.href} className="hover:text-slate-900 transition">
+                <Link
+                  key={policy.href}
+                  href={policy.href}
+                  className="hover:text-slate-900 transition"
+                >
                   {policy.label}
                 </Link>
               ))}
