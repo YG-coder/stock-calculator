@@ -3,9 +3,9 @@ import Link from "next/link";
 import { CALCULATORS } from "@/lib/constants";
 
 export const metadata: Metadata = {
-    title: "전체 계산기 모음",
+    title: "주식 계산기 모음 | 수익률, 평단가, 손절가, 배당 계산기",
     description:
-        "수익률 계산기, 평단가 계산기, 손절가 계산기, 본전 회복 계산기, 손익비 계산기, 포지션 사이즈 계산기, 배당 수익 계산기 등 주식 투자에 필요한 전체 계산기를 한 곳에서 확인하세요.",
+        "주식 수익률 계산기, 물타기 평단가 계산기, 손절가 계산기, 목표가 계산기, 본전 회복 계산기, 손익비 계산기, 포지션 사이즈 계산기, 배당 수익 계산기를 한 곳에서 확인하세요.",
     alternates: {
         canonical: "https://주식계산기.kr/calculators",
     },
@@ -20,8 +20,8 @@ export default function CalculatorsPage() {
                         전체 주식 계산기 모음
                     </h1>
                     <p className="mt-6 text-lg leading-relaxed text-slate-500">
-                        수익률, 평단가, 목표가, 손절가, 본전 회복, 손익비, 포지션 사이즈,
-                        배당 수익 계산기까지 한 곳에서 확인할 수 있습니다.
+                        주식 수익률 계산기, 물타기 평단가 계산기, 손절가 계산기, 목표가 계산기,
+                        본전 회복 계산기, 손익비 계산기, 포지션 사이즈 계산기, 배당 수익 계산기를 한 곳에서 확인하세요.
                     </p>
                 </div>
             </section>

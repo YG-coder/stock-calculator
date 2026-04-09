@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
-import { CALCULATORS, POLICY_ROUTES } from "@/lib/constants";
+import { HEADER_CALCULATORS, POLICY_ROUTES } from "@/lib/constants";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,10 +14,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-/* =========================
-   SEO Metadata
-========================= */
-
 export const metadata: Metadata = {
   metadataBase: new URL("https://주식계산기.kr"),
   title: {
@@ -25,7 +21,18 @@ export const metadata: Metadata = {
     template: "%s | 주식계산기.kr",
   },
   description:
-    "손절가 계산기, 수익률 계산기, 평단가 계산기, 목표가 계산기, 본전 회복 계산기를 포함한 8종의 핵심 기능 주식 계산기 모음 사이트입니다.",
+    "손절가 계산기, 수익률 계산기, 평단가 계산기, 목표가 계산기, 본전 회복 계산기, 배당 수익 계산기를 포함한 8종의 핵심 기능 주식 계산기 모음 사이트입니다.",
+  keywords: [
+    "주식 계산기",
+    "손절가 계산기",
+    "평단가 계산기",
+    "수익률 계산기",
+    "목표가 계산기",
+    "물타기 계산기",
+    "본전 회복 계산기",
+    "배당 계산기",
+    "배당 수익 계산기",
+  ],
   alternates: {
     canonical: "https://주식계산기.kr",
   },
@@ -51,35 +58,25 @@ export const metadata: Metadata = {
   },
 };
 
-/* =========================
-   Layout
-========================= */
-
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="ko">
       <head>
-        {/* Google AdSense */}
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6405509957088169"
           crossOrigin="anonymous"
         />
       </head>
-
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 text-slate-900 flex flex-col min-h-screen`}
       >
-        {/* =========================
-            HEADER
-        ========================= */}
         <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-3 px-4 py-4 md:px-6">
-            {/* 로고 */}
             <Link
               href="/"
               className="whitespace-nowrap text-2xl font-extrabold tracking-tight text-slate-900 hover:text-slate-700 transition"
@@ -87,29 +84,22 @@ export default function RootLayout({
               주식계산기.kr
             </Link>
 
-            {/* 네비 */}
             <nav className="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm font-semibold text-slate-600 max-[1100px]:w-full max-[1100px]:justify-center">
-              {CALCULATORS.map((calc) => (
+              {HEADER_CALCULATORS.map((item) => (
                 <Link
-                  key={calc.href}
-                  href={calc.href}
+                  key={item.href}
+                  href={item.href}
                   className="whitespace-nowrap hover:text-slate-900 transition-colors"
                 >
-                  {calc.label}
+                  {item.label}
                 </Link>
               ))}
             </nav>
           </div>
         </header>
 
-        {/* =========================
-            MAIN
-        ========================= */}
-        <main className="flex-grow">{children}</main>
+        <div className="flex-grow">{children}</div>
 
-        {/* =========================
-            FOOTER
-        ========================= */}
         <footer className="border-t border-slate-200 bg-white py-12 text-center text-sm text-slate-500">
           <div className="mx-auto max-w-5xl px-6">
             <div className="flex flex-wrap justify-center gap-4 md:gap-8 mb-8 font-medium">
@@ -123,12 +113,10 @@ export default function RootLayout({
                 </Link>
               ))}
             </div>
-
             <p>
               본 사이트에서 제공하는 계산 결과는 참고용이며, 투자 권유를 의미하지 않습니다.
               투자에 대한 최종 판단과 책임은 사용자에게 있습니다.
             </p>
-
             <p className="mt-6 text-xs text-slate-400">
               © {new Date().getFullYear()} 주식계산기.kr All rights reserved.
             </p>
