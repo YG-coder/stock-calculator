@@ -9,6 +9,9 @@ import {
     ResultDetail,
     InputField,
 } from "@/components/ui/Shared";
+import CurrencyToggle from "@/components/calculator/CurrencyToggle";
+
+type Currency = "KRW" | "USDT";
 
 function formatNumber(value: number, maximumFractionDigits = 2) {
     if (!Number.isFinite(value)) return "0";
@@ -19,12 +22,15 @@ function formatNumber(value: number, maximumFractionDigits = 2) {
 }
 
 export default function CryptoLeverageProfitCalculator() {
+    const [currency, setCurrency] = useState<Currency>("USDT");
     const [entryPrice, setEntryPrice] = useState("");
     const [exitPrice, setExitPrice] = useState("");
     const [margin, setMargin] = useState("");
     const [leverage, setLeverage] = useState("");
     const [positionType, setPositionType] = useState<"long" | "short">("long");
     const [feeRate, setFeeRate] = useState("0.05");
+
+    const moneyUnit = currency === "KRW" ? "원" : "USDT";
 
     const result = useMemo(() => {
         const entry = Number(entryPrice);
@@ -92,12 +98,15 @@ export default function CryptoLeverageProfitCalculator() {
                 title="레버리지 수익 계산 조건 입력"
                 description="진입가, 종료가, 증거금, 레버리지, 포지션 방향을 입력하면 실제 수익과 ROE를 계산합니다."
             >
+                <CurrencyToggle value={currency} onChange={setCurrency} />
+
                 <div className="grid gap-4 sm:grid-cols-2">
                     <InputField
                         id="entryPrice"
                         label="진입 가격"
                         type="number"
-                        placeholder="예: 100000000"
+                        placeholder={currency === "KRW" ? "예: 100000000" : "예: 70000"}
+                        unit={moneyUnit}
                         value={entryPrice}
                         onChange={(e) => setEntryPrice(e.target.value)}
                     />
@@ -105,7 +114,8 @@ export default function CryptoLeverageProfitCalculator() {
                         id="exitPrice"
                         label="종료 가격"
                         type="number"
-                        placeholder="예: 105000000"
+                        placeholder={currency === "KRW" ? "예: 105000000" : "예: 73500"}
+                        unit={moneyUnit}
                         value={exitPrice}
                         onChange={(e) => setExitPrice(e.target.value)}
                     />
@@ -116,8 +126,8 @@ export default function CryptoLeverageProfitCalculator() {
                         id="margin"
                         label="투입 증거금"
                         type="number"
-                        placeholder="예: 1000000"
-                        unit="원"
+                        placeholder={currency === "KRW" ? "예: 1000000" : "예: 1000"}
+                        unit={moneyUnit}
                         value={margin}
                         onChange={(e) => setMargin(e.target.value)}
                     />
@@ -155,6 +165,11 @@ export default function CryptoLeverageProfitCalculator() {
                         onChange={(e) => setFeeRate(e.target.value)}
                     />
                 </div>
+
+                <p className="text-sm leading-relaxed text-slate-500">
+                    KRW / USDT 토글은 환율 자동 변환 기능이 아니라 계산 기준 통화를 선택하는 기능입니다.
+                    선택한 통화 기준으로 직접 값을 입력하세요.
+                </p>
             </CalculatorCard>
 
             <ResultCard
@@ -165,7 +180,7 @@ export default function CryptoLeverageProfitCalculator() {
                 <ResultHighlight
                     label="실제 순손익"
                     value={formatNumber(result.netPnl)}
-                    unit="원"
+                    unit={moneyUnit}
                     tone={tone}
                 />
 
@@ -173,7 +188,7 @@ export default function CryptoLeverageProfitCalculator() {
                     <ResultDetail
                         label="포지션 규모"
                         value={formatNumber(result.positionSize)}
-                        unit="원"
+                        unit={moneyUnit}
                     />
                     <ResultDetail
                         label="가격 변동률"
@@ -183,12 +198,12 @@ export default function CryptoLeverageProfitCalculator() {
                     <ResultDetail
                         label="수수료 반영 전 손익"
                         value={formatNumber(result.grossPnl)}
-                        unit="원"
+                        unit={moneyUnit}
                     />
                     <ResultDetail
                         label="총 수수료"
                         value={formatNumber(result.totalFee)}
-                        unit="원"
+                        unit={moneyUnit}
                     />
                     <ResultDetail
                         label="증거금 대비 수익률(ROE)"
