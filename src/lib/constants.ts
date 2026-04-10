@@ -78,6 +78,12 @@ export const CALCULATORS = [
     desc: "청산가, 수익률, 물타기 계산기 허브",
     badge: "암호화폐",
   },
+  {
+    href: "/crypto/entry",
+    title: "코인 100배 진입 계산기",
+    desc: "손절폭 기준 권장 배율, 주문 명목가치, 익절가 계산",
+    badge: "진입 전략",
+  },
 ];
 
 export const HEADER_CALCULATORS = [
