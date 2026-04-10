@@ -231,4 +231,73 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
             },
         ],
     },
+    "crypto-profit-calculator": {
+        slug: "crypto-profit-calculator",
+        metadata: {
+            title: "코인 수익 계산기 | 비트코인·이더리움 수익률 및 순수익 계산",
+            description:
+                "매수 가격, 매도 가격, 보유 수량, 거래 수수료를 기준으로 코인 실제 수익과 수익률을 계산하는 코인 수익 계산기입니다.",
+            keywords: [
+                "코인 수익 계산기",
+                "비트코인 수익 계산기",
+                "암호화폐 수익률 계산기",
+                "코인 수수료 계산",
+                "crypto profit calculator",
+            ],
+            openGraph: {
+                title: "코인 수익 계산기 | 비트코인·이더리움 수익률 및 순수익 계산",
+                description:
+                    "암호화폐 매수·매도 가격과 수수료를 반영해 실제 순수익과 수익률을 계산하세요.",
+                type: "website",
+            },
+        },
+        badge: "수익 계산",
+        title: "코인 수익 계산기",
+        headerDescription:
+            "코인 수익 계산기는 암호화폐 매수 가격, 매도 가격, 수량, 거래 수수료를 기준으로 실제 순수익과 수익률을 계산하는 도구입니다.",
+        articleTitle: "코인 수익 계산기란?",
+        articleIntro:
+            "비트코인, 이더리움 같은 암호화폐 거래에서 매수·매도 가격과 수수료를 반영해 실제 수익을 계산하는 도구입니다.",
+        articleBody:
+            "코인 거래는 가격 변동뿐 아니라 거래 수수료도 실제 수익에 영향을 줍니다. 따라서 단순 가격 차이만 보는 것이 아니라 매수 수수료와 매도 수수료까지 함께 반영해 순수익을 확인하는 것이 중요합니다.",
+        formulaTitle: "코인 수익 계산 기본 개념",
+        formula:
+            "순수익 = (매도금액 - 매도수수료) - (매수금액 + 매수수수료)",
+        formulaDescription:
+            "실제 수익률은 매수·매도 수수료를 모두 반영한 순수익을 기준으로 계산하는 것이 가장 정확합니다.",
+        faqs: [
+            {
+                question: "코인 수익 계산 시 수수료를 꼭 넣어야 하나요?",
+                answer:
+                    "네. 수수료를 빼고 보면 실제 순수익보다 높게 보일 수 있어 정확한 판단이 어렵습니다.",
+            },
+            {
+                question: "업비트, 바이낸스, 비트겟 수수료가 다른데 적용 가능한가요?",
+                answer:
+                    "네. 거래소별 수수료율이 다르므로 매수·매도 수수료율을 직접 입력해 반영할 수 있습니다.",
+            },
+            {
+                question: "수량은 소수점으로 입력해도 되나요?",
+                answer:
+                    "네. 비트코인이나 이더리움처럼 소수점 단위로 거래하는 코인도 반영할 수 있습니다.",
+            },
+        ],
+        related: [
+            {
+                href: "/crypto",
+                title: "코인 계산기 모음",
+                desc: "청산가, 수익률, 물타기 계산기 한 곳에서 확인",
+            },
+            {
+                href: "/crypto/liquidation",
+                title: "코인 청산가 계산기",
+                desc: "레버리지 거래 시 예상 청산 가격 계산",
+            },
+            {
+                href: "/profit-calculator",
+                title: "주식 수익률 계산기",
+                desc: "기본 수익률 계산 구조 비교",
+            },
+        ],
+    },
 };

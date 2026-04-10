@@ -18,7 +18,7 @@ const calculators = [
     },
     {
         title: "코인 수익 계산기",
-        desc: "매수/매도 가격 기준 수익률을 계산합니다.",
+        desc: "매수/매도 가격과 수수료 기준 실제 수익률을 계산합니다.",
         href: "/crypto/profit",
     },
     {
