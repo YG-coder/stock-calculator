@@ -503,6 +503,11 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
         formula: "펀딩비 = 포지션 규모 × 펀딩비율 × 적용 횟수",
         formulaDescription:
             "펀딩비율이 양수인지 음수인지에 따라 롱 또는 숏 포지션이 지급하거나 수령하게 됩니다.",
+
+        exampleTitle: "펀딩비 계산 예시",
+        exampleBody:
+            "예를 들어 10,000 USDT 규모의 포지션을 보유하고 있고, 펀딩비율이 0.01%이며 하루 동안 3번 펀딩비가 적용된다고 가정해보겠습니다. 이 경우 1회당 펀딩비는 1 USDT이고, 총 3 USDT가 누적됩니다. 포지션 규모가 크거나 장시간 포지션을 유지할수록 누적 펀딩비 부담이 커질 수 있으므로, 단기 수익뿐 아니라 펀딩비까지 함께 계산하는 것이 중요합니다.",
+
         faqs: [
             {
                 question: "펀딩비는 항상 지급만 하나요?",
@@ -519,7 +524,13 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 answer:
                     "네. 거래소마다 펀딩비율과 적용 주기가 다를 수 있으므로 실제 거래소 기준과 함께 확인하는 것이 좋습니다.",
             },
+            {
+                question: "펀딩비는 수익 계산기와 별도로 봐야 하나요?",
+                answer:
+                    "네. 레버리지 거래에서는 가격 변동으로 인한 손익과 펀딩비가 별도로 누적되기 때문에, 실제 순수익을 보려면 두 요소를 함께 확인하는 것이 좋습니다.",
+            },
         ],
+
         related: [
             {
                 href: "/crypto",
