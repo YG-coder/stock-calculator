@@ -46,7 +46,7 @@ export default function CryptoPage() {
             {/* 계산기 리스트 */}
             <div className="mx-auto max-w-5xl px-6 py-16">
                 <section className="grid gap-6 sm:grid-cols-2 mb-16">
-                    {CALCULATORS.filter((c) => c.href.startsWith("/crypto")).map(
+                    {CALCULATORS.filter((c) => c.category === "crypto").map(
                         (calc) => (
                             <Link
                                 key={calc.href}
