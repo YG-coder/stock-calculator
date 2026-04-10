@@ -71,6 +71,13 @@ export const CALCULATORS = [
     desc: "양도소득세와 세후 수익 계산",
     badge: "세금 분석",
   },
+  {
+    href: "/crypto",
+    label: "코인 계산기",
+    title: "코인 계산기 모음",
+    desc: "청산가, 수익률, 물타기 계산기 허브",
+    badge: "암호화폐",
+  },
 ];
 
 export const HEADER_CALCULATORS = [
@@ -81,6 +88,7 @@ export const HEADER_CALCULATORS = [
   { href: "/compound-interest-calculator", label: "복리 계산기" },
   { href: "/overseas-stock-tax-calculator", label: "해외주식 세금" },
   { href: "/calculators", label: "전체 계산기" },
+  { href: "/crypto", label: "코인 계산기" },
 ];
 
 export const POLICY_ROUTES = [

@@ -162,4 +162,73 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
             },
         ],
     },
+    "crypto-liquidation-calculator": {
+        slug: "crypto-liquidation-calculator",
+        metadata: {
+            title: "코인 청산가 계산기 | 레버리지 롱·숏 청산 가격 계산",
+            description:
+                "비트코인, 이더리움 등 암호화폐 선물 거래에서 레버리지와 진입가를 기준으로 예상 청산 가격을 계산하는 코인 청산가 계산기입니다.",
+            keywords: [
+                "코인 청산가 계산기",
+                "비트코인 청산가",
+                "레버리지 계산기",
+                "선물 청산가 계산",
+                "crypto liquidation calculator",
+            ],
+            openGraph: {
+                title: "코인 청산가 계산기 | 레버리지 롱·숏 청산 가격 계산",
+                description:
+                    "암호화폐 선물 거래에서 레버리지와 포지션 방향에 따라 예상 청산 가격을 빠르게 계산하세요.",
+                type: "website",
+            },
+        },
+        badge: "레버리지 관리",
+        title: "코인 청산가 계산기",
+        headerDescription:
+            "코인 청산가 계산기는 암호화폐 선물 거래에서 진입 가격, 레버리지, 포지션 방향을 기준으로 예상 청산 가격을 계산하는 도구입니다.",
+        articleTitle: "코인 청산가 계산기란?",
+        articleIntro:
+            "비트코인, 이더리움 같은 암호화폐 선물 거래에서 청산 위험 구간을 미리 계산하는 도구입니다.",
+        articleBody:
+            "레버리지가 높을수록 작은 가격 변동에도 청산될 수 있기 때문에, 진입 전에 청산 가격을 확인하는 것이 중요합니다. 특히 고배율 거래에서는 손절 전략과 함께 청산가 계산이 필수입니다.",
+        formulaTitle: "청산가 계산 기본 개념",
+        formula:
+            "롱: 진입가 × (1 - 1/레버리지 + 유지증거금률) / 숏: 진입가 × (1 + 1/레버리지 - 유지증거금률)",
+        formulaDescription:
+            "실제 거래소별 청산가는 수수료, 유지증거금률, 계약 방식에 따라 달라질 수 있으며, 본 계산기는 대표적인 예측값을 제공합니다.",
+        faqs: [
+            {
+                question: "청산가는 거래소마다 다른가요?",
+                answer:
+                    "네. 거래소마다 유지증거금률, 수수료, 계약 방식이 달라 실제 청산가는 약간 다를 수 있습니다.",
+            },
+            {
+                question: "롱과 숏의 청산가 계산 방식은 다른가요?",
+                answer:
+                    "네. 롱은 가격이 하락할 때 청산 위험이 커지고, 숏은 가격이 상승할 때 청산 위험이 커집니다.",
+            },
+            {
+                question: "고배율일수록 왜 위험한가요?",
+                answer:
+                    "레버리지가 높을수록 진입가 대비 청산 가격 간격이 좁아져 작은 변동에도 청산될 수 있기 때문입니다.",
+            },
+        ],
+        related: [
+            {
+                href: "/crypto",
+                title: "코인 계산기 모음",
+                desc: "청산가, 수익률, 물타기 계산기 한 곳에서 확인",
+            },
+            {
+                href: "/compound-interest-calculator",
+                title: "복리 계산기",
+                desc: "장기 투자 시 예상 최종 금액 계산",
+            },
+            {
+                href: "/profit-calculator",
+                title: "주식 수익률 계산기",
+                desc: "기본 수익률 계산 구조 참고",
+            },
+        ],
+    },
 };
