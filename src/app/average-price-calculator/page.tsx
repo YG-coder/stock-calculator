@@ -56,14 +56,16 @@ export default function AveragePriceCalculatorPage() {
 
           <Article title="평단가 계산 방법은?">
             <p>평단가는 총 매수 금액을 총 보유 수량으로 나누어 계산합니다.</p>
-            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 my-6 text-center">
-              <p className="font-mono text-sm sm:text-lg text-slate-800 font-bold tracking-tight">
-                (기존 매수가 × 기존 수량) + (추가 매수가 × 추가 수량)
-                <br />
-                ─────────────────────────
-                <br />
-                (기존 수량 + 추가 수량)
-              </p>
+            <div className="my-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-6">
+              <div className="mx-auto max-w-md text-center font-mono font-bold text-slate-800">
+                <div className="break-keep text-base leading-relaxed sm:text-lg">
+                  (기존 매수가 × 기존 수량) + (추가 매수가 × 추가 수량)
+                </div>
+                <div className="my-3 border-t-2 border-slate-700" />
+                <div className="break-keep text-base leading-relaxed sm:text-lg">
+                  (기존 수량 + 추가 수량)
+                </div>
+              </div>
             </div>
             <p>
               여러 번 나누어 매수한 경우 단순 평균이 아니라 매수 금액 비중까지 반영해야 정확한 평균 단가를 구할 수 있습니다.
