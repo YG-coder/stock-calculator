@@ -64,6 +64,13 @@ export const CALCULATORS = [
     desc: "초기 투자금과 추가 투자금을 반영한 복리 수익 계산",
     badge: "장기 투자",
   },
+  {
+    href: "/overseas-stock-tax-calculator",
+    label: "해외주식 세금",
+    title: "해외주식 세금 계산기",
+    desc: "양도소득세와 세후 수익 계산",
+    badge: "세금 분석",
+  },
 ];
 
 export const HEADER_CALCULATORS = [
@@ -72,6 +79,7 @@ export const HEADER_CALCULATORS = [
   { href: "/stop-loss-calculator", label: "손절가" },
   { href: "/dividend-calculator", label: "배당 수익" },
   { href: "/compound-interest-calculator", label: "복리 계산기" },
+  { href: "/overseas-stock-tax-calculator", label: "해외주식 세금" },
   { href: "/calculators", label: "전체 계산기" },
 ];
 
