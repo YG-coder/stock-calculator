@@ -9,6 +9,9 @@ import {
     ResultDetail,
     InputField,
 } from "@/components/ui/Shared";
+import CurrencyToggle from "@/components/calculator/CurrencyToggle";
+
+type Currency = "KRW" | "USDT";
 
 function formatNumber(value: number, maximumFractionDigits = 2) {
     if (!Number.isFinite(value)) return "0";
@@ -19,11 +22,14 @@ function formatNumber(value: number, maximumFractionDigits = 2) {
 }
 
 export default function CryptoLiquidationCalculator() {
+    const [currency, setCurrency] = useState<Currency>("USDT");
     const [entryPrice, setEntryPrice] = useState("");
     const [leverage, setLeverage] = useState("");
     const [marginType, setMarginType] = useState<"isolated" | "cross">("isolated");
     const [positionType, setPositionType] = useState<"long" | "short">("long");
     const [maintenanceMarginRate, setMaintenanceMarginRate] = useState("0.5");
+
+    const priceUnit = currency === "KRW" ? "원" : "USDT";
 
     const result = useMemo(() => {
         const entry = Number(entryPrice);
@@ -86,12 +92,15 @@ export default function CryptoLiquidationCalculator() {
                 title="코인 청산가 조건 입력"
                 description="진입 가격, 레버리지, 포지션 방향을 입력하면 예상 청산 가격을 계산합니다."
             >
+                <CurrencyToggle value={currency} onChange={setCurrency} />
+
                 <div className="grid gap-4 sm:grid-cols-2">
                     <InputField
                         id="entryPrice"
                         label="진입 가격"
                         type="number"
-                        placeholder="예: 100000"
+                        placeholder={currency === "KRW" ? "예: 100000000" : "예: 70000"}
+                        unit={priceUnit}
                         value={entryPrice}
                         onChange={(e) => setEntryPrice(e.target.value)}
                     />
@@ -142,6 +151,11 @@ export default function CryptoLiquidationCalculator() {
                     value={maintenanceMarginRate}
                     onChange={(e) => setMaintenanceMarginRate(e.target.value)}
                 />
+
+                <p className="text-sm leading-relaxed text-slate-500">
+                    선택한 통화 단위에 맞춰 직접 입력하세요. KRW/USDT 토글은 환율 변환 기능이 아니라
+                    계산 기준 통화를 선택하는 기능입니다.
+                </p>
             </CalculatorCard>
 
             <ResultCard
@@ -152,6 +166,7 @@ export default function CryptoLiquidationCalculator() {
                 <ResultHighlight
                     label="예상 청산 가격"
                     value={formatNumber(result.liquidationPrice)}
+                    unit={priceUnit}
                     tone="negative"
                 />
 
@@ -159,6 +174,7 @@ export default function CryptoLiquidationCalculator() {
                     <ResultDetail
                         label="파산 가격(이론값)"
                         value={formatNumber(result.bankruptcyPrice)}
+                        unit={priceUnit}
                     />
                     <ResultDetail
                         label="진입가 대비 변동 폭"
