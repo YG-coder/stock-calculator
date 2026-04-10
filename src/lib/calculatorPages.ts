@@ -438,4 +438,72 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
             },
         ],
     },
+    "crypto-funding-fee-calculator": {
+        slug: "crypto-funding-fee-calculator",
+        metadata: {
+            title: "펀딩비 계산기 | 코인 선물 Funding Fee 예상 금액 계산",
+            description:
+                "암호화폐 선물 거래에서 포지션 규모, 펀딩비율, 적용 횟수를 기준으로 예상 펀딩비를 계산하는 펀딩비 계산기입니다.",
+            keywords: [
+                "펀딩비 계산기",
+                "funding fee calculator",
+                "코인 펀딩비",
+                "비트코인 펀딩비",
+                "선물 펀딩비 계산",
+            ],
+            openGraph: {
+                title: "펀딩비 계산기 | 코인 선물 Funding Fee 예상 금액 계산",
+                description:
+                    "암호화폐 선물 거래에서 예상 펀딩비를 계산하고 롱·숏 포지션별 지급/수령 구조를 확인하세요.",
+                type: "website",
+            },
+        },
+        badge: "펀딩비 분석",
+        title: "펀딩비 계산기",
+        headerDescription:
+            "펀딩비 계산기는 암호화폐 선물 거래에서 포지션 규모, 펀딩비율, 적용 횟수를 기준으로 예상 펀딩비를 계산하는 도구입니다.",
+        articleTitle: "펀딩비 계산기란?",
+        articleIntro:
+            "비트코인, 이더리움 등 암호화폐 선물 거래에서 펀딩비 지급 또는 수령 금액을 계산하는 도구입니다.",
+        articleBody:
+            "펀딩비는 선물 가격과 현물 가격의 괴리를 조정하기 위해 정해지는 비용입니다. 포지션 규모가 클수록, 펀딩비율이 높을수록 실제 손익에 미치는 영향이 커지므로 거래 전에 꼭 확인하는 것이 좋습니다.",
+        formulaTitle: "펀딩비 계산 기본 개념",
+        formula: "펀딩비 = 포지션 규모 × 펀딩비율 × 적용 횟수",
+        formulaDescription:
+            "펀딩비율이 양수인지 음수인지에 따라 롱 또는 숏 포지션이 지급하거나 수령하게 됩니다.",
+        faqs: [
+            {
+                question: "펀딩비는 항상 지급만 하나요?",
+                answer:
+                    "아니요. 펀딩비율이 양수인지 음수인지, 그리고 롱·숏 포지션인지에 따라 지급 또는 수령할 수 있습니다.",
+            },
+            {
+                question: "펀딩비는 수익에 큰 영향을 주나요?",
+                answer:
+                    "네. 포지션 규모가 크거나 장시간 포지션을 유지할수록 누적 펀딩비가 실제 수익에 큰 영향을 줄 수 있습니다.",
+            },
+            {
+                question: "거래소마다 펀딩비가 다른가요?",
+                answer:
+                    "네. 거래소마다 펀딩비율과 적용 주기가 다를 수 있으므로 실제 거래소 기준과 함께 확인하는 것이 좋습니다.",
+            },
+        ],
+        related: [
+            {
+                href: "/crypto",
+                title: "코인 계산기 모음",
+                desc: "청산가, 수익, 물타기 계산기 한 곳에서 확인",
+            },
+            {
+                href: "/crypto/leverage-profit",
+                title: "코인 레버리지 수익 계산기",
+                desc: "롱·숏 포지션의 실제 수익과 ROE 계산",
+            },
+            {
+                href: "/crypto/liquidation",
+                title: "코인 청산가 계산기",
+                desc: "레버리지 거래 시 예상 청산 가격 계산",
+            },
+        ],
+    },
 };

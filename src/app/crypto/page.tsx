@@ -2,9 +2,9 @@ import Link from "next/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "코인 계산기 모음 | 청산가, 레버리지 수익, 수익률, 물타기 계산기",
+    title: "코인 계산기 모음 | 청산가, 레버리지 수익, 수익률, 물타기, 펀딩비 계산기",
     description:
-        "비트코인, 이더리움 등 암호화폐 투자에 필요한 청산가 계산기, 레버리지 수익 계산기, 코인 수익 계산기, 물타기 계산기를 한 곳에서 확인하세요.",
+        "비트코인, 이더리움 등 암호화폐 투자에 필요한 청산가 계산기, 레버리지 수익 계산기, 코인 수익 계산기, 물타기 계산기, 펀딩비 계산기를 한 곳에서 확인하세요.",
     alternates: {
         canonical: "https://주식계산기.kr/crypto",
     },
@@ -31,6 +31,11 @@ const calculators = [
         desc: "추가 매수 시 평균 단가를 계산합니다.",
         href: "/crypto/average",
     },
+    {
+        title: "펀딩비 계산기",
+        desc: "포지션 규모와 펀딩비율 기준 예상 펀딩비를 계산합니다.",
+        href: "/crypto/funding-fee",
+    },
 ];
 
 export default function CryptoPage() {
@@ -40,7 +45,7 @@ export default function CryptoPage() {
 
             <p className="mb-12 leading-relaxed text-slate-600">
                 암호화폐 투자 시 반드시 필요한 핵심 계산기들을 한 곳에 모았습니다.
-                레버리지 청산가, 선물 수익, 현물 수익률, 물타기 계산까지 빠르게 확인하세요.
+                레버리지 청산가, 선물 수익, 현물 수익률, 물타기, 펀딩비 계산까지 빠르게 확인하세요.
             </p>
 
             <div className="grid gap-6 md:grid-cols-2">
