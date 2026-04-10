@@ -198,6 +198,11 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
             "롱: 진입가 × (1 - 1/레버리지 + 유지증거금률) / 숏: 진입가 × (1 + 1/레버리지 - 유지증거금률)",
         formulaDescription:
             "실제 거래소별 청산가는 수수료, 유지증거금률, 계약 방식에 따라 달라질 수 있으며, 본 계산기는 대표적인 예측값을 제공합니다.",
+
+        exampleTitle: "코인 청산가 계산 예시",
+        exampleBody:
+            "예를 들어 비트코인을 70,000 USDT에 10배 레버리지로 롱 포지션에 진입했다고 가정해보겠습니다. 이 경우 가격이 약 10% 하락하면 이론적으로 자본이 모두 소진될 수 있으며, 실제 청산 가격은 유지증거금률을 반영해 그보다 조금 높은 구간에서 발생합니다. 반대로 숏 포지션에서는 가격이 상승할 때 청산 위험이 커지므로, 진입 전 반드시 청산가를 계산해 리스크를 관리해야 합니다.",
+
         faqs: [
             {
                 question: "청산가는 거래소마다 다른가요?",
@@ -214,7 +219,13 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 answer:
                     "레버리지가 높을수록 진입가 대비 청산 가격 간격이 좁아져 작은 변동에도 청산될 수 있기 때문입니다.",
             },
+            {
+                question: "청산가와 손절가는 같은 개념인가요?",
+                answer:
+                    "아니요. 청산가는 강제 종료되는 가격이고, 손절가는 투자자가 직접 설정하는 리스크 관리 기준입니다. 일반적으로 청산가보다 훨씬 여유 있게 손절가를 설정하는 것이 안전합니다.",
+            },
         ],
+
         related: [
             {
                 href: "/crypto",
@@ -222,14 +233,14 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 desc: "청산가, 수익률, 물타기 계산기 한 곳에서 확인",
             },
             {
-                href: "/compound-interest-calculator",
-                title: "복리 계산기",
-                desc: "장기 투자 시 예상 최종 금액 계산",
+                href: "/crypto/leverage-profit",
+                title: "코인 레버리지 수익 계산기",
+                desc: "롱·숏 포지션의 실제 수익과 ROE 계산",
             },
             {
-                href: "/profit-calculator",
-                title: "주식 수익률 계산기",
-                desc: "기본 수익률 계산 구조 참고",
+                href: "/crypto/profit",
+                title: "코인 수익 계산기",
+                desc: "현물 거래 기준 실제 순수익 계산",
             },
         ],
     },
