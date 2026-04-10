@@ -300,4 +300,73 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
             },
         ],
     },
+    "crypto-average-calculator": {
+        slug: "crypto-average-calculator",
+        metadata: {
+            title: "코인 물타기 계산기 | 비트코인·이더리움 평균 단가 계산",
+            description:
+                "암호화폐 추가 매수 시 평균 매입 단가가 어떻게 달라지는지 계산하는 코인 물타기 계산기입니다. 비트코인, 이더리움 등 코인의 평균 단가를 쉽게 확인할 수 있습니다.",
+            keywords: [
+                "코인 물타기 계산기",
+                "코인 평단가 계산기",
+                "비트코인 평균단가",
+                "암호화폐 물타기",
+                "crypto average calculator",
+            ],
+            openGraph: {
+                title: "코인 물타기 계산기 | 비트코인·이더리움 평균 단가 계산",
+                description:
+                    "추가 매수 후 코인 평균 단가가 어떻게 바뀌는지 계산해보세요. 물타기 전략 판단에 도움이 됩니다.",
+                type: "website",
+            },
+        },
+        badge: "평균 단가",
+        title: "코인 물타기 계산기",
+        headerDescription:
+            "코인 물타기 계산기는 기존 매수 가격과 추가 매수 가격, 보유 수량을 기준으로 새로운 평균 매입 단가를 계산하는 도구입니다.",
+        articleTitle: "코인 물타기 계산기란?",
+        articleIntro:
+            "비트코인, 이더리움 같은 암호화폐를 추가 매수할 때 평균 단가가 어떻게 변하는지 계산하는 도구입니다.",
+        articleBody:
+            "코인 시장은 변동성이 크기 때문에 단순 감으로 물타기를 하면 위험할 수 있습니다. 추가 매수 후 평균 단가를 미리 계산해두면 손익분기점과 이후 대응 전략을 더 명확하게 판단할 수 있습니다.",
+        formulaTitle: "코인 평균 단가 계산 기본 개념",
+        formula:
+            "평균 단가 = (기존 매수금액 + 추가 매수금액) ÷ 총 보유 수량",
+        formulaDescription:
+            "단순 평균이 아니라 실제 매수 금액 비중과 수량을 함께 반영해야 정확한 평균 단가를 구할 수 있습니다.",
+        faqs: [
+            {
+                question: "코인도 물타기 계산이 필요한가요?",
+                answer:
+                    "네. 암호화폐는 가격 변동이 크기 때문에 추가 매수 후 평균 단가가 어떻게 변하는지 확인하는 것이 중요합니다.",
+            },
+            {
+                question: "소수점 수량도 계산 가능한가요?",
+                answer:
+                    "네. 비트코인, 이더리움처럼 소수점 단위로 거래하는 코인도 계산할 수 있습니다.",
+            },
+            {
+                question: "물타기를 하면 항상 유리한가요?",
+                answer:
+                    "아니요. 평균 단가는 낮아질 수 있지만 추가 자금이 들어가므로 손절가와 목표가를 함께 고려해야 합니다.",
+            },
+        ],
+        related: [
+            {
+                href: "/crypto",
+                title: "코인 계산기 모음",
+                desc: "청산가, 수익률, 물타기 계산기 한 곳에서 확인",
+            },
+            {
+                href: "/crypto/profit",
+                title: "코인 수익 계산기",
+                desc: "매수·매도 가격과 수수료 기준 순수익 계산",
+            },
+            {
+                href: "/average-price-calculator",
+                title: "주식 평단가 계산기",
+                desc: "주식 물타기 평균 단가 계산",
+            },
+        ],
+    },
 };
