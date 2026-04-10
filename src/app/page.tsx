@@ -71,15 +71,6 @@ export default function HomePage() {
           ))}
         </section>
 
-        <div className="mb-16 text-center">
-          <Link
-            href="/calculators"
-            className="inline-flex items-center rounded-2xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
-          >
-            전체 계산기 보기
-          </Link>
-        </div>
-
         <SectionCard>
           <Article title="왜 주식 계산기가 필요한가요?">
             <p>
