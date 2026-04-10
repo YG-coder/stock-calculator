@@ -80,8 +80,8 @@ export default function CryptoEntryCalculator() {
     return (
         <CalculatorLayout>
             <CalculatorCard
-                title="100배 진입 계산 조건 입력"
-                description="진입가, 손절가, 시드, 리스크 비율, 손익비를 입력하면 권장 배율과 주문 명목가치를 계산합니다."
+                title="코인 100배 진입 계산기"
+                description="진입가, 손절가, 시드, 리스크 비율, 손익비를 입력하면 손절폭 기준 권장 배율, 주문 금액, 익절가를 계산할 수 있습니다."
             >
                 <CurrencyToggle value={currency} onChange={setCurrency} />
 
@@ -138,7 +138,7 @@ export default function CryptoEntryCalculator() {
 
                 <p className="text-sm leading-relaxed text-slate-500">
                     KRW / USDT 토글은 환율 자동 변환이 아니라 계산 기준 통화를 선택하는 기능입니다.
-                    이 계산기는 엑셀 구조와 동일하게 손절폭을 기준으로 배율과 주문 명목가치를 계산합니다.
+                    손절폭을 기준으로 권장 배율과 주문 금액을 계산하는 방식입니다.
                 </p>
             </CalculatorCard>
 
