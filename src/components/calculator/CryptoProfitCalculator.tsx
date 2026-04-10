@@ -9,6 +9,9 @@ import {
     ResultDetail,
     InputField,
 } from "@/components/ui/Shared";
+import CurrencyToggle from "@/components/calculator/CurrencyToggle";
+
+type Currency = "KRW" | "USDT";
 
 function formatNumber(value: number, maximumFractionDigits = 2) {
     if (!Number.isFinite(value)) return "0";
@@ -19,11 +22,14 @@ function formatNumber(value: number, maximumFractionDigits = 2) {
 }
 
 export default function CryptoProfitCalculator() {
+    const [currency, setCurrency] = useState<Currency>("USDT");
     const [buyPrice, setBuyPrice] = useState("");
     const [sellPrice, setSellPrice] = useState("");
     const [quantity, setQuantity] = useState("");
     const [buyFeeRate, setBuyFeeRate] = useState("0.05");
     const [sellFeeRate, setSellFeeRate] = useState("0.05");
+
+    const moneyUnit = currency === "KRW" ? "원" : "USDT";
 
     const result = useMemo(() => {
         const buy = Number(buyPrice);
@@ -88,12 +94,15 @@ export default function CryptoProfitCalculator() {
                 title="코인 수익 계산 조건 입력"
                 description="매수 가격, 매도 가격, 수량, 수수료를 입력하면 실제 수익과 수익률을 계산합니다."
             >
+                <CurrencyToggle value={currency} onChange={setCurrency} />
+
                 <div className="grid gap-4 sm:grid-cols-2">
                     <InputField
                         id="buyPrice"
                         label="매수 가격"
                         type="number"
-                        placeholder="예: 100000000"
+                        placeholder={currency === "KRW" ? "예: 100000000" : "예: 70000"}
+                        unit={moneyUnit}
                         value={buyPrice}
                         onChange={(e) => setBuyPrice(e.target.value)}
                     />
@@ -101,7 +110,8 @@ export default function CryptoProfitCalculator() {
                         id="sellPrice"
                         label="매도 가격"
                         type="number"
-                        placeholder="예: 110000000"
+                        placeholder={currency === "KRW" ? "예: 110000000" : "예: 77000"}
+                        unit={moneyUnit}
                         value={sellPrice}
                         onChange={(e) => setSellPrice(e.target.value)}
                     />
@@ -136,6 +146,11 @@ export default function CryptoProfitCalculator() {
                         onChange={(e) => setSellFeeRate(e.target.value)}
                     />
                 </div>
+
+                <p className="text-sm leading-relaxed text-slate-500">
+                    KRW / USDT 토글은 환율 자동 변환 기능이 아니라 계산 기준 통화를 선택하는 기능입니다.
+                    선택한 통화 기준으로 직접 값을 입력하세요.
+                </p>
             </CalculatorCard>
 
             <ResultCard
@@ -144,8 +159,9 @@ export default function CryptoProfitCalculator() {
                 isValid={result.valid}
             >
                 <ResultHighlight
-                    label="세전/세후 반영 실제 순수익"
+                    label="실제 순손익"
                     value={formatNumber(result.netProfit)}
+                    unit={moneyUnit}
                     tone={tone}
                 />
 
@@ -153,14 +169,17 @@ export default function CryptoProfitCalculator() {
                     <ResultDetail
                         label="총 매수 금액(수수료 포함)"
                         value={formatNumber(result.totalBuy)}
+                        unit={moneyUnit}
                     />
                     <ResultDetail
                         label="총 매도 금액(수수료 차감)"
                         value={formatNumber(result.totalSell)}
+                        unit={moneyUnit}
                     />
                     <ResultDetail
                         label="총 수수료"
                         value={formatNumber(result.totalFee)}
+                        unit={moneyUnit}
                     />
                     <ResultDetail
                         label="수익률"
@@ -170,10 +189,12 @@ export default function CryptoProfitCalculator() {
                     <ResultDetail
                         label="수수료 반영 전 손익"
                         value={formatNumber(result.grossProfit)}
+                        unit={moneyUnit}
                     />
                     <ResultDetail
                         label="실제 순손익"
                         value={formatNumber(result.netProfit)}
+                        unit={moneyUnit}
                     />
                 </div>
             </ResultCard>
