@@ -369,4 +369,73 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
             },
         ],
     },
+    "crypto-leverage-profit-calculator": {
+        slug: "crypto-leverage-profit-calculator",
+        metadata: {
+            title: "코인 레버리지 수익 계산기 | 롱·숏 선물 수익률 및 ROE 계산",
+            description:
+                "암호화폐 선물 거래에서 진입가, 종료가, 증거금, 레버리지를 기준으로 실제 수익과 ROE를 계산하는 코인 레버리지 수익 계산기입니다.",
+            keywords: [
+                "코인 레버리지 수익 계산기",
+                "비트코인 선물 수익 계산기",
+                "롱 숏 수익 계산기",
+                "ROE 계산기",
+                "crypto leverage profit calculator",
+            ],
+            openGraph: {
+                title: "코인 레버리지 수익 계산기 | 롱·숏 선물 수익률 및 ROE 계산",
+                description:
+                    "암호화폐 선물 거래에서 레버리지와 포지션 방향을 반영한 실제 수익과 ROE를 계산해보세요.",
+                type: "website",
+            },
+        },
+        badge: "선물 수익",
+        title: "코인 레버리지 수익 계산기",
+        headerDescription:
+            "코인 레버리지 수익 계산기는 암호화폐 선물 거래에서 진입가, 종료가, 증거금, 레버리지를 기준으로 실제 수익과 증거금 대비 수익률을 계산하는 도구입니다.",
+        articleTitle: "코인 레버리지 수익 계산기란?",
+        articleIntro:
+            "비트코인, 이더리움 같은 암호화폐 선물 거래에서 롱·숏 포지션의 실제 수익과 ROE를 계산하는 도구입니다.",
+        articleBody:
+            "현물 수익 계산과 달리 레버리지 거래는 증거금 대비 수익률이 크게 달라지고, 거래 수수료도 실제 순수익에 큰 영향을 줍니다. 따라서 진입 전과 청산 전에 실제 수익 구조를 정확히 계산하는 것이 중요합니다.",
+        formulaTitle: "레버리지 수익 계산 기본 개념",
+        formula:
+            "순수익 = (포지션 규모 × 가격 변동률) - 진입 수수료 - 종료 수수료",
+        formulaDescription:
+            "포지션 규모는 증거금 × 레버리지로 계산하며, 실제 수익률은 총 수수료까지 반영해 계산하는 것이 정확합니다.",
+        faqs: [
+            {
+                question: "ROE는 무엇인가요?",
+                answer:
+                    "ROE는 증거금 대비 수익률입니다. 같은 가격 변동이라도 레버리지가 높을수록 ROE가 크게 변합니다.",
+            },
+            {
+                question: "롱과 숏 수익 계산 방식은 다른가요?",
+                answer:
+                    "네. 롱은 가격 상승 시 수익이 나고, 숏은 가격 하락 시 수익이 납니다.",
+            },
+            {
+                question: "수수료를 꼭 넣어야 하나요?",
+                answer:
+                    "네. 선물 거래는 진입과 종료 모두 수수료가 발생하므로 실제 순수익을 보려면 반드시 반영하는 것이 좋습니다.",
+            },
+        ],
+        related: [
+            {
+                href: "/crypto",
+                title: "코인 계산기 모음",
+                desc: "청산가, 수익률, 물타기 계산기 한 곳에서 확인",
+            },
+            {
+                href: "/crypto/liquidation",
+                title: "코인 청산가 계산기",
+                desc: "레버리지 거래 시 예상 청산 가격 계산",
+            },
+            {
+                href: "/crypto/profit",
+                title: "코인 수익 계산기",
+                desc: "현물 거래 기준 실제 순수익 계산",
+            },
+        ],
+    },
 };
