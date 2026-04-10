@@ -18,6 +18,8 @@ export type CalculatorPageConfig = {
     formulaTitle?: string;
     formula?: string;
     formulaDescription?: string;
+    exampleTitle?: string;
+    exampleBody?: string;
     faqs?: {
         question: string;
         answer: string;
@@ -403,6 +405,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
             "순수익 = (포지션 규모 × 가격 변동률) - 진입 수수료 - 종료 수수료",
         formulaDescription:
             "포지션 규모는 증거금 × 레버리지로 계산하며, 실제 수익률은 총 수수료까지 반영해 계산하는 것이 정확합니다.",
+        exampleTitle: "레버리지 수익 계산 예시",
+        exampleBody:
+            "예를 들어 비트코인을 70,000 USDT에 진입하고 10배 레버리지를 사용했다고 가정해보겠습니다. 가격이 73,500 USDT로 약 5% 상승하면, 단순 가격 상승률은 5% 수준이지만 증거금 기준 수익률은 훨씬 크게 확대될 수 있습니다. 반대로 가격이 하락하면 손실도 같은 방식으로 빠르게 커지므로, 레버리지 수익 계산기는 청산가 계산기와 함께 사용하는 것이 가장 안전합니다.",
         faqs: [
             {
                 question: "ROE는 무엇인가요?",
@@ -418,6 +423,11 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 question: "수수료를 꼭 넣어야 하나요?",
                 answer:
                     "네. 선물 거래는 진입과 종료 모두 수수료가 발생하므로 실제 순수익을 보려면 반드시 반영하는 것이 좋습니다.",
+            },
+            {
+                question: "레버리지가 높을수록 수익이 무조건 좋은가요?",
+                answer:
+                    "아니요. 레버리지가 높을수록 수익뿐 아니라 손실과 청산 위험도 함께 커집니다. 높은 배율일수록 수익 계산기와 청산가 계산기를 함께 확인하는 것이 중요합니다.",
             },
         ],
         related: [

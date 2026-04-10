@@ -16,7 +16,7 @@ type Props = {
 
 export default function CalculatorPageTemplate({ config, children }: Props) {
     return (
-        <main className="min-h-screen bg-slate-50 text-slate-900 pb-20">
+        <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
             <PageHeader
                 badge={config.badge}
                 title={config.title}
@@ -31,24 +31,32 @@ export default function CalculatorPageTemplate({ config, children }: Props) {
                         <p>
                             <strong>{config.title}</strong>는 {config.articleIntro}
                         </p>
-                        {config.articleBody && <p>{config.articleBody}</p>}
+                        {config.articleBody ? <p>{config.articleBody}</p> : null}
                     </Article>
 
-                    {config.formulaTitle && (
+                    {config.formulaTitle ? (
                         <Article title={config.formulaTitle}>
-                            {config.formula && (
-                                <div className="bg-slate-50 p-6 rounded-2xl border text-center my-6">
-                                    <p className="font-mono text-xl font-bold">
-                                        {config.formula}
-                                    </p>
+                            {config.formula ? (
+                                <div className="my-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-6">
+                                    <div className="mx-auto max-w-3xl text-center font-mono font-bold text-slate-800">
+                                        <div className="break-keep text-sm leading-relaxed sm:text-base md:text-lg">
+                                            {config.formula}
+                                        </div>
+                                    </div>
                                 </div>
-                            )}
-                            {config.formulaDescription && <p>{config.formulaDescription}</p>}
+                            ) : null}
+                            {config.formulaDescription ? <p>{config.formulaDescription}</p> : null}
                         </Article>
-                    )}
+                    ) : null}
+
+                    {config.exampleTitle ? (
+                        <Article title={config.exampleTitle}>
+                            {config.exampleBody ? <p>{config.exampleBody}</p> : null}
+                        </Article>
+                    ) : null}
                 </SectionCard>
 
-                {config.faqs && (
+                {config.faqs?.length ? (
                     <FaqSection title="자주 묻는 질문 (FAQ)">
                         {config.faqs.map((faq) => (
                             <FaqItem
@@ -58,11 +66,11 @@ export default function CalculatorPageTemplate({ config, children }: Props) {
                             />
                         ))}
                     </FaqSection>
-                )}
+                ) : null}
 
-                {config.related && (
+                {config.related?.length ? (
                     <RelatedCalculators links={config.related} />
-                )}
+                ) : null}
 
                 <Disclaimer />
             </div>
