@@ -9,6 +9,9 @@ import {
     ResultDetail,
     InputField,
 } from "@/components/ui/Shared";
+import CurrencyToggle from "@/components/calculator/CurrencyToggle";
+
+type Currency = "KRW" | "USDT";
 
 function formatNumber(value: number, maximumFractionDigits = 2) {
     if (!Number.isFinite(value)) return "0";
@@ -19,10 +22,13 @@ function formatNumber(value: number, maximumFractionDigits = 2) {
 }
 
 export default function CryptoFundingFeeCalculator() {
+    const [currency, setCurrency] = useState<Currency>("USDT");
     const [positionSize, setPositionSize] = useState("");
     const [fundingRate, setFundingRate] = useState("");
     const [fundingCount, setFundingCount] = useState("1");
     const [positionType, setPositionType] = useState<"long" | "short">("long");
+
+    const moneyUnit = currency === "KRW" ? "원" : "USDT";
 
     const result = useMemo(() => {
         const size = Number(positionSize);
@@ -79,12 +85,14 @@ export default function CryptoFundingFeeCalculator() {
                 title="펀딩비 계산 조건 입력"
                 description="포지션 규모, 펀딩비율, 횟수, 포지션 방향을 입력하면 예상 펀딩비를 계산합니다."
             >
+                <CurrencyToggle value={currency} onChange={setCurrency} />
+
                 <InputField
                     id="positionSize"
                     label="포지션 규모"
                     type="number"
-                    placeholder="예: 5000000"
-                    unit="원"
+                    placeholder={currency === "KRW" ? "예: 5000000" : "예: 5000"}
+                    unit={moneyUnit}
                     value={positionSize}
                     onChange={(e) => setPositionSize(e.target.value)}
                 />
@@ -121,6 +129,11 @@ export default function CryptoFundingFeeCalculator() {
                         <option value="short">숏 (Short)</option>
                     </select>
                 </label>
+
+                <p className="text-sm leading-relaxed text-slate-500">
+                    KRW / USDT 토글은 환율 자동 변환 기능이 아니라 계산 기준 통화를 선택하는 기능입니다.
+                    선택한 통화 기준으로 직접 값을 입력하세요.
+                </p>
             </CalculatorCard>
 
             <ResultCard
@@ -131,7 +144,7 @@ export default function CryptoFundingFeeCalculator() {
                 <ResultHighlight
                     label="총 예상 펀딩비"
                     value={formatNumber(result.totalFee)}
-                    unit="원"
+                    unit={moneyUnit}
                     tone={tone}
                 />
 
@@ -139,12 +152,12 @@ export default function CryptoFundingFeeCalculator() {
                     <ResultDetail
                         label="1회당 펀딩비"
                         value={formatNumber(result.oneTimeFee)}
-                        unit="원"
+                        unit={moneyUnit}
                     />
                     <ResultDetail
                         label="누적 펀딩비"
                         value={formatNumber(result.totalFee)}
-                        unit="원"
+                        unit={moneyUnit}
                     />
                 </div>
 
