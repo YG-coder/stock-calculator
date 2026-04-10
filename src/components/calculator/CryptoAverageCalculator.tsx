@@ -9,6 +9,9 @@ import {
     ResultDetail,
     InputField,
 } from "@/components/ui/Shared";
+import CurrencyToggle from "@/components/calculator/CurrencyToggle";
+
+type Currency = "KRW" | "USDT";
 
 function formatNumber(value: number, maximumFractionDigits = 2) {
     if (!Number.isFinite(value)) return "0";
@@ -19,10 +22,13 @@ function formatNumber(value: number, maximumFractionDigits = 2) {
 }
 
 export default function CryptoAverageCalculator() {
+    const [currency, setCurrency] = useState<Currency>("USDT");
     const [price1, setPrice1] = useState("");
     const [qty1, setQty1] = useState("");
     const [price2, setPrice2] = useState("");
     const [qty2, setQty2] = useState("");
+
+    const moneyUnit = currency === "KRW" ? "원" : "USDT";
 
     const result = useMemo(() => {
         const p1 = Number(price1);
@@ -76,12 +82,15 @@ export default function CryptoAverageCalculator() {
                 title="코인 물타기 조건 입력"
                 description="기존 매수 정보와 추가 매수 정보를 입력하면 평균 단가가 계산됩니다."
             >
+                <CurrencyToggle value={currency} onChange={setCurrency} />
+
                 <div className="grid gap-4 sm:grid-cols-2">
                     <InputField
                         id="price1"
                         label="기존 매수 가격"
                         type="number"
-                        placeholder="예: 100000000"
+                        placeholder={currency === "KRW" ? "예: 100000000" : "예: 70000"}
+                        unit={moneyUnit}
                         value={price1}
                         onChange={(e) => setPrice1(e.target.value)}
                     />
@@ -100,7 +109,8 @@ export default function CryptoAverageCalculator() {
                         id="price2"
                         label="추가 매수 가격"
                         type="number"
-                        placeholder="예: 85000000"
+                        placeholder={currency === "KRW" ? "예: 85000000" : "예: 59500"}
+                        unit={moneyUnit}
                         value={price2}
                         onChange={(e) => setPrice2(e.target.value)}
                     />
@@ -113,6 +123,11 @@ export default function CryptoAverageCalculator() {
                         onChange={(e) => setQty2(e.target.value)}
                     />
                 </div>
+
+                <p className="text-sm leading-relaxed text-slate-500">
+                    KRW / USDT 토글은 환율 자동 변환 기능이 아니라 계산 기준 통화를 선택하는 기능입니다.
+                    선택한 통화 기준으로 직접 값을 입력하세요.
+                </p>
             </CalculatorCard>
 
             <ResultCard
@@ -123,6 +138,7 @@ export default function CryptoAverageCalculator() {
                 <ResultHighlight
                     label="새 평균 단가"
                     value={formatNumber(result.avgPrice)}
+                    unit={moneyUnit}
                     tone="default"
                 />
 
@@ -134,6 +150,7 @@ export default function CryptoAverageCalculator() {
                     <ResultDetail
                         label="총 매수 금액"
                         value={formatNumber(result.totalAmount)}
+                        unit={moneyUnit}
                     />
                 </div>
             </ResultCard>
