@@ -358,6 +358,11 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
             "평균 단가 = (기존 매수금액 + 추가 매수금액) ÷ 총 보유 수량",
         formulaDescription:
             "단순 평균이 아니라 실제 매수 금액 비중과 수량을 함께 반영해야 정확한 평균 단가를 구할 수 있습니다.",
+
+        exampleTitle: "코인 물타기 계산 예시",
+        exampleBody:
+            "예를 들어 비트코인을 70,000 USDT에 0.2개 매수한 뒤, 가격이 60,000 USDT로 하락했을 때 0.1개를 추가 매수했다고 가정해보겠습니다. 이 경우 평균 단가는 단순히 두 가격의 평균이 아니라, 각 매수 금액과 수량 비중을 함께 반영해 계산해야 합니다. 물타기 계산기를 사용하면 추가 매수 후 새로운 평균 단가와 손익분기점을 더 정확하게 확인할 수 있습니다.",
+
         faqs: [
             {
                 question: "코인도 물타기 계산이 필요한가요?",
@@ -374,7 +379,13 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 answer:
                     "아니요. 평균 단가는 낮아질 수 있지만 추가 자금이 들어가므로 손절가와 목표가를 함께 고려해야 합니다.",
             },
+            {
+                question: "평균 단가만 낮아지면 바로 안전한가요?",
+                answer:
+                    "아니요. 평균 단가가 낮아져도 시장이 추가로 하락하면 손실이 더 커질 수 있습니다. 물타기 전략은 손절 기준과 함께 사용해야 합니다.",
+            },
         ],
+
         related: [
             {
                 href: "/crypto",
