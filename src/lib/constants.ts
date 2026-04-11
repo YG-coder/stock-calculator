@@ -155,6 +155,14 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "미국주식",
     category: "hub",
   },
+  {
+    href: "/us-stocks/exchange-profit",
+    label: "환율 반영 수익",
+    title: "미국주식 환율 반영 수익 계산기",
+    desc: "환율과 수수료를 반영한 원화 기준 실제 수익 계산",
+    badge: "환율 분석",
+    category: "stock",
+  },
 ];
 
 export const HEADER_CALCULATORS = [
