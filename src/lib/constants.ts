@@ -147,6 +147,14 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "평균 단가",
     category: "crypto",
   },
+  {
+    href: "/us-stocks",
+    label: "미국주식 계산기",
+    title: "미국주식 계산기 모음",
+    desc: "세금, 수익률, 배당, 복리 계산기 허브",
+    badge: "미국주식",
+    category: "hub",
+  },
 ];
 
 export const HEADER_CALCULATORS = [
