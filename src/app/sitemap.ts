@@ -2,16 +2,20 @@ import type { MetadataRoute } from "next";
 import { SITE_URL, CALCULATORS, POLICY_ROUTES } from "@/lib/constants";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = [
+  const routes = Array.from(new Set([
     "",
     ...CALCULATORS.map(c => c.href),
     ...POLICY_ROUTES.map(p => p.href)
-  ];
+  ]));
 
   return routes.map((route) => ({
     url: `${SITE_URL}${route}`,
     lastModified: new Date(),
     changeFrequency: "weekly",
-    priority: route === "" ? 1 : 0.8,
+    priority:
+      route === "" ? 1 :
+        route.startsWith("/crypto") ? 0.9 :
+          route.includes("calculator") ? 0.8 :
+            0.7,
   }));
 }
