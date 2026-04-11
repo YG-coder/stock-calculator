@@ -25,6 +25,8 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
+  const featuredCalculators = CALCULATORS.filter((c) => c.featured);
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
       <section className="bg-white border-b border-slate-200">
@@ -37,15 +39,14 @@ export default function HomePage() {
             <br className="hidden sm:block" /> 간편하게 확인하세요.
           </h1>
           <p className="mt-8 max-w-3xl text-lg sm:text-xl leading-relaxed text-slate-500">
-            주식 평단가 계산기, 수익률 계산기, 손절가 계산기, 목표가 계산기,
-            본전 회복 계산기, 배당 수익 계산기까지 투자에 필요한 핵심 계산을 한 곳에서 빠르게 확인할 수 있습니다.
+            국내주식, 코인, 미국주식 투자에 필요한 핵심 계산기를 카테고리별로 빠르게 확인할 수 있습니다.
           </p>
         </div>
       </section>
 
       <div className="mx-auto max-w-5xl px-6 py-16 md:px-8">
         <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 mb-16">
-          {CALCULATORS.map((calc) => (
+          {featuredCalculators.map((calc) => (
             <Link
               key={calc.href}
               href={calc.href}
@@ -75,21 +76,14 @@ export default function HomePage() {
           <Article title="왜 주식 계산기가 필요한가요?">
             <p>
               투자에 실패하는 가장 큰 이유는 <strong>감정적 판단</strong>입니다.
-              주가가 떨어지면 더 떨어질까 봐 두려워서 매도하고, 주가가 오르면 더 오를까 봐 욕심을 부리다
-              적절한 매도 타이밍을 놓치기 쉽습니다.
-            </p>
-            <p>
-              주식 계산기 사이트를 활용하면 복잡한 엑셀 수식 없이도 수익률, 평단가, 손절가,
-              목표가, 본전 회복률 같은 핵심 지표를 빠르게 확인할 수 있습니다.
               숫자를 기준으로 투자 판단을 내리면 리스크를 객관적으로 관리하는 데 도움이 됩니다.
             </p>
           </Article>
 
           <Article title="주식 계산기 활용법 안내">
             <p>
-              본 사이트에서 제공하는 모든 계산 결과는 기초 수학 식에 기반한 참고용 수치입니다.
-              실제 국내외 증권사 계좌에서 매매할 때는 <strong>실 거래 수수료, 세금, 슬리피지</strong> 등에 따라
-              실제 체결 결과와 차이가 날 수 있으므로, 언제나 보수적인 기준으로 투자 판단을 하는 것이 좋습니다.
+              본 사이트에서 제공하는 모든 계산 결과는 참고용 수치입니다.
+              실제 수수료, 세금, 슬리피지에 따라 결과는 달라질 수 있습니다.
             </p>
           </Article>
         </SectionCard>

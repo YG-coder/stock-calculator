@@ -25,6 +25,18 @@ export const metadata: Metadata = {
 };
 
 export default function CryptoPage() {
+    const order = [
+        "/crypto/entry",
+        "/crypto/liquidation",
+        "/crypto/leverage-profit",
+        "/crypto/profit",
+        "/crypto/funding-fee",
+        "/crypto/average",
+    ];
+
+    const calculators = CALCULATORS
+        .filter((c) => c.hubs?.includes("crypto"))
+        .sort((a, b) => order.indexOf(a.href) - order.indexOf(b.href));
     return (
         <main className="min-h-screen bg-slate-50 text-slate-900 pb-20">
             {/* 헤더 */}
@@ -46,7 +58,7 @@ export default function CryptoPage() {
             {/* 계산기 리스트 */}
             <div className="mx-auto max-w-5xl px-6 py-16">
                 <section className="grid gap-6 sm:grid-cols-2 mb-16">
-                    {CALCULATORS.filter((c) => c.category === "crypto").map(
+                    {calculators.map(
                         (calc) => (
                             <Link
                                 key={calc.href}
