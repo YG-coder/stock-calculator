@@ -163,6 +163,14 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "환율 분석",
     category: "stock",
   },
+  {
+    href: "/us-stocks/dividend",
+    label: "미국주식 배당",
+    title: "미국주식 배당 계산기",
+    desc: "세전·세후 배당금과 배당수익률 계산",
+    badge: "배당 분석",
+    category: "stock",
+  },
 ];
 
 export const HEADER_CALCULATORS = [
