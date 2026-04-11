@@ -1,41 +1,38 @@
-"use client";
-
-type Currency = "KRW" | "USDT";
-
-type Props = {
-    value: Currency;
-    onChange: (value: Currency) => void;
-    label?: string;
+type CurrencyToggleProps<T extends string> = {
+    value: T;
+    onChange: (value: T) => void;
+    options?: readonly [T, T];
 };
 
-export default function CurrencyToggle({
+export default function CurrencyToggle<T extends string>({
     value,
     onChange,
-    label = "표시 통화",
-}: Props) {
+    options,
+}: CurrencyToggleProps<T>) {
+    const [left, right] = options ?? ([("KRW" as T), ("USDT" as T)] as const);
+
     return (
-        <div className="space-y-2">
-            <span className="block text-sm font-semibold text-slate-700">{label}</span>
-
-            <div className="inline-flex rounded-2xl border border-slate-300 bg-white p-1">
-                {(["KRW", "USDT"] as const).map((currency) => {
-                    const active = value === currency;
-
-                    return (
-                        <button
-                            key={currency}
-                            type="button"
-                            onClick={() => onChange(currency)}
-                            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${active
-                                    ? "bg-slate-900 text-white"
-                                    : "text-slate-600 hover:bg-slate-100"
-                                }`}
-                        >
-                            {currency}
-                        </button>
-                    );
-                })}
-            </div>
+        <div className="mb-6 inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1">
+            <button
+                type="button"
+                onClick={() => onChange(left)}
+                className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${value === left
+                        ? "bg-white text-slate-900 shadow-sm"
+                        : "text-slate-500 hover:text-slate-700"
+                    }`}
+            >
+                {left}
+            </button>
+            <button
+                type="button"
+                onClick={() => onChange(right)}
+                className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${value === right
+                        ? "bg-white text-slate-900 shadow-sm"
+                        : "text-slate-500 hover:text-slate-700"
+                    }`}
+            >
+                {right}
+            </button>
         </div>
     );
 }

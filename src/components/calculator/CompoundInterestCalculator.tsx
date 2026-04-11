@@ -9,148 +9,145 @@ import {
     ResultDetail,
     InputField,
 } from "@/components/ui/Shared";
+import CurrencyToggle from "@/components/calculator/CurrencyToggle";
 
-function formatNumber(value: number) {
+type Currency = "KRW" | "USD";
+
+function formatNumber(value: number, maximumFractionDigits = 0) {
     if (!Number.isFinite(value)) return "0";
     return new Intl.NumberFormat("ko-KR", {
-        maximumFractionDigits: 0,
+        minimumFractionDigits: 0,
+        maximumFractionDigits,
     }).format(value);
 }
 
 export default function CompoundInterestCalculator() {
-    const [principal, setPrincipal] = useState("");
-    const [monthlyContribution, setMonthlyContribution] = useState("");
-    const [annualRate, setAnnualRate] = useState("");
-    const [years, setYears] = useState("");
+    const [currency, setCurrency] = useState<Currency>("KRW");
+
+    const [initial, setInitial] = useState("1000000");
+    const [monthly, setMonthly] = useState("100000");
+    const [rate, setRate] = useState("10");
+    const [years, setYears] = useState("10");
+
+    const moneyUnit = currency === "KRW" ? "원" : "USD";
 
     const result = useMemo(() => {
-        const p = Number(principal);
-        const m = Number(monthlyContribution);
-        const r = Number(annualRate);
-        const y = Number(years);
+        const P = Number(initial);
+        const PMT = Number(monthly);
+        const r = Number(rate) / 100;
+        const t = Number(years);
 
         if (
-            !Number.isFinite(p) ||
-            !Number.isFinite(m) ||
+            !Number.isFinite(P) ||
+            !Number.isFinite(PMT) ||
             !Number.isFinite(r) ||
-            !Number.isFinite(y) ||
-            p < 0 ||
-            m < 0 ||
+            !Number.isFinite(t) ||
+            P < 0 ||
+            PMT < 0 ||
             r < 0 ||
-            y <= 0
+            t <= 0
         ) {
             return {
                 valid: false,
-                finalAmount: 0,
-                totalPrincipal: 0,
-                totalContribution: 0,
-                totalInvested: 0,
-                totalInterest: 0,
+                total: 0,
+                principal: 0,
+                profit: 0,
             };
         }
 
-        const months = Math.floor(y * 12);
-        const monthlyRate = r / 100 / 12;
+        const n = 12;
+        const total =
+            P * Math.pow(1 + r / n, n * t) +
+            PMT * ((Math.pow(1 + r / n, n * t) - 1) / (r / n));
 
-        let futureValue = p;
-
-        for (let i = 0; i < months; i++) {
-            futureValue = futureValue * (1 + monthlyRate) + m;
-        }
-
-        const totalContribution = m * months;
-        const totalInvested = p + totalContribution;
-        const totalInterest = futureValue - totalInvested;
+        const principal = P + PMT * n * t;
+        const profit = total - principal;
 
         return {
             valid: true,
-            finalAmount: futureValue,
-            totalPrincipal: p,
-            totalContribution,
-            totalInvested,
-            totalInterest,
+            total,
+            principal,
+            profit,
         };
-    }, [principal, monthlyContribution, annualRate, years]);
+    }, [initial, monthly, rate, years]);
 
     return (
         <CalculatorLayout>
             <CalculatorCard
-                title="복리 투자 조건 입력"
-                description="초기 투자금, 매월 추가 투자금, 예상 연 수익률, 투자 기간을 입력하세요."
+                title="복리 계산기"
+                description="초기 투자금과 매월 투자금, 수익률을 입력하면 복리 기준 예상 자산을 계산합니다."
             >
-                <InputField
-                    id="principal"
-                    label="초기 투자금"
-                    type="number"
-                    placeholder="예: 10000000"
-                    unit="원"
-                    value={principal}
-                    onChange={(e) => setPrincipal(e.target.value)}
+                <CurrencyToggle
+                    value={currency}
+                    onChange={setCurrency}
+                    options={["KRW", "USD"] as const}
                 />
 
-                <InputField
-                    id="monthlyContribution"
-                    label="매월 추가 투자금"
-                    type="number"
-                    placeholder="예: 500000"
-                    unit="원"
-                    value={monthlyContribution}
-                    onChange={(e) => setMonthlyContribution(e.target.value)}
-                />
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <InputField
+                        id="initial"
+                        label="초기 투자금"
+                        type="number"
+                        value={initial}
+                        onChange={(e) => setInitial(e.target.value)}
+                        unit={moneyUnit}
+                    />
+                    <InputField
+                        id="monthly"
+                        label="월 추가 투자금"
+                        type="number"
+                        value={monthly}
+                        onChange={(e) => setMonthly(e.target.value)}
+                        unit={moneyUnit}
+                    />
+                </div>
 
-                <InputField
-                    id="annualRate"
-                    label="예상 연 수익률"
-                    type="number"
-                    placeholder="예: 7"
-                    unit="%"
-                    value={annualRate}
-                    onChange={(e) => setAnnualRate(e.target.value)}
-                />
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <InputField
+                        id="rate"
+                        label="연 수익률"
+                        type="number"
+                        value={rate}
+                        onChange={(e) => setRate(e.target.value)}
+                        unit="%"
+                    />
+                    <InputField
+                        id="years"
+                        label="투자 기간"
+                        type="number"
+                        value={years}
+                        onChange={(e) => setYears(e.target.value)}
+                        unit="년"
+                    />
+                </div>
 
-                <InputField
-                    id="years"
-                    label="투자 기간"
-                    type="number"
-                    placeholder="예: 10"
-                    unit="년"
-                    value={years}
-                    onChange={(e) => setYears(e.target.value)}
-                />
+                <p className="text-sm leading-relaxed text-slate-500">
+                    KRW / USD 토글은 환율 자동 변환 기능이 아니라 계산 기준 통화를 선택하는 기능입니다.
+                    국내주식은 원화, 미국주식은 달러 기준으로 입력하면 됩니다.
+                </p>
             </CalculatorCard>
 
             <ResultCard
                 title="복리 계산 결과"
-                emptyMessage="투자 조건을 입력하시면 예상 최종 금액이 계산됩니다."
+                emptyMessage="값을 입력하면 결과가 계산됩니다."
                 isValid={result.valid}
             >
                 <ResultHighlight
-                    label="예상 최종 금액"
-                    value={formatNumber(result.finalAmount)}
-                    unit="원"
-                    tone="positive"
+                    label="최종 자산"
+                    value={formatNumber(result.total)}
+                    unit={moneyUnit}
                 />
 
                 <div className="grid gap-4 sm:grid-cols-2">
                     <ResultDetail
-                        label="초기 투자금"
-                        value={formatNumber(result.totalPrincipal)}
-                        unit="원"
+                        label="총 투자금"
+                        value={formatNumber(result.principal)}
+                        unit={moneyUnit}
                     />
                     <ResultDetail
-                        label="추가 투자금 합계"
-                        value={formatNumber(result.totalContribution)}
-                        unit="원"
-                    />
-                    <ResultDetail
-                        label="총 납입 원금"
-                        value={formatNumber(result.totalInvested)}
-                        unit="원"
-                    />
-                    <ResultDetail
-                        label="복리 수익"
-                        value={formatNumber(result.totalInterest)}
-                        unit="원"
+                        label="총 수익"
+                        value={formatNumber(result.profit)}
+                        unit={moneyUnit}
                     />
                 </div>
             </ResultCard>
