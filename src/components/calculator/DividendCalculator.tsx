@@ -2,191 +2,181 @@
 
 import { useMemo, useState } from "react";
 import {
-    CalculatorCard,
     CalculatorLayout,
-    InputField,
+    CalculatorCard,
     ResultCard,
-    ResultDetail,
     ResultHighlight,
+    ResultDetail,
+    InputField,
 } from "@/components/ui/Shared";
+import CurrencyToggle from "@/components/calculator/CurrencyToggle";
 
-function formatNumber(value: number) {
+type Currency = "KRW" | "USD";
+
+function formatNumber(value: number, maximumFractionDigits = 2) {
     if (!Number.isFinite(value)) return "0";
     return new Intl.NumberFormat("ko-KR", {
-        maximumFractionDigits: 2,
+        minimumFractionDigits: 0,
+        maximumFractionDigits,
     }).format(value);
 }
 
 export default function DividendCalculator() {
-    const [price, setPrice] = useState("");
-    const [shares, setShares] = useState("");
-    const [dividendPerShare, setDividendPerShare] = useState("");
-    const [market, setMarket] = useState<"kr" | "us">("kr");
+    const [currency, setCurrency] = useState<Currency>("KRW");
 
-    const taxRate = market === "kr" ? 0.154 : 0.15;
+    const [shares, setShares] = useState("100");
+    const [dividendPerShare, setDividendPerShare] = useState("500");
+    const [buyPrice, setBuyPrice] = useState("10000");
+    const [taxRate, setTaxRate] = useState("15.4");
+
+    const moneyUnit = currency === "KRW" ? "원" : "USD";
 
     const result = useMemo(() => {
-        const priceNum = Number(price);
-        const sharesNum = Number(shares);
-        const dividendNum = Number(dividendPerShare);
+        const qty = Number(shares);
+        const dividend = Number(dividendPerShare);
+        const price = Number(buyPrice);
+        const tax = Number(taxRate) / 100;
 
         if (
-            !Number.isFinite(priceNum) ||
-            !Number.isFinite(sharesNum) ||
-            !Number.isFinite(dividendNum) ||
-            priceNum <= 0 ||
-            sharesNum <= 0 ||
-            dividendNum < 0
+            !Number.isFinite(qty) ||
+            !Number.isFinite(dividend) ||
+            !Number.isFinite(price) ||
+            !Number.isFinite(tax) ||
+            qty <= 0 ||
+            dividend < 0 ||
+            price <= 0 ||
+            tax < 0 ||
+            tax >= 1
         ) {
-            return null;
+            return {
+                valid: false,
+                grossDividend: 0,
+                taxAmount: 0,
+                netDividend: 0,
+                totalInvestment: 0,
+                grossYield: 0,
+                netYield: 0,
+            };
         }
 
-        const totalInvestment = priceNum * sharesNum;
-        const grossDividend = dividendNum * sharesNum;
-        const taxAmount = grossDividend * taxRate;
+        const grossDividend = qty * dividend;
+        const taxAmount = grossDividend * tax;
         const netDividend = grossDividend - taxAmount;
-        const grossYield = (grossDividend / totalInvestment) * 100;
-        const netYield = (netDividend / totalInvestment) * 100;
+        const totalInvestment = qty * price;
+        const grossYield =
+            totalInvestment > 0 ? (grossDividend / totalInvestment) * 100 : 0;
+        const netYield =
+            totalInvestment > 0 ? (netDividend / totalInvestment) * 100 : 0;
 
         return {
-            totalInvestment,
+            valid: true,
             grossDividend,
             taxAmount,
             netDividend,
+            totalInvestment,
             grossYield,
             netYield,
         };
-    }, [price, shares, dividendPerShare, taxRate]);
+    }, [shares, dividendPerShare, buyPrice, taxRate]);
 
     return (
         <CalculatorLayout>
             <CalculatorCard
                 title="배당 수익 계산기"
-                description="주가, 보유 수량, 1주당 배당금을 입력하면 세전·세후 배당금과 배당수익률을 계산할 수 있습니다."
+                description="보유 수량, 주당 배당금, 평균 매수가, 세율을 입력하면 세전·세후 배당금과 배당수익률을 계산할 수 있습니다."
             >
-                <div className="grid gap-5 md:grid-cols-2">
-                    <div>
-                        <label className="mb-2 block text-sm font-semibold text-slate-700">
-                            시장 선택
-                        </label>
-                        <select
-                            value={market}
-                            onChange={(e) => setMarket(e.target.value as "kr" | "us")}
-                            className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-slate-500"
-                        >
-                            <option value="kr">국내 주식 (배당소득세 15.4%)</option>
-                            <option value="us">미국 주식 (배당 원천징수 15%)</option>
-                        </select>
-                    </div>
+                <CurrencyToggle
+                    value={currency}
+                    onChange={setCurrency}
+                    options={["KRW", "USD"] as const}
+                />
 
-                    <InputField
-                        id="price"
-                        label="현재 주가"
-                        type="number"
-                        inputMode="decimal"
-                        min="0"
-                        step="0.01"
-                        value={price}
-                        onChange={(e) => setPrice(e.target.value)}
-                        placeholder="예: 80000"
-                        unit="원"
-                    />
-
+                <div className="grid gap-4 sm:grid-cols-2">
                     <InputField
                         id="shares"
                         label="보유 수량"
                         type="number"
-                        inputMode="numeric"
-                        min="0"
-                        step="1"
+                        placeholder="예: 100"
                         value={shares}
                         onChange={(e) => setShares(e.target.value)}
-                        placeholder="예: 100"
-                        unit="주"
                     />
-
                     <InputField
                         id="dividendPerShare"
-                        label="1주당 배당금"
+                        label="주당 배당금"
                         type="number"
-                        inputMode="decimal"
-                        min="0"
-                        step="0.01"
+                        placeholder={currency === "KRW" ? "예: 500" : "예: 2"}
+                        unit={moneyUnit}
                         value={dividendPerShare}
                         onChange={(e) => setDividendPerShare(e.target.value)}
-                        placeholder="예: 1500"
-                        unit="원"
                     />
                 </div>
 
-                <div className="mt-6 rounded-2xl bg-slate-50 p-4 text-sm leading-relaxed text-slate-600">
-                    <p>
-                        국내 주식은 배당소득세 15.4%, 미국 주식은 배당 원천징수 15%를 기준으로 계산합니다.
-                    </p>
-                    <p className="mt-1">
-                        미국 주식은 일반적인 W-8BEN 제출 기준이며, 실제 세율은 계좌 및 세무 상황에 따라 달라질 수 있습니다.
-                    </p>
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <InputField
+                        id="buyPrice"
+                        label="평균 매수가"
+                        type="number"
+                        placeholder={currency === "KRW" ? "예: 10000" : "예: 50"}
+                        unit={moneyUnit}
+                        value={buyPrice}
+                        onChange={(e) => setBuyPrice(e.target.value)}
+                    />
+                    <InputField
+                        id="taxRate"
+                        label="세율"
+                        type="number"
+                        placeholder="예: 15.4"
+                        unit="%"
+                        value={taxRate}
+                        onChange={(e) => setTaxRate(e.target.value)}
+                    />
                 </div>
+
+                <p className="text-sm leading-relaxed text-slate-500">
+                    KRW / USD 토글은 환율 자동 변환 기능이 아니라 계산 기준 통화를 선택하는 기능입니다.
+                    국내주식은 원화, 미국주식은 달러 기준으로 입력하면 됩니다.
+                </p>
             </CalculatorCard>
 
             <ResultCard
                 title="배당 수익 계산 결과"
-                emptyMessage="값을 입력하면 예상 배당금과 배당수익률이 표시됩니다."
-                isValid={!!result}
+                emptyMessage="보유 수량, 배당금, 평균 매수가를 입력하면 결과가 계산됩니다."
+                isValid={result.valid}
             >
-                {result && (
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <ResultHighlight
-                            label="세후 배당금"
-                            value={formatNumber(result.netDividend)}
-                            unit="원"
-                            tone={
-                                result.netDividend > 0
-                                    ? "positive"
-                                    : result.netDividend < 0
-                                        ? "negative"
-                                        : "default"
-                            }
-                        />
+                <ResultHighlight
+                    label="세후 총 배당금"
+                    value={formatNumber(result.netDividend)}
+                    unit={moneyUnit}
+                    tone="positive"
+                />
 
-                        <ResultHighlight
-                            label="세후 배당수익률"
-                            value={formatNumber(result.netYield)}
-                            unit="%"
-                            tone={
-                                result.netYield > 0
-                                    ? "positive"
-                                    : result.netYield < 0
-                                        ? "negative"
-                                        : "default"
-                            }
-                        />
-
-                        <ResultDetail
-                            label="총 투자금"
-                            value={formatNumber(result.totalInvestment)}
-                            unit="원"
-                        />
-
-                        <ResultDetail
-                            label="세전 배당금"
-                            value={formatNumber(result.grossDividend)}
-                            unit="원"
-                        />
-
-                        <ResultDetail
-                            label="예상 세금"
-                            value={formatNumber(result.taxAmount)}
-                            unit="원"
-                        />
-
-                        <ResultDetail
-                            label="세전 배당수익률"
-                            value={formatNumber(result.grossYield)}
-                            unit="%"
-                        />
-                    </div>
-                )}
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <ResultDetail
+                        label="세전 총 배당금"
+                        value={formatNumber(result.grossDividend)}
+                        unit={moneyUnit}
+                    />
+                    <ResultDetail
+                        label="세금"
+                        value={formatNumber(result.taxAmount)}
+                        unit={moneyUnit}
+                    />
+                    <ResultDetail
+                        label="총 투자금"
+                        value={formatNumber(result.totalInvestment)}
+                        unit={moneyUnit}
+                    />
+                    <ResultDetail
+                        label="세전 배당수익률"
+                        value={formatNumber(result.grossYield)}
+                        unit="%"
+                    />
+                    <ResultDetail
+                        label="세후 배당수익률"
+                        value={formatNumber(result.netYield)}
+                        unit="%"
+                    />
+                </div>
             </ResultCard>
         </CalculatorLayout>
     );
