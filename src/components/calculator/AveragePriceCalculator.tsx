@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { formatNumber, parsePositive } from "@/lib/number";
 import {
   CalculatorLayout,
   CalculatorCard,
@@ -10,105 +9,159 @@ import {
   ResultDetail,
   InputField,
 } from "@/components/ui/Shared";
+import CurrencyToggle from "@/components/calculator/CurrencyToggle";
+
+type Currency = "KRW" | "USD";
+
+function formatNumber(value: number, maximumFractionDigits = 2) {
+  if (!Number.isFinite(value)) return "0";
+  return new Intl.NumberFormat("ko-KR", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits,
+  }).format(value);
+}
 
 export default function AveragePriceCalculator() {
-  const [price1, setPrice1] = useState("");
-  const [qty1, setQty1] = useState("");
-  const [price2, setPrice2] = useState("");
-  const [qty2, setQty2] = useState("");
+  const [currency, setCurrency] = useState<Currency>("KRW");
+
+  const [currentPrice, setCurrentPrice] = useState("10000");
+  const [currentQuantity, setCurrentQuantity] = useState("10");
+  const [additionalPrice, setAdditionalPrice] = useState("8000");
+  const [additionalQuantity, setAdditionalQuantity] = useState("10");
+
+  const moneyUnit = currency === "KRW" ? "원" : "USD";
 
   const result = useMemo(() => {
-    const p1 = parsePositive(price1);
-    const q1 = parsePositive(qty1);
-    const p2 = parsePositive(price2);
-    const q2 = parsePositive(qty2);
+    const currentP = Number(currentPrice);
+    const currentQ = Number(currentQuantity);
+    const addP = Number(additionalPrice);
+    const addQ = Number(additionalQuantity);
 
-    const totalQty = q1 + q2;
-    const totalAmount = p1 * q1 + p2 * q2;
-
-    if (totalQty <= 0) {
-      return { valid: false, avgPrice: 0, totalQty: 0, totalAmount: 0 };
+    if (
+      !Number.isFinite(currentP) ||
+      !Number.isFinite(currentQ) ||
+      !Number.isFinite(addP) ||
+      !Number.isFinite(addQ) ||
+      currentP <= 0 ||
+      currentQ <= 0 ||
+      addP <= 0 ||
+      addQ <= 0
+    ) {
+      return {
+        valid: false,
+        currentAmount: 0,
+        additionalAmount: 0,
+        totalAmount: 0,
+        totalQuantity: 0,
+        averagePrice: 0,
+      };
     }
 
-    const avgPrice = totalAmount / totalQty;
+    const currentAmount = currentP * currentQ;
+    const additionalAmount = addP * addQ;
+    const totalAmount = currentAmount + additionalAmount;
+    const totalQuantity = currentQ + addQ;
+    const averagePrice = totalQuantity > 0 ? totalAmount / totalQuantity : 0;
 
     return {
       valid: true,
-      avgPrice,
-      totalQty,
+      currentAmount,
+      additionalAmount,
       totalAmount,
+      totalQuantity,
+      averagePrice,
     };
-  }, [price1, qty1, price2, qty2]);
+  }, [currentPrice, currentQuantity, additionalPrice, additionalQuantity]);
 
   return (
     <CalculatorLayout>
-      <div className="space-y-6">
-        <CalculatorCard title="1. 기존 보유" description="기존 매수가와 수량을 입력하세요.">
-          <InputField
-            id="price1"
-            label="기존 매수가 (원)"
-            type="number"
-            placeholder="예: 50000"
-            unit="원"
-            value={price1}
-            onChange={(e) => setPrice1(e.target.value)}
-          />
-          <InputField
-            id="qty1"
-            label="기존 수량 (주)"
-            type="number"
-            placeholder="예: 100"
-            unit="주"
-            value={qty1}
-            onChange={(e) => setQty1(e.target.value)}
-          />
-        </CalculatorCard>
+      <CalculatorCard
+        title="물타기 평단가 계산기"
+        description="기존 매수가와 수량, 추가 매수가와 수량을 입력하면 새로운 평균 매입 단가를 계산할 수 있습니다."
+      >
+        <CurrencyToggle
+          value={currency}
+          onChange={setCurrency}
+          options={["KRW", "USD"] as const}
+        />
 
-        <CalculatorCard
-          title="2. 추가 매수 (물타기)"
-          description="추가로 매수한 내역을 입력하세요."
-        >
+        <div className="grid gap-4 sm:grid-cols-2">
           <InputField
-            id="price2"
-            label="추가 매수가 (원)"
+            id="currentPrice"
+            label="기존 매수가"
             type="number"
-            placeholder="예: 45000"
-            unit="원"
-            value={price2}
-            onChange={(e) => setPrice2(e.target.value)}
+            placeholder={currency === "KRW" ? "예: 10000" : "예: 100"}
+            unit={moneyUnit}
+            value={currentPrice}
+            onChange={(e) => setCurrentPrice(e.target.value)}
           />
           <InputField
-            id="qty2"
-            label="추가 수량 (주)"
+            id="currentQuantity"
+            label="기존 보유 수량"
             type="number"
-            placeholder="예: 50"
-            unit="주"
-            value={qty2}
-            onChange={(e) => setQty2(e.target.value)}
+            placeholder="예: 10"
+            value={currentQuantity}
+            onChange={(e) => setCurrentQuantity(e.target.value)}
           />
-        </CalculatorCard>
-      </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <InputField
+            id="additionalPrice"
+            label="추가 매수가"
+            type="number"
+            placeholder={currency === "KRW" ? "예: 8000" : "예: 80"}
+            unit={moneyUnit}
+            value={additionalPrice}
+            onChange={(e) => setAdditionalPrice(e.target.value)}
+          />
+          <InputField
+            id="additionalQuantity"
+            label="추가 매수 수량"
+            type="number"
+            placeholder="예: 10"
+            value={additionalQuantity}
+            onChange={(e) => setAdditionalQuantity(e.target.value)}
+          />
+        </div>
+
+        <p className="text-sm leading-relaxed text-slate-500">
+          KRW / USD 토글은 환율 자동 변환 기능이 아니라 계산 기준 통화를 선택하는 기능입니다.
+          국내주식은 원화, 미국주식은 달러 기준으로 입력하면 됩니다.
+        </p>
+      </CalculatorCard>
 
       <ResultCard
         title="평단가 계산 결과"
-        emptyMessage="매수 내역을 입력하시면\n평균 단가가 자동으로 계산됩니다."
+        emptyMessage="기존 매수가와 수량, 추가 매수가와 수량을 입력하면 결과가 계산됩니다."
         isValid={result.valid}
       >
         <ResultHighlight
-          label="최종 평균 단가"
-          value={formatNumber(result.avgPrice)}
-          unit="원"
+          label="새 평균 매입 단가"
+          value={formatNumber(result.averagePrice)}
+          unit={moneyUnit}
+          tone="default"
         />
+
         <div className="grid gap-4 sm:grid-cols-2">
           <ResultDetail
-            label="총 보유 수량"
-            value={formatNumber(result.totalQty)}
-            unit="주"
+            label="기존 매수 금액"
+            value={formatNumber(result.currentAmount)}
+            unit={moneyUnit}
+          />
+          <ResultDetail
+            label="추가 매수 금액"
+            value={formatNumber(result.additionalAmount)}
+            unit={moneyUnit}
           />
           <ResultDetail
             label="총 매수 금액"
             value={formatNumber(result.totalAmount)}
-            unit="원"
+            unit={moneyUnit}
+          />
+          <ResultDetail
+            label="총 보유 수량"
+            value={formatNumber(result.totalQuantity, 4)}
           />
         </div>
       </ResultCard>
