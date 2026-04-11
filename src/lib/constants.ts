@@ -6,8 +6,8 @@ export type CalculatorItem = {
   title: string;
   desc: string;
   badge: string;
-  category: "stock" | "crypto" | "hub";
-  hubs?: ("stocks" | "crypto" | "us-stocks")[];
+  kind: "calculator" | "hub";
+  groups?: ("stocks" | "crypto" | "us-stocks")[];
   featured?: boolean;
 };
 
@@ -19,8 +19,8 @@ export const CALCULATORS: CalculatorItem[] = [
     title: "주식 수익률 계산기",
     desc: "매수가와 현재가 기준 수익률 계산",
     badge: "수익 실현",
-    category: "stock",
-    hubs: ["stocks"],
+    kind: "calculator",
+    groups: ["stocks"],
     featured: true,
   },
   {
@@ -29,8 +29,8 @@ export const CALCULATORS: CalculatorItem[] = [
     title: "물타기 평단가 계산기",
     desc: "추가 매수 후 평균 단가 계산",
     badge: "포지션 조절",
-    category: "stock",
-    hubs: ["stocks", "us-stocks"],
+    kind: "calculator",
+    groups: ["stocks", "us-stocks"],
     featured: true,
   },
   {
@@ -39,8 +39,8 @@ export const CALCULATORS: CalculatorItem[] = [
     title: "주식 손절가 계산기",
     desc: "손실 제한 기준 가격 계산",
     badge: "리스크 관리",
-    category: "stock",
-    hubs: ["stocks"],
+    kind: "calculator",
+    groups: ["stocks"],
     featured: true,
   },
   {
@@ -49,8 +49,8 @@ export const CALCULATORS: CalculatorItem[] = [
     title: "복리 계산기",
     desc: "장기 투자 복리 수익 계산",
     badge: "장기 투자",
-    category: "stock",
-    hubs: ["stocks", "us-stocks"],
+    kind: "calculator",
+    groups: ["stocks", "us-stocks"],
     featured: true,
   },
 
@@ -61,8 +61,8 @@ export const CALCULATORS: CalculatorItem[] = [
     title: "해외주식 세금 계산기",
     desc: "세후 수익이 얼마나 남는지 계산",
     badge: "세금 분석",
-    category: "stock",
-    hubs: ["us-stocks"],
+    kind: "calculator",
+    groups: ["us-stocks"],
   },
   {
     href: "/us-stocks/exchange-profit",
@@ -70,8 +70,8 @@ export const CALCULATORS: CalculatorItem[] = [
     title: "환율 반영 수익 계산기",
     desc: "환율까지 반영한 실제 수익 확인",
     badge: "환율 분석",
-    category: "stock",
-    hubs: ["us-stocks"],
+    kind: "calculator",
+    groups: ["us-stocks"],
   },
   {
     href: "/us-stocks/dividend",
@@ -79,28 +79,19 @@ export const CALCULATORS: CalculatorItem[] = [
     title: "미국주식 배당 계산기",
     desc: "세후 배당금과 배당수익률 계산",
     badge: "배당 분석",
-    category: "stock",
-    hubs: ["us-stocks"],
+    kind: "calculator",
+    groups: ["us-stocks"],
   },
 
   // ===== 코인 =====
-  {
-    href: "/crypto",
-    label: "코인",
-    title: "코인 계산기 모음",
-    desc: "청산가, 수익률, 레버리지 계산기",
-    badge: "암호화폐",
-    category: "hub",
-    featured: true,
-  },
   {
     href: "/crypto/entry",
     label: "진입",
     title: "코인 100배 진입 계산기",
     desc: "권장 배율 및 주문 금액 계산",
     badge: "진입 전략",
-    category: "crypto",
-    hubs: ["crypto"],
+    kind: "calculator",
+    groups: ["crypto"],
   },
   {
     href: "/crypto/liquidation",
@@ -108,8 +99,8 @@ export const CALCULATORS: CalculatorItem[] = [
     title: "코인 청산가 계산기",
     desc: "레버리지 청산 가격 계산",
     badge: "리스크 관리",
-    category: "crypto",
-    hubs: ["crypto"],
+    kind: "calculator",
+    groups: ["crypto"],
   },
 
   // ===== 허브 =====
@@ -119,7 +110,16 @@ export const CALCULATORS: CalculatorItem[] = [
     title: "주식 계산기 모음",
     desc: "국내주식 투자 계산기 모음",
     badge: "주식",
-    category: "hub",
+    kind: "hub",
+    featured: true,
+  },
+  {
+    href: "/crypto",
+    label: "코인",
+    title: "코인 계산기 모음",
+    desc: "청산가, 수익률, 레버리지 계산기",
+    badge: "암호화폐",
+    kind: "hub",
     featured: true,
   },
   {
@@ -128,7 +128,7 @@ export const CALCULATORS: CalculatorItem[] = [
     title: "미국주식 계산기 모음",
     desc: "세금, 환율, 배당 계산기",
     badge: "미국주식",
-    category: "hub",
+    kind: "hub",
     featured: true,
   },
 ];

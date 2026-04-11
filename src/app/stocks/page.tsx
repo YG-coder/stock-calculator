@@ -3,7 +3,7 @@ import { CALCULATORS } from "@/lib/constants";
 
 export default function StocksPage() {
     const calculators = CALCULATORS.filter((c) =>
-        c.hubs?.includes("stocks")
+        c.groups?.includes("stocks")
     );
 
     return (

@@ -35,7 +35,7 @@ export default function CryptoPage() {
     ];
 
     const calculators = CALCULATORS
-        .filter((c) => c.hubs?.includes("crypto"))
+        .filter((c) => c.groups?.includes("crypto"))
         .sort((a, b) => order.indexOf(a.href) - order.indexOf(b.href));
     return (
         <main className="min-h-screen bg-slate-50 text-slate-900 pb-20">
