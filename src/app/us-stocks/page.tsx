@@ -45,7 +45,7 @@ export default function USStocksPage() {
             {/* 계산기 리스트 */}
             <div className="mx-auto max-w-5xl px-6 py-16">
                 <section className="grid gap-6 sm:grid-cols-2 mb-16">
-                    {CALCULATORS.filter((c) => c.category === "stock").map((calc) => (
+                    {CALCULATORS.filter((c) => c.hubs?.includes("us-stocks")).map((calc) => (
                         <Link
                             key={calc.href}
                             href={calc.href}

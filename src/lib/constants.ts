@@ -7,6 +7,7 @@ export type CalculatorItem = {
   desc: string;
   badge: string;
   category: "stock" | "crypto" | "hub";
+  hubs?: ("crypto" | "us-stocks")[];
 };
 
 export const CALCULATORS: CalculatorItem[] = [
@@ -25,6 +26,7 @@ export const CALCULATORS: CalculatorItem[] = [
     desc: "추가 매수 후 평균 매입 단가(평단가)를 계산",
     badge: "포지션 조절",
     category: "stock",
+    hubs: ["us-stocks"],
   },
   {
     href: "/target-price-calculator",
@@ -73,6 +75,7 @@ export const CALCULATORS: CalculatorItem[] = [
     desc: "세전·세후 배당금과 배당수익률을 자동 계산",
     badge: "현금 흐름",
     category: "stock",
+    hubs: ["us-stocks"],
   },
   {
     href: "/compound-interest-calculator",
@@ -81,6 +84,7 @@ export const CALCULATORS: CalculatorItem[] = [
     desc: "초기 투자금과 추가 투자금을 반영한 복리 수익 계산",
     badge: "장기 투자",
     category: "stock",
+    hubs: ["us-stocks"],
   },
   {
     href: "/overseas-stock-tax-calculator",
@@ -89,6 +93,34 @@ export const CALCULATORS: CalculatorItem[] = [
     desc: "양도소득세와 세후 수익 계산",
     badge: "세금 분석",
     category: "stock",
+    hubs: ["us-stocks"],
+  },
+
+  {
+    href: "/us-stocks",
+    label: "미국주식 계산기",
+    title: "미국주식 계산기 모음",
+    desc: "세금, 환율, 배당, 복리 계산기 허브",
+    badge: "미국주식",
+    category: "hub",
+  },
+  {
+    href: "/us-stocks/exchange-profit",
+    label: "환율 반영 수익",
+    title: "미국주식 환율 반영 수익 계산기",
+    desc: "환율과 수수료를 반영한 원화 기준 실제 수익 계산",
+    badge: "환율 분석",
+    category: "stock",
+    hubs: ["us-stocks"],
+  },
+  {
+    href: "/us-stocks/dividend",
+    label: "미국주식 배당",
+    title: "미국주식 배당 계산기",
+    desc: "세전·세후 배당금과 배당수익률 계산",
+    badge: "배당 분석",
+    category: "stock",
+    hubs: ["us-stocks"],
   },
 
   {
@@ -106,6 +138,7 @@ export const CALCULATORS: CalculatorItem[] = [
     desc: "손절폭 기준 권장 배율, 주문 명목가치, 익절가 계산",
     badge: "진입 전략",
     category: "crypto",
+    hubs: ["crypto"],
   },
   {
     href: "/crypto/liquidation",
@@ -114,6 +147,7 @@ export const CALCULATORS: CalculatorItem[] = [
     desc: "레버리지 롱·숏 포지션의 예상 청산 가격 계산",
     badge: "리스크 관리",
     category: "crypto",
+    hubs: ["crypto"],
   },
   {
     href: "/crypto/leverage-profit",
@@ -122,6 +156,7 @@ export const CALCULATORS: CalculatorItem[] = [
     desc: "롱·숏 포지션의 실제 수익과 ROE 계산",
     badge: "선물 수익",
     category: "crypto",
+    hubs: ["crypto"],
   },
   {
     href: "/crypto/profit",
@@ -130,6 +165,7 @@ export const CALCULATORS: CalculatorItem[] = [
     desc: "매수·매도 가격과 수수료 기준 실제 순수익 계산",
     badge: "수익 계산",
     category: "crypto",
+    hubs: ["crypto"],
   },
   {
     href: "/crypto/funding-fee",
@@ -138,6 +174,7 @@ export const CALCULATORS: CalculatorItem[] = [
     desc: "포지션 규모와 펀딩비율 기준 예상 펀딩비 계산",
     badge: "펀딩비 분석",
     category: "crypto",
+    hubs: ["crypto"],
   },
   {
     href: "/crypto/average",
@@ -146,30 +183,7 @@ export const CALCULATORS: CalculatorItem[] = [
     desc: "추가 매수 후 평균 단가와 총 매수 금액 계산",
     badge: "평균 단가",
     category: "crypto",
-  },
-  {
-    href: "/us-stocks",
-    label: "미국주식 계산기",
-    title: "미국주식 계산기 모음",
-    desc: "세금, 수익률, 배당, 복리 계산기 허브",
-    badge: "미국주식",
-    category: "hub",
-  },
-  {
-    href: "/us-stocks/exchange-profit",
-    label: "환율 반영 수익",
-    title: "미국주식 환율 반영 수익 계산기",
-    desc: "환율과 수수료를 반영한 원화 기준 실제 수익 계산",
-    badge: "환율 분석",
-    category: "stock",
-  },
-  {
-    href: "/us-stocks/dividend",
-    label: "미국주식 배당",
-    title: "미국주식 배당 계산기",
-    desc: "세전·세후 배당금과 배당수익률 계산",
-    badge: "배당 분석",
-    category: "stock",
+    hubs: ["crypto"],
   },
 ];
 
@@ -182,6 +196,7 @@ export const HEADER_CALCULATORS = [
   { href: "/overseas-stock-tax-calculator", label: "해외주식 세금" },
   { href: "/calculators", label: "전체 계산기" },
   { href: "/crypto", label: "코인 계산기" },
+  { href: "/us-stocks", label: "미국주식 계산기" },
 ];
 
 export const POLICY_ROUTES = [
