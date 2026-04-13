@@ -9,6 +9,7 @@ export type CalculatorItem = {
   kind: "calculator" | "hub";
   groups?: ("stocks" | "crypto" | "us-stocks")[];
   featured?: boolean;
+  isCommon?: boolean; // ✅ 공용 여부 추가
 };
 
 export const CALCULATORS: CalculatorItem[] = [
@@ -21,6 +22,7 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "수익 실현",
     kind: "calculator",
     groups: ["stocks"],
+    isCommon: true, // ✅ 공용
     featured: true,
   },
   {
@@ -30,7 +32,8 @@ export const CALCULATORS: CalculatorItem[] = [
     desc: "추가 매수 후 평균 단가 계산",
     badge: "포지션 조절",
     kind: "calculator",
-    groups: ["stocks", "us-stocks"],
+    groups: ["stocks"],
+    isCommon: true,
     featured: true,
   },
   {
@@ -41,6 +44,7 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "수익 실현",
     kind: "calculator",
     groups: ["stocks"],
+    isCommon: true,
   },
   {
     href: "/stop-loss-calculator",
@@ -50,6 +54,7 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "리스크 관리",
     kind: "calculator",
     groups: ["stocks"],
+    isCommon: true,
     featured: true,
   },
   {
@@ -60,6 +65,7 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "리스크 관리",
     kind: "calculator",
     groups: ["stocks"],
+    isCommon: true,
   },
   {
     href: "/risk-reward-calculator",
@@ -69,6 +75,7 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "전략 검증",
     kind: "calculator",
     groups: ["stocks"],
+    isCommon: true,
   },
   {
     href: "/position-size-calculator",
@@ -78,6 +85,7 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "자금 관리",
     kind: "calculator",
     groups: ["stocks"],
+    isCommon: true,
   },
   {
     href: "/dividend-calculator",
@@ -86,7 +94,8 @@ export const CALCULATORS: CalculatorItem[] = [
     desc: "세전·세후 배당금과 배당수익률 계산",
     badge: "현금 흐름",
     kind: "calculator",
-    groups: ["stocks", "us-stocks"],
+    groups: ["stocks"],
+    isCommon: true,
   },
   {
     href: "/compound-interest-calculator",
@@ -95,11 +104,12 @@ export const CALCULATORS: CalculatorItem[] = [
     desc: "장기 투자 복리 수익 계산",
     badge: "장기 투자",
     kind: "calculator",
-    groups: ["stocks", "us-stocks"],
+    groups: ["stocks"],
+    isCommon: true,
     featured: true,
   },
 
-  // ===== 미국 주식 =====
+  // ===== 미국 주식 (전용만) =====
   {
     href: "/overseas-stock-tax-calculator",
     label: "세금",
@@ -151,7 +161,7 @@ export const CALCULATORS: CalculatorItem[] = [
     href: "/crypto/leverage-profit",
     label: "레버리지 수익",
     title: "코인 레버리지 수익 계산기",
-    desc: "롱·숏 포지션의 실제 수익과 ROE 계산",
+    desc: "롱·숏 포지션 수익과 ROE 계산",
     badge: "선물 수익",
     kind: "calculator",
     groups: ["crypto"],
@@ -160,7 +170,7 @@ export const CALCULATORS: CalculatorItem[] = [
     href: "/crypto/profit",
     label: "코인 수익",
     title: "코인 수익 계산기",
-    desc: "매수·매도 가격과 수수료 기준 실제 순수익 계산",
+    desc: "매수·매도 가격 기준 순수익 계산",
     badge: "수익 계산",
     kind: "calculator",
     groups: ["crypto"],
@@ -169,7 +179,7 @@ export const CALCULATORS: CalculatorItem[] = [
     href: "/crypto/funding-fee",
     label: "펀딩비",
     title: "펀딩비 계산기",
-    desc: "포지션 규모와 펀딩비율 기준 예상 펀딩비 계산",
+    desc: "포지션 기준 예상 펀딩비 계산",
     badge: "펀딩비 분석",
     kind: "calculator",
     groups: ["crypto"],
@@ -178,7 +188,7 @@ export const CALCULATORS: CalculatorItem[] = [
     href: "/crypto/average",
     label: "코인 물타기",
     title: "코인 물타기 계산기",
-    desc: "추가 매수 후 평균 단가와 총 매수 금액 계산",
+    desc: "평균 단가 및 총 매수 금액 계산",
     badge: "평균 단가",
     kind: "calculator",
     groups: ["crypto"],
@@ -198,7 +208,7 @@ export const CALCULATORS: CalculatorItem[] = [
     href: "/crypto",
     label: "코인",
     title: "코인 계산기 모음",
-    desc: "청산가, 수익률, 레버리지 계산기",
+    desc: "암호화폐 계산기 모음",
     badge: "암호화폐",
     kind: "hub",
     featured: true,

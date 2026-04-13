@@ -44,6 +44,7 @@ export default function StocksPage() {
 
     return (
         <main className="min-h-screen bg-slate-50 text-slate-900 pb-20">
+            {/* 헤더 */}
             <section className="bg-white border-b border-slate-200">
                 <div className="mx-auto max-w-5xl px-6 py-20 md:py-28 text-center">
                     <span className="inline-flex rounded-full bg-slate-100 px-4 py-1.5 text-sm font-semibold text-slate-600 mb-6">
@@ -59,6 +60,7 @@ export default function StocksPage() {
                 </div>
             </section>
 
+            {/* 계산기 리스트 */}
             <div className="mx-auto max-w-5xl px-6 py-16">
                 <section className="grid gap-6 sm:grid-cols-2 mb-16">
                     {calculators.map((calc) => (
@@ -67,17 +69,26 @@ export default function StocksPage() {
                             href={calc.href}
                             className="group rounded-2xl bg-white p-6 border border-slate-200 hover:shadow-lg hover:-translate-y-1 transition"
                         >
-                            <div className="flex justify-between mb-4">
+                            {/* ✅ 공용 배지 포함 */}
+                            <div className="flex items-center gap-2 mb-4">
                                 <span className="text-xs bg-slate-100 px-2 py-1 rounded">
                                     {calc.badge}
                                 </span>
+
+                                {calc.isCommon && (
+                                    <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded border border-blue-200">
+                                        공용
+                                    </span>
+                                )}
                             </div>
+
                             <h2 className="text-xl font-bold mb-2">{calc.title}</h2>
                             <p className="text-sm text-slate-500">{calc.desc}</p>
                         </Link>
                     ))}
                 </section>
 
+                {/* SEO 콘텐츠 */}
                 <SectionCard>
                     <Article title="주식 계산기가 왜 필요한가요?">
                         <p>
