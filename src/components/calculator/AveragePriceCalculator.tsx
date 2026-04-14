@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { formatNumber, parsePositive } from "@/lib/number";
 import {
   CalculatorLayout,
   CalculatorCard,
@@ -13,158 +14,119 @@ import CurrencyToggle from "@/components/calculator/CurrencyToggle";
 
 type Currency = "KRW" | "USD";
 
-function formatNumber(value: number, maximumFractionDigits = 2) {
-  if (!Number.isFinite(value)) return "0";
-  return new Intl.NumberFormat("ko-KR", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits,
-  }).format(value);
-}
-
 export default function AveragePriceCalculator() {
   const [currency, setCurrency] = useState<Currency>("KRW");
-
-  const [currentPrice, setCurrentPrice] = useState("10000");
-  const [currentQuantity, setCurrentQuantity] = useState("10");
-  const [additionalPrice, setAdditionalPrice] = useState("8000");
-  const [additionalQuantity, setAdditionalQuantity] = useState("10");
+  const [firstPrice, setFirstPrice] = useState("");
+  const [firstQuantity, setFirstQuantity] = useState("");
+  const [secondPrice, setSecondPrice] = useState("");
+  const [secondQuantity, setSecondQuantity] = useState("");
 
   const moneyUnit = currency === "KRW" ? "원" : "USD";
 
   const result = useMemo(() => {
-    const currentP = Number(currentPrice);
-    const currentQ = Number(currentQuantity);
-    const addP = Number(additionalPrice);
-    const addQ = Number(additionalQuantity);
+    const p1 = parsePositive(firstPrice);
+    const q1 = parsePositive(firstQuantity);
+    const p2 = parsePositive(secondPrice);
+    const q2 = parsePositive(secondQuantity);
 
-    if (
-      !Number.isFinite(currentP) ||
-      !Number.isFinite(currentQ) ||
-      !Number.isFinite(addP) ||
-      !Number.isFinite(addQ) ||
-      currentP <= 0 ||
-      currentQ <= 0 ||
-      addP <= 0 ||
-      addQ <= 0
-    ) {
+    if (p1 <= 0 || q1 <= 0 || p2 <= 0 || q2 <= 0) {
       return {
         valid: false,
-        currentAmount: 0,
-        additionalAmount: 0,
-        totalAmount: 0,
-        totalQuantity: 0,
         averagePrice: 0,
+        totalQuantity: 0,
+        totalAmount: 0,
       };
     }
 
-    const currentAmount = currentP * currentQ;
-    const additionalAmount = addP * addQ;
-    const totalAmount = currentAmount + additionalAmount;
-    const totalQuantity = currentQ + addQ;
-    const averagePrice = totalQuantity > 0 ? totalAmount / totalQuantity : 0;
+    const totalQuantity = q1 + q2;
+    const totalAmount = p1 * q1 + p2 * q2;
+    const averagePrice = totalAmount / totalQuantity;
 
     return {
       valid: true,
-      currentAmount,
-      additionalAmount,
-      totalAmount,
-      totalQuantity,
       averagePrice,
+      totalQuantity,
+      totalAmount,
     };
-  }, [currentPrice, currentQuantity, additionalPrice, additionalQuantity]);
+  }, [firstPrice, firstQuantity, secondPrice, secondQuantity]);
 
   return (
-    <CalculatorLayout>
-      <CalculatorCard
-        title="물타기 평단가 계산기"
-        description="기존 매수가와 수량, 추가 매수가와 수량을 입력하면 새로운 평균 매입 단가를 계산할 수 있습니다."
-      >
-        <CurrencyToggle
-          value={currency}
-          onChange={setCurrency}
-          options={["KRW", "USD"] as const}
-        />
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <InputField
-            id="currentPrice"
-            label="기존 매수가"
-            type="number"
-            placeholder={currency === "KRW" ? "예: 10000" : "예: 100"}
-            unit={moneyUnit}
-            value={currentPrice}
-            onChange={(e) => setCurrentPrice(e.target.value)}
+      <CalculatorLayout>
+        <CalculatorCard
+            title="매수 정보 입력"
+            description="기존 매수와 추가 매수 가격, 수량을 입력하면 평균 단가를 계산할 수 있습니다."
+        >
+          <CurrencyToggle
+              value={currency}
+              onChange={setCurrency}
+              options={["KRW", "USD"] as const}
           />
-          <InputField
-            id="currentQuantity"
-            label="기존 보유 수량"
-            type="number"
-            placeholder="예: 10"
-            value={currentQuantity}
-            onChange={(e) => setCurrentQuantity(e.target.value)}
-          />
-        </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
           <InputField
-            id="additionalPrice"
-            label="추가 매수가"
-            type="number"
-            placeholder={currency === "KRW" ? "예: 8000" : "예: 80"}
-            unit={moneyUnit}
-            value={additionalPrice}
-            onChange={(e) => setAdditionalPrice(e.target.value)}
+              id="firstPrice"
+              label={`1차 매수가 (${moneyUnit})`}
+              type="number"
+              placeholder={currency === "KRW" ? "예: 50000" : "예: 50"}
+              unit={moneyUnit}
+              value={firstPrice}
+              onChange={(e) => setFirstPrice(e.target.value)}
           />
           <InputField
-            id="additionalQuantity"
-            label="추가 매수 수량"
-            type="number"
-            placeholder="예: 10"
-            value={additionalQuantity}
-            onChange={(e) => setAdditionalQuantity(e.target.value)}
+              id="firstQuantity"
+              label="1차 매수 수량"
+              type="number"
+              placeholder="예: 10"
+              unit="주"
+              value={firstQuantity}
+              onChange={(e) => setFirstQuantity(e.target.value)}
           />
-        </div>
+          <InputField
+              id="secondPrice"
+              label={`추가 매수가 (${moneyUnit})`}
+              type="number"
+              placeholder={currency === "KRW" ? "예: 40000" : "예: 40"}
+              unit={moneyUnit}
+              value={secondPrice}
+              onChange={(e) => setSecondPrice(e.target.value)}
+          />
+          <InputField
+              id="secondQuantity"
+              label="추가 매수 수량"
+              type="number"
+              placeholder="예: 10"
+              unit="주"
+              value={secondQuantity}
+              onChange={(e) => setSecondQuantity(e.target.value)}
+          />
 
-        <p className="text-sm leading-relaxed text-slate-500">
-          KRW / USD 토글은 환율 자동 변환 기능이 아니라 계산 기준 통화를 선택하는 기능입니다.
-          국내주식은 원화, 미국주식은 달러 기준으로 입력하면 됩니다.
-        </p>
-      </CalculatorCard>
+          <p className="text-sm text-slate-500">
+            값을 입력하면 평균 단가가 자동으로 계산됩니다.
+          </p>
+        </CalculatorCard>
 
-      <ResultCard
-        title="평단가 계산 결과"
-        emptyMessage="기존 매수가와 수량, 추가 매수가와 수량을 입력하면 결과가 계산됩니다."
-        isValid={result.valid}
-      >
-        <ResultHighlight
-          label="새 평균 매입 단가"
-          value={formatNumber(result.averagePrice)}
-          unit={moneyUnit}
-          tone="default"
-        />
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <ResultDetail
-            label="기존 매수 금액"
-            value={formatNumber(result.currentAmount)}
-            unit={moneyUnit}
+        <ResultCard
+            title="평단가 계산 결과"
+            emptyMessage="값을 입력하면 결과가 표시됩니다."
+            isValid={result.valid}
+        >
+          <ResultHighlight
+              label="평균 단가"
+              value={formatNumber(result.averagePrice)}
+              unit={moneyUnit}
           />
-          <ResultDetail
-            label="추가 매수 금액"
-            value={formatNumber(result.additionalAmount)}
-            unit={moneyUnit}
-          />
-          <ResultDetail
-            label="총 매수 금액"
-            value={formatNumber(result.totalAmount)}
-            unit={moneyUnit}
-          />
-          <ResultDetail
-            label="총 보유 수량"
-            value={formatNumber(result.totalQuantity, 4)}
-          />
-        </div>
-      </ResultCard>
-    </CalculatorLayout>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <ResultDetail
+                label="총 보유 수량"
+                value={formatNumber(result.totalQuantity)}
+                unit="주"
+            />
+            <ResultDetail
+                label="총 매수 금액"
+                value={formatNumber(result.totalAmount)}
+                unit={moneyUnit}
+            />
+          </div>
+        </ResultCard>
+      </CalculatorLayout>
   );
 }

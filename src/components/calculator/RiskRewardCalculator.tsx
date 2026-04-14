@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { parsePositive } from "@/lib/number";
+import { formatNumber, parsePositive } from "@/lib/number";
 import {
   CalculatorLayout,
   CalculatorCard,
@@ -10,109 +10,122 @@ import {
   ResultDetail,
   InputField,
 } from "@/components/ui/Shared";
+import CurrencyToggle from "@/components/calculator/CurrencyToggle";
+
+type Currency = "KRW" | "USD";
 
 export default function RiskRewardCalculator() {
+  const [currency, setCurrency] = useState<Currency>("KRW");
   const [entryPrice, setEntryPrice] = useState("");
+  const [stopPrice, setStopPrice] = useState("");
   const [targetPrice, setTargetPrice] = useState("");
-  const [stopLossPrice, setStopLossPrice] = useState("");
+
+  const moneyUnit = currency === "KRW" ? "원" : "USD";
 
   const result = useMemo(() => {
     const entry = parsePositive(entryPrice);
+    const stop = parsePositive(stopPrice);
     const target = parsePositive(targetPrice);
-    const stop = parsePositive(stopLossPrice);
 
-    if (entry <= 0 || target <= 0 || stop <= 0 || stop >= entry || target <= entry) {
-      return { valid: false, rewardRate: 0, riskRate: 0, rrRatio: 0, winRate: 0 };
+    if (entry <= 0 || stop <= 0 || target <= 0) {
+      return {
+        valid: false,
+        riskAmount: 0,
+        rewardAmount: 0,
+        riskRewardRatio: 0,
+      };
     }
 
-    const rewardAmount = target - entry;
     const riskAmount = entry - stop;
+    const rewardAmount = target - entry;
 
-    const rewardRate = (rewardAmount / entry) * 100;
-    const riskRate = (riskAmount / entry) * 100;
+    if (riskAmount <= 0 || rewardAmount <= 0) {
+      return {
+        valid: false,
+        riskAmount: 0,
+        rewardAmount: 0,
+        riskRewardRatio: 0,
+      };
+    }
 
-    const rrRatio = rewardAmount / riskAmount;
-    const winRate = (1 / (1 + rrRatio)) * 100;
+    const riskRewardRatio = rewardAmount / riskAmount;
 
     return {
       valid: true,
-      rewardRate,
-      riskRate,
-      rrRatio,
-      winRate,
+      riskAmount,
+      rewardAmount,
+      riskRewardRatio,
     };
-  }, [entryPrice, targetPrice, stopLossPrice]);
+  }, [entryPrice, stopPrice, targetPrice]);
 
   return (
-    <CalculatorLayout>
-      <CalculatorCard
-        title="가격 정보 입력"
-        description="진입가와 예상 목표가, 손절가를 입력하세요."
-      >
-        <InputField
-          id="entryPrice"
-          label="진입 가격 (매수가)"
-          type="number"
-          placeholder="예: 50000"
-          unit="원"
-          value={entryPrice}
-          onChange={(e) => setEntryPrice(e.target.value)}
-        />
-        <InputField
-          id="targetPrice"
-          label="목표 가격 (익절가)"
-          type="number"
-          placeholder="예: 55000"
-          unit="원"
-          value={targetPrice}
-          onChange={(e) => setTargetPrice(e.target.value)}
-        />
-        <InputField
-          id="stopLossPrice"
-          label="손절 가격 (손절가)"
-          type="number"
-          placeholder="예: 48000"
-          unit="원"
-          value={stopLossPrice}
-          onChange={(e) => setStopLossPrice(e.target.value)}
-        />
-      </CalculatorCard>
+      <CalculatorLayout>
+        <CalculatorCard
+            title="진입/손절/목표가 입력"
+            description="진입가, 손절가, 목표가를 입력하면 손익비를 계산할 수 있습니다."
+        >
+          <CurrencyToggle
+              value={currency}
+              onChange={setCurrency}
+              options={["KRW", "USD"] as const}
+          />
 
-      <ResultCard
-        title="손익비 계산 결과"
-        emptyMessage="올바른 가격(익절가 > 진입가 > 손절가)을\n모두 입력하시면 결과가 계산됩니다."
-        isValid={result.valid}
-      >
-        <ResultHighlight
-          label="손익비 (Risk : Reward)"
-          value={`1 : ${result.rrRatio.toFixed(2)}`}
-          tone={
-            result.rrRatio > 1
-              ? "positive"
-              : result.rrRatio < 1
-                ? "negative"
-                : "default"
-          }
-        />
-        <div className="grid gap-4 sm:grid-cols-2">
-          <ResultDetail
-            label="기대 수익률"
-            value={`+${result.rewardRate.toFixed(2)}`}
-            unit="%"
+          <InputField
+              id="entryPrice"
+              label={`진입가 (${moneyUnit})`}
+              type="number"
+              placeholder={currency === "KRW" ? "예: 50000" : "예: 50"}
+              unit={moneyUnit}
+              value={entryPrice}
+              onChange={(e) => setEntryPrice(e.target.value)}
           />
-          <ResultDetail
-            label="예상 손실률"
-            value={`-${result.riskRate.toFixed(2)}`}
-            unit="%"
+          <InputField
+              id="stopPrice"
+              label={`손절가 (${moneyUnit})`}
+              type="number"
+              placeholder={currency === "KRW" ? "예: 47000" : "예: 47"}
+              unit={moneyUnit}
+              value={stopPrice}
+              onChange={(e) => setStopPrice(e.target.value)}
           />
-        </div>
-        <div className="rounded-xl bg-slate-50 border border-slate-200 p-5 shadow-sm mt-2">
-          <p className="text-sm font-medium text-slate-700 leading-relaxed">
-            현재 셋업의 필요 승률은 <strong className="text-slate-900">{result.winRate.toFixed(1)}%</strong>
-            입니다. 해당 승률 이상을 유지해야만 장기적으로 계좌가 우상향합니다.
+          <InputField
+              id="targetPrice"
+              label={`목표가 (${moneyUnit})`}
+              type="number"
+              placeholder={currency === "KRW" ? "예: 56000" : "예: 56"}
+              unit={moneyUnit}
+              value={targetPrice}
+              onChange={(e) => setTargetPrice(e.target.value)}
+          />
+
+          <p className="text-sm text-slate-500">
+            손절가는 진입가보다 낮아야 하고, 목표가는 진입가보다 높아야 합니다.
           </p>
-        </div>
-      </ResultCard>
-    </CalculatorLayout>
+        </CalculatorCard>
+
+        <ResultCard
+            title="손익비 계산 결과"
+            emptyMessage="값을 입력하면 결과가 표시됩니다."
+            isValid={result.valid}
+        >
+          <ResultHighlight
+              label="손익비"
+              value={result.riskRewardRatio.toFixed(2)}
+              unit="R"
+          />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <ResultDetail
+                label="리스크 금액"
+                value={formatNumber(result.riskAmount)}
+                unit={moneyUnit}
+            />
+            <ResultDetail
+                label="보상 금액"
+                value={formatNumber(result.rewardAmount)}
+                unit={moneyUnit}
+            />
+          </div>
+        </ResultCard>
+      </CalculatorLayout>
   );
 }
