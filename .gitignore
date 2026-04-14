@@ -39,3 +39,5 @@ next-env.d.ts
 # OpenNext
 /.open-next
 .idea
+*.zip
+.dev.vars
