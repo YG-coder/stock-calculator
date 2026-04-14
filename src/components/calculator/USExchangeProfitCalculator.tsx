@@ -19,13 +19,13 @@ function formatNumber(value: number, maximumFractionDigits = 2) {
 }
 
 export default function USExchangeProfitCalculator() {
-    const [buyPriceUsd, setBuyPriceUsd] = useState("100");
-    const [sellPriceUsd, setSellPriceUsd] = useState("120");
-    const [quantity, setQuantity] = useState("10");
-    const [buyExchangeRate, setBuyExchangeRate] = useState("1350");
-    const [sellExchangeRate, setSellExchangeRate] = useState("1380");
-    const [buyFeeKrw, setBuyFeeKrw] = useState("0");
-    const [sellFeeKrw, setSellFeeKrw] = useState("0");
+    const [buyPriceUsd, setBuyPriceUsd] = useState("");
+    const [sellPriceUsd, setSellPriceUsd] = useState("");
+    const [quantity, setQuantity] = useState("");
+    const [buyExchangeRate, setBuyExchangeRate] = useState("");
+    const [sellExchangeRate, setSellExchangeRate] = useState("");
+    const [buyFeeKrw, setBuyFeeKrw] = useState("");
+    const [sellFeeKrw, setSellFeeKrw] = useState("");
 
     const result = useMemo(() => {
         const buyPrice = Number(buyPriceUsd);
@@ -33,8 +33,8 @@ export default function USExchangeProfitCalculator() {
         const qty = Number(quantity);
         const buyRate = Number(buyExchangeRate);
         const sellRate = Number(sellExchangeRate);
-        const buyFee = Number(buyFeeKrw);
-        const sellFee = Number(sellFeeKrw);
+        const buyFee = Number(buyFeeKrw || "0");
+        const sellFee = Number(sellFeeKrw || "0");
 
         if (
             !Number.isFinite(buyPrice) ||
@@ -105,71 +105,63 @@ export default function USExchangeProfitCalculator() {
     return (
         <CalculatorLayout>
             <CalculatorCard
-                title="미국주식 환율 반영 수익 계산기"
-                description="매수·매도 가격과 환율, 수량, 수수료를 입력하면 달러 기준 손익과 원화 기준 실제 수익을 계산할 수 있습니다."
+                title="미국주식 환율 반영 수익 입력"
+                description="매수·매도 가격, 수량, 매수·매도 시점 환율, 수수료를 입력하면 원화 기준 실제 수익을 계산할 수 있습니다."
             >
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <InputField
-                        id="buyPriceUsd"
-                        label="매수 가격"
-                        type="number"
-                        placeholder="예: 100"
-                        unit="USD"
-                        value={buyPriceUsd}
-                        onChange={(e) => setBuyPriceUsd(e.target.value)}
-                    />
-                    <InputField
-                        id="sellPriceUsd"
-                        label="매도 가격"
-                        type="number"
-                        placeholder="예: 120"
-                        unit="USD"
-                        value={sellPriceUsd}
-                        onChange={(e) => setSellPriceUsd(e.target.value)}
-                    />
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <InputField
-                        id="quantity"
-                        label="수량"
-                        type="number"
-                        placeholder="예: 10"
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
-                    />
-                    <InputField
-                        id="buyExchangeRate"
-                        label="매수 환율"
-                        type="number"
-                        placeholder="예: 1350"
-                        unit="원/USD"
-                        value={buyExchangeRate}
-                        onChange={(e) => setBuyExchangeRate(e.target.value)}
-                    />
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <InputField
-                        id="sellExchangeRate"
-                        label="매도 환율"
-                        type="number"
-                        placeholder="예: 1380"
-                        unit="원/USD"
-                        value={sellExchangeRate}
-                        onChange={(e) => setSellExchangeRate(e.target.value)}
-                    />
-                    <InputField
-                        id="buyFeeKrw"
-                        label="매수 수수료"
-                        type="number"
-                        placeholder="예: 0"
-                        unit="원"
-                        value={buyFeeKrw}
-                        onChange={(e) => setBuyFeeKrw(e.target.value)}
-                    />
-                </div>
-
+                <InputField
+                    id="buyPriceUsd"
+                    label="매수가"
+                    type="number"
+                    placeholder="예: 100"
+                    unit="USD"
+                    value={buyPriceUsd}
+                    onChange={(e) => setBuyPriceUsd(e.target.value)}
+                />
+                <InputField
+                    id="sellPriceUsd"
+                    label="매도가"
+                    type="number"
+                    placeholder="예: 120"
+                    unit="USD"
+                    value={sellPriceUsd}
+                    onChange={(e) => setSellPriceUsd(e.target.value)}
+                />
+                <InputField
+                    id="quantity"
+                    label="수량"
+                    type="number"
+                    placeholder="예: 10"
+                    unit="주"
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                />
+                <InputField
+                    id="buyExchangeRate"
+                    label="매수 환율"
+                    type="number"
+                    placeholder="예: 1350"
+                    unit="원"
+                    value={buyExchangeRate}
+                    onChange={(e) => setBuyExchangeRate(e.target.value)}
+                />
+                <InputField
+                    id="sellExchangeRate"
+                    label="매도 환율"
+                    type="number"
+                    placeholder="예: 1380"
+                    unit="원"
+                    value={sellExchangeRate}
+                    onChange={(e) => setSellExchangeRate(e.target.value)}
+                />
+                <InputField
+                    id="buyFeeKrw"
+                    label="매수 수수료"
+                    type="number"
+                    placeholder="예: 0"
+                    unit="원"
+                    value={buyFeeKrw}
+                    onChange={(e) => setBuyFeeKrw(e.target.value)}
+                />
                 <InputField
                     id="sellFeeKrw"
                     label="매도 수수료"
@@ -180,37 +172,46 @@ export default function USExchangeProfitCalculator() {
                     onChange={(e) => setSellFeeKrw(e.target.value)}
                 />
 
-                <p className="text-sm leading-relaxed text-slate-500">
-                    미국주식은 달러 기준 수익이 나더라도 환율과 수수료에 따라 원화 기준 실제 수익이 달라질 수 있습니다.
+                <p className="text-sm text-slate-500">
+                    값을 입력하면 결과가 자동으로 계산됩니다.
                 </p>
             </CalculatorCard>
 
             <ResultCard
                 title="환율 반영 수익 계산 결과"
-                emptyMessage="매수·매도 가격, 환율, 수량을 입력하면 결과가 계산됩니다."
+                emptyMessage="값을 입력하면 결과가 자동으로 계산됩니다."
                 isValid={result.valid}
             >
                 <ResultHighlight
-                    label="원화 기준 실제 순손익"
-                    value={formatNumber(result.krwProfit)}
+                    label="원화 기준 실제 손익"
+                    value={`${result.krwProfit > 0 ? "+" : ""}${formatNumber(result.krwProfit)}`}
                     unit="원"
                     tone={tone}
                 />
-
                 <div className="grid gap-4 sm:grid-cols-2">
                     <ResultDetail
                         label="총 매수 금액"
+                        value={formatNumber(result.totalBuyUsd)}
+                        unit="USD"
+                    />
+                    <ResultDetail
+                        label="총 매도 금액"
+                        value={formatNumber(result.totalSellUsd)}
+                        unit="USD"
+                    />
+                    <ResultDetail
+                        label="원화 매수 금액"
                         value={formatNumber(result.totalBuyKrw)}
                         unit="원"
                     />
                     <ResultDetail
-                        label="총 매도 금액"
+                        label="원화 매도 금액"
                         value={formatNumber(result.totalSellKrw)}
                         unit="원"
                     />
                     <ResultDetail
                         label="달러 기준 손익"
-                        value={formatNumber(result.usdProfit)}
+                        value={`${result.usdProfit > 0 ? "+" : ""}${formatNumber(result.usdProfit)}`}
                         unit="USD"
                     />
                     <ResultDetail
@@ -219,8 +220,10 @@ export default function USExchangeProfitCalculator() {
                         unit="%"
                     />
                     <ResultDetail
-                        label="환율 영향 금액"
-                        value={formatNumber(result.exchangeEffectKrw)}
+                        label="환율 효과"
+                        value={`${result.exchangeEffectKrw > 0 ? "+" : ""}${formatNumber(
+                            result.exchangeEffectKrw
+                        )}`}
                         unit="원"
                     />
                 </div>

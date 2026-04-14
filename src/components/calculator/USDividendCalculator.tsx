@@ -19,31 +19,31 @@ function formatNumber(value: number, maximumFractionDigits = 2) {
 }
 
 export default function USDividendCalculator() {
-    const [shares, setShares] = useState("100");
-    const [annualDividendPerShareUsd, setAnnualDividendPerShareUsd] = useState("2");
-    const [buyPriceUsd, setBuyPriceUsd] = useState("50");
-    const [exchangeRate, setExchangeRate] = useState("1350");
-    const [withholdingTaxRate, setWithholdingTaxRate] = useState("15");
+    const [shares, setShares] = useState("");
+    const [annualDividendPerShareUsd, setAnnualDividendPerShareUsd] = useState("");
+    const [buyPriceUsd, setBuyPriceUsd] = useState("");
+    const [exchangeRate, setExchangeRate] = useState("");
+    const [withholdingTaxRate, setWithholdingTaxRate] = useState("");
 
     const result = useMemo(() => {
         const qty = Number(shares);
         const annualDividend = Number(annualDividendPerShareUsd);
         const buyPrice = Number(buyPriceUsd);
         const rate = Number(exchangeRate);
-        const taxRate = Number(withholdingTaxRate) / 100;
+        const taxRatePercent = Number(withholdingTaxRate);
 
         if (
             !Number.isFinite(qty) ||
             !Number.isFinite(annualDividend) ||
             !Number.isFinite(buyPrice) ||
             !Number.isFinite(rate) ||
-            !Number.isFinite(taxRate) ||
+            !Number.isFinite(taxRatePercent) ||
             qty <= 0 ||
             annualDividend < 0 ||
             buyPrice <= 0 ||
             rate <= 0 ||
-            taxRate < 0 ||
-            taxRate >= 1
+            taxRatePercent < 0 ||
+            taxRatePercent >= 100
         ) {
             return {
                 valid: false,
@@ -58,6 +58,7 @@ export default function USDividendCalculator() {
             };
         }
 
+        const taxRate = taxRatePercent / 100;
         const grossAnnualDividendUsd = qty * annualDividend;
         const taxAmountUsd = grossAnnualDividendUsd * taxRate;
         const netAnnualDividendUsd = grossAnnualDividendUsd - taxAmountUsd;
@@ -67,8 +68,10 @@ export default function USDividendCalculator() {
         const monthlyNetDividendKrw = netAnnualDividendKrw / 12;
 
         const totalBuyAmountUsd = qty * buyPrice;
-        const grossYield = totalBuyAmountUsd > 0 ? (grossAnnualDividendUsd / totalBuyAmountUsd) * 100 : 0;
-        const netYield = totalBuyAmountUsd > 0 ? (netAnnualDividendUsd / totalBuyAmountUsd) * 100 : 0;
+        const grossYield =
+            totalBuyAmountUsd > 0 ? (grossAnnualDividendUsd / totalBuyAmountUsd) * 100 : 0;
+        const netYield =
+            totalBuyAmountUsd > 0 ? (netAnnualDividendUsd / totalBuyAmountUsd) * 100 : 0;
 
         return {
             valid: true,
@@ -86,53 +89,48 @@ export default function USDividendCalculator() {
     return (
         <CalculatorLayout>
             <CalculatorCard
-                title="미국주식 배당 계산기"
-                description="보유 수량, 연간 주당 배당금, 매수가, 환율, 원천징수세율을 입력하면 세전·세후 배당금과 배당수익률을 계산할 수 있습니다."
+                title="미국주식 배당 정보 입력"
+                description="보유 주식 수, 주당 연간 배당금, 매수가, 환율, 원천징수세율을 입력하면 세전·세후 배당 수익을 계산할 수 있습니다."
             >
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <InputField
-                        id="shares"
-                        label="보유 수량"
-                        type="number"
-                        placeholder="예: 100"
-                        value={shares}
-                        onChange={(e) => setShares(e.target.value)}
-                    />
-                    <InputField
-                        id="annualDividendPerShareUsd"
-                        label="연간 주당 배당금"
-                        type="number"
-                        placeholder="예: 2"
-                        unit="USD"
-                        value={annualDividendPerShareUsd}
-                        onChange={(e) => setAnnualDividendPerShareUsd(e.target.value)}
-                    />
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <InputField
-                        id="buyPriceUsd"
-                        label="평균 매수가"
-                        type="number"
-                        placeholder="예: 50"
-                        unit="USD"
-                        value={buyPriceUsd}
-                        onChange={(e) => setBuyPriceUsd(e.target.value)}
-                    />
-                    <InputField
-                        id="exchangeRate"
-                        label="환율"
-                        type="number"
-                        placeholder="예: 1350"
-                        unit="원/USD"
-                        value={exchangeRate}
-                        onChange={(e) => setExchangeRate(e.target.value)}
-                    />
-                </div>
-
+                <InputField
+                    id="shares"
+                    label="보유 수량"
+                    type="number"
+                    placeholder="예: 100"
+                    unit="주"
+                    value={shares}
+                    onChange={(e) => setShares(e.target.value)}
+                />
+                <InputField
+                    id="annualDividendPerShareUsd"
+                    label="주당 연간 배당금"
+                    type="number"
+                    placeholder="예: 2"
+                    unit="USD"
+                    value={annualDividendPerShareUsd}
+                    onChange={(e) => setAnnualDividendPerShareUsd(e.target.value)}
+                />
+                <InputField
+                    id="buyPriceUsd"
+                    label="매수가"
+                    type="number"
+                    placeholder="예: 50"
+                    unit="USD"
+                    value={buyPriceUsd}
+                    onChange={(e) => setBuyPriceUsd(e.target.value)}
+                />
+                <InputField
+                    id="exchangeRate"
+                    label="환율"
+                    type="number"
+                    placeholder="예: 1350"
+                    unit="원"
+                    value={exchangeRate}
+                    onChange={(e) => setExchangeRate(e.target.value)}
+                />
                 <InputField
                     id="withholdingTaxRate"
-                    label="배당 원천징수세율"
+                    label="원천징수세율"
                     type="number"
                     placeholder="예: 15"
                     unit="%"
@@ -140,23 +138,21 @@ export default function USDividendCalculator() {
                     onChange={(e) => setWithholdingTaxRate(e.target.value)}
                 />
 
-                <p className="text-sm leading-relaxed text-slate-500">
-                    미국주식 배당은 보통 원천징수 후 실수령액이 달라지므로, 세전 배당금과 세후 배당금을 함께 확인하는 것이 중요합니다.
+                <p className="text-sm text-slate-500">
+                    값을 입력하면 결과가 자동으로 계산됩니다.
                 </p>
             </CalculatorCard>
 
             <ResultCard
                 title="미국주식 배당 계산 결과"
-                emptyMessage="보유 수량과 배당금 정보를 입력하면 결과가 계산됩니다."
+                emptyMessage="값을 입력하면 결과가 자동으로 계산됩니다."
                 isValid={result.valid}
             >
                 <ResultHighlight
-                    label="연간 세후 배당금"
-                    value={formatNumber(result.netAnnualDividendKrw)}
+                    label="월 예상 세후 배당금"
+                    value={formatNumber(result.monthlyNetDividendKrw)}
                     unit="원"
-                    tone="positive"
                 />
-
                 <div className="grid gap-4 sm:grid-cols-2">
                     <ResultDetail
                         label="연간 세전 배당금"
@@ -169,14 +165,19 @@ export default function USDividendCalculator() {
                         unit="USD"
                     />
                     <ResultDetail
-                        label="연간 세전 배당금(원화)"
+                        label="연간 세전 배당금"
                         value={formatNumber(result.grossAnnualDividendKrw)}
                         unit="원"
                     />
                     <ResultDetail
-                        label="월 예상 세후 배당금"
-                        value={formatNumber(result.monthlyNetDividendKrw)}
+                        label="연간 세후 배당금"
+                        value={formatNumber(result.netAnnualDividendKrw)}
                         unit="원"
+                    />
+                    <ResultDetail
+                        label="원천징수 세금"
+                        value={formatNumber(result.taxAmountUsd)}
+                        unit="USD"
                     />
                     <ResultDetail
                         label="세전 배당수익률"
@@ -187,11 +188,6 @@ export default function USDividendCalculator() {
                         label="세후 배당수익률"
                         value={formatNumber(result.netYield)}
                         unit="%"
-                    />
-                    <ResultDetail
-                        label="원천징수 세금"
-                        value={formatNumber(result.taxAmountUsd)}
-                        unit="USD"
                     />
                 </div>
             </ResultCard>
