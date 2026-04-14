@@ -1,105 +1,137 @@
-import { Metadata } from "next";
-import TargetPriceCalculator from "@/components/calculator/TargetPriceCalculator";
-import {
-  PageHeader,
-  SectionCard,
-  Article,
-  FaqSection,
-  FaqItem,
-  RelatedCalculators,
-  Disclaimer,
-} from "@/components/ui/Shared";
+import React from "react";
+import StopLossCalculator from "@/components/calculator/StopLossCalculator";
 
-export const metadata: Metadata = {
-  title: "주식 목표가 계산기 | 목표 수익률 따른 매도 가격 산출",
+export const metadata = {
+  title: "주식 손절가 계산기 | 손절 가격과 손실 비율 계산",
   description:
-    "주식을 얼마에 팔아야 원하는 수익을 얻을 수 있을까요? 매수가와 목표 수익률을 입력하면 정확한 매도 가격을 즉시 계산해 드립니다.",
-  keywords: [
-    "주식 목표가 계산기",
-    "목표 매도가",
-    "매도 가격 계산기",
-    "목표 수익률",
-    "수익 실현 계산",
-  ],
-  openGraph: {
-    title: "주식 목표가 계산기 | 목표 수익률 매도 가격 산출",
-    description:
-      "감정에 휘둘리지 말고 기계적인 매도를 준비하세요. 목표가와 1주당 이익을 미리 계산해주는 필수 툴입니다.",
-    type: "website",
-  },
+      "주식 손절가를 계산해 손실 관리 기준을 미리 정하세요. 매수가와 손절 비율을 기준으로 손절 가격을 쉽게 확인할 수 있습니다.",
 };
 
-export default function TargetPriceCalculatorPage() {
+export default function StopLossCalculatorPage() {
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
-      <PageHeader
-        badge="수익 실현 툴"
-        title="주식 목표가 계산기"
-        description="주식 목표가 계산기는 매수가와 목표 수익률을 기준으로 목표 매도 가격을 계산하는 도구입니다. 원하는 수익률에 맞는 가격을 미리 설정하여 감정에 흔들리지 않는 매도 전략을 세울 수 있습니다."
-      />
+      <main style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+        <h1>주식 손절가 계산기</h1>
 
-      <div className="mx-auto max-w-5xl px-6 py-12 md:px-8 md:py-16">
-        <TargetPriceCalculator />
+        <section style={{ marginBottom: "40px" }}>
+          <StopLossCalculator />
+        </section>
 
-        <SectionCard>
-          <Article title="주식 목표가 계산기란? (설명)">
-            <p>
-              <strong>주식 목표가 계산기</strong>는 매수가와 목표 수익률을 기준으로 목표 매도 가격을 계산하는 도구입니다.
-              원하는 수익률에 도달하기 위해 필요한 가격을 미리 확인하면, 감정에 흔들리지 않고 계획적인 매도 전략을 세울 수 있습니다.
-            </p>
-            <p>
-              종목을 매수하기 전부터 <strong>1차 목표가(+10%), 2차 목표가(+20%)</strong>를 미리 설정해두면
-              시장 가격 변동에 감정적으로 흔들리지 않고 원칙적인 투자를 이어갈 수 있습니다.
-              이 도구는 수익을 극대화하면서도 익절 타이밍을 구체화하는 데에 필수적입니다.
-            </p>
-          </Article>
+        <section>
+          <h2>주식 손절가 계산이 왜 중요한가요?</h2>
+          <p>
+            손절가는 예상과 다른 흐름이 나왔을 때 손실을 일정 범위 안에서 제한하기 위한 기준입니다.
+            많은 개인 투자자가 손실이 커지는 이유는 매수는 계획적으로 하지만, 손절은 감정적으로 하기 때문입니다.
+            주식 손절가 계산기를 활용하면 매수 전에 미리 손절 가격을 정할 수 있어 불필요한 버티기를 줄이고
+            자금 관리 원칙을 지키는 데 도움이 됩니다.
+          </p>
+          <p>
+            일반적으로 손절가는 매수가에서 일정 비율을 낮춘 가격으로 계산합니다.
+            예를 들어 50,000원에 매수했고 손절 기준을 10%로 잡았다면 손절가는 45,000원이 됩니다.
+            이렇게 미리 기준을 정해두면 시장이 급하게 흔들릴 때도 즉흥적으로 대응하지 않고,
+            자신의 투자 원칙에 따라 움직일 수 있습니다.
+          </p>
 
-          <Article title="계산 방법 (수식)">
-            <p>목표가를 구하는 수식은 다음과 같습니다:</p>
-            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 my-6 text-center">
-              <p className="font-mono text-xl text-slate-800 font-bold tracking-tight">
-                매수가 × (1 + 목표수익률 / 100)
-              </p>
-            </div>
-            <p>
-              예를 들어 50,000원에 매수한 주식의 목표 수익률을 15%로 잡았다면
-              <code>50000 × (1 + 0.15) = 57,500원</code>에 매도 주문을 걸어두시면 됩니다.
-            </p>
-          </Article>
-        </SectionCard>
+          <h2>손절가 계산 방법</h2>
+          <p>
+            손절가 계산의 기본 개념은 단순합니다. 현재 매수한 가격에서 내가 감당할 수 있는 손실 비율만큼
+            낮춘 가격을 구하면 됩니다.
+          </p>
+          <p>
+            <b>손절가 = 매수가 × (1 - 손절 비율)</b>
+          </p>
+          <p>
+            예를 들어 매수가가 100,000원이고 손절 비율이 8%라면 손절가는 92,000원입니다.
+            투자 스타일에 따라 3%, 5%, 8%, 10% 등 기준은 달라질 수 있지만, 중요한 것은 숫자를 미리 정하는 것입니다.
+          </p>
 
-        <FaqSection title="자주 묻는 질문 (FAQ)">
-          <FaqItem
-            question="수수료 및 제세공과금이 포함된 가격인가요?"
-            answer="산출된 가격은 순수 자산 상승분만을 반영한 가격입니다. 한국장의 경우 매도 시 거래세 및 매매수수료(약 0.2~0.3%)가 부과되므로, 목표 가격보다 한두 호가 높게 매도해야 원하는 실수령액에 도달하게 됩니다."
-          />
-          <FaqItem
-            question="현재가로는 목표가를 계산할 수 없나요?"
-            answer="본인의 원래 매수 단가가 아니라 '현재가'를 매수 가격 란에 입력하시면, '지금 이 가격에서 10% 상승한다면 얼마일까?'와 같은 시뮬레이션 용도로 완벽하게 사용하실 수 있습니다."
-          />
-          <FaqItem
-            question="반대로 하락할 때를 대비하려면요?"
-            answer="목표 수익률은 목표가 계산기가 관리하지만, 반대로 가격이 떨어질 때 일정 손실에서 끊어내는 전략은 사이트 내 '손절가 계산기'를 함께 활용하여 가급적 양방향 대응을 해야 합니다."
-          />
-        </FaqSection>
+          <h3>활용 팁</h3>
+          <ul>
+            <li>매수 전에 손절가를 먼저 정하고 진입하세요.</li>
+            <li>종목마다 변동성이 다르므로 손절 비율도 동일하게 쓰지 않는 것이 좋습니다.</li>
+            <li>손절 기준은 계좌 전체 리스크 관리와 함께 보아야 합니다.</li>
+            <li>감정이 아니라 원칙으로 대응하기 위해 계산기를 활용하세요.</li>
+          </ul>
+        </section>
 
-        <RelatedCalculators
-          links={[
-            {
-              href: "/profit-calculator",
-              title: "주식 수익률 계산기",
-              desc: "현재가 기준 실제 수익률과 손익 확인",
-            },
-            {
-              href: "/break-even-calculator",
-              title: "본전 회복 계산기",
-              desc: "손실 구간에서 원금 회복에 필요한 상승률 계산",
-            },
-          ]}
+        <section style={{ marginTop: "40px" }}>
+          <h2>자주 묻는 질문 (FAQ)</h2>
+
+          <h3>Q. 손절가는 몇 퍼센트로 잡는 게 좋나요?</h3>
+          <p>
+            정답은 없지만 단기 매매는 보통 더 짧게, 중장기 투자나 변동성이 큰 종목은 조금 더 넓게 잡기도 합니다.
+            중요한 것은 자신의 투자 원칙에 맞는 기준을 일관되게 적용하는 것입니다.
+          </p>
+
+          <h3>Q. 손절을 꼭 해야 하나요?</h3>
+          <p>
+            모든 상황에서 기계적으로 해야 한다고 볼 수는 없지만, 손절 기준이 없으면 손실이 커질 가능성이 높습니다.
+            특히 단기 매매에서는 손절 원칙이 매우 중요합니다.
+          </p>
+
+          <h3>Q. 손절가 계산기와 수익률 계산기는 어떻게 다르나요?</h3>
+          <p>
+            수익률 계산기는 현재 수익 또는 손실 상태를 확인하는 용도이고, 손절가 계산기는 앞으로 어디서 손실을 제한할지
+            기준 가격을 정하는 용도입니다.
+          </p>
+        </section>
+
+        <section style={{ marginTop: "40px" }}>
+          <h3>다른 계산기도 함께 사용해보세요</h3>
+          <ul>
+            <li><a href="/profit-calculator">주식 수익률 계산기</a></li>
+            <li><a href="/average-price-calculator">주식 평단가 계산기</a></li>
+            <li><a href="/target-price-calculator">주식 목표가 계산기</a></li>
+          </ul>
+        </section>
+
+        <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "WebApplication",
+                name: "주식 손절가 계산기",
+                applicationCategory: "FinanceApplication",
+                operatingSystem: "All",
+              }),
+            }}
         />
 
-        <Disclaimer />
-      </div>
-    </main>
+        <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                mainEntity: [
+                  {
+                    "@type": "Question",
+                    name: "손절가는 몇 퍼센트로 잡는 게 좋나요?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "정답은 없지만 투자 스타일과 종목 변동성에 따라 기준이 달라집니다. 중요한 것은 일관된 원칙을 세우는 것입니다.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "손절을 꼭 해야 하나요?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "손절 기준이 없으면 손실이 커질 가능성이 높습니다. 특히 단기 매매에서는 손절 원칙이 중요합니다.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "손절가 계산기와 수익률 계산기는 어떻게 다르나요?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "수익률 계산기는 현재 손익 상태를 확인하는 용도이고, 손절가 계산기는 앞으로 손실 제한 기준 가격을 정하는 용도입니다.",
+                    },
+                  },
+                ],
+              }),
+            }}
+        />
+      </main>
   );
 }
