@@ -92,10 +92,7 @@ export default function StopLossCalculatorPage() {
               </div>
             </CalculatorCard>
 
-            <ResultCard
-                title="계산 결과"
-                description="입력한 손절 비율 기준으로 예상 손절가와 손실 규모를 보여줍니다."
-            >
+            <ResultCard title="계산 결과">
               {result ? (
                   <div className="space-y-4">
                     <ResultHighlight
