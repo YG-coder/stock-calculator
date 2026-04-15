@@ -1,137 +1,228 @@
-import React from "react";
-import StopLossCalculator from "@/components/calculator/StopLossCalculator";
+// src/app/stop-loss-calculator/page.tsx
+"use client";
 
-export const metadata = {
-  title: "주식 손절가 계산기 | 손절 가격과 손실 비율 계산",
+import { useMemo, useState } from "react";
+import type { Metadata } from "next";
+import {
+  PageHeader,
+  SectionCard,
+  Article,
+  CalculatorLayout,
+  CalculatorCard,
+  ResultCard,
+  ResultHighlight,
+  ResultDetail,
+  InputField,
+} from "@/components/ui/Shared";
+
+export const metadata: Metadata = {
+  title: "손절가 계산기",
   description:
-      "주식 손절가를 계산해 손실 관리 기준을 미리 정하세요. 매수가와 손절 비율을 기준으로 손절 가격을 쉽게 확인할 수 있습니다.",
+      "매수가와 손절 비율을 입력하면 손절가와 손실 금액을 계산할 수 있는 주식 손절가 계산기입니다.",
+  alternates: {
+    canonical: "https://주식계산기.kr/stop-loss-calculator",
+  },
+  openGraph: {
+    title: "손절가 계산기 | 주식계산기.kr",
+    description:
+        "매수가와 손절 비율을 입력하면 손절가와 손실 금액을 계산할 수 있습니다.",
+    url: "https://주식계산기.kr/stop-loss-calculator",
+    siteName: "주식계산기.kr",
+    locale: "ko_KR",
+    type: "website",
+  },
 };
 
+function formatNumber(value: number) {
+  if (!Number.isFinite(value)) return "-";
+  return new Intl.NumberFormat("ko-KR").format(Math.round(value));
+}
+
 export default function StopLossCalculatorPage() {
+  const [buyPrice, setBuyPrice] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [stopLossPercent, setStopLossPercent] = useState("");
+
+  const result = useMemo(() => {
+    const buy = Number(buyPrice);
+    const qty = Number(quantity);
+    const stopPercent = Number(stopLossPercent);
+
+    if (!buy || !qty || !stopPercent) {
+      return null;
+    }
+
+    const stopPrice = buy * (1 - stopPercent / 100);
+    const lossPerShare = buy - stopPrice;
+    const totalLoss = lossPerShare * qty;
+    const totalBuyAmount = buy * qty;
+    const lossRate = totalBuyAmount > 0 ? (totalLoss / totalBuyAmount) * 100 : 0;
+
+    return {
+      stopPrice,
+      lossPerShare,
+      totalLoss,
+      totalBuyAmount,
+      lossRate,
+    };
+  }, [buyPrice, quantity, stopLossPercent]);
+
   return (
-      <main style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-        <h1>주식 손절가 계산기</h1>
-
-        <section style={{ marginBottom: "40px" }}>
-          <StopLossCalculator />
-        </section>
-
-        <section>
-          <h2>주식 손절가 계산이 왜 중요한가요?</h2>
-          <p>
-            손절가는 예상과 다른 흐름이 나왔을 때 손실을 일정 범위 안에서 제한하기 위한 기준입니다.
-            많은 개인 투자자가 손실이 커지는 이유는 매수는 계획적으로 하지만, 손절은 감정적으로 하기 때문입니다.
-            주식 손절가 계산기를 활용하면 매수 전에 미리 손절 가격을 정할 수 있어 불필요한 버티기를 줄이고
-            자금 관리 원칙을 지키는 데 도움이 됩니다.
-          </p>
-          <p>
-            일반적으로 손절가는 매수가에서 일정 비율을 낮춘 가격으로 계산합니다.
-            예를 들어 50,000원에 매수했고 손절 기준을 10%로 잡았다면 손절가는 45,000원이 됩니다.
-            이렇게 미리 기준을 정해두면 시장이 급하게 흔들릴 때도 즉흥적으로 대응하지 않고,
-            자신의 투자 원칙에 따라 움직일 수 있습니다.
-          </p>
-
-          <h2>손절가 계산 방법</h2>
-          <p>
-            손절가 계산의 기본 개념은 단순합니다. 현재 매수한 가격에서 내가 감당할 수 있는 손실 비율만큼
-            낮춘 가격을 구하면 됩니다.
-          </p>
-          <p>
-            <b>손절가 = 매수가 × (1 - 손절 비율)</b>
-          </p>
-          <p>
-            예를 들어 매수가가 100,000원이고 손절 비율이 8%라면 손절가는 92,000원입니다.
-            투자 스타일에 따라 3%, 5%, 8%, 10% 등 기준은 달라질 수 있지만, 중요한 것은 숫자를 미리 정하는 것입니다.
-          </p>
-
-          <h3>활용 팁</h3>
-          <ul>
-            <li>매수 전에 손절가를 먼저 정하고 진입하세요.</li>
-            <li>종목마다 변동성이 다르므로 손절 비율도 동일하게 쓰지 않는 것이 좋습니다.</li>
-            <li>손절 기준은 계좌 전체 리스크 관리와 함께 보아야 합니다.</li>
-            <li>감정이 아니라 원칙으로 대응하기 위해 계산기를 활용하세요.</li>
-          </ul>
-        </section>
-
-        <section style={{ marginTop: "40px" }}>
-          <h2>자주 묻는 질문 (FAQ)</h2>
-
-          <h3>Q. 손절가는 몇 퍼센트로 잡는 게 좋나요?</h3>
-          <p>
-            정답은 없지만 단기 매매는 보통 더 짧게, 중장기 투자나 변동성이 큰 종목은 조금 더 넓게 잡기도 합니다.
-            중요한 것은 자신의 투자 원칙에 맞는 기준을 일관되게 적용하는 것입니다.
-          </p>
-
-          <h3>Q. 손절을 꼭 해야 하나요?</h3>
-          <p>
-            모든 상황에서 기계적으로 해야 한다고 볼 수는 없지만, 손절 기준이 없으면 손실이 커질 가능성이 높습니다.
-            특히 단기 매매에서는 손절 원칙이 매우 중요합니다.
-          </p>
-
-          <h3>Q. 손절가 계산기와 수익률 계산기는 어떻게 다르나요?</h3>
-          <p>
-            수익률 계산기는 현재 수익 또는 손실 상태를 확인하는 용도이고, 손절가 계산기는 앞으로 어디서 손실을 제한할지
-            기준 가격을 정하는 용도입니다.
-          </p>
-        </section>
-
-        <section style={{ marginTop: "40px" }}>
-          <h3>다른 계산기도 함께 사용해보세요</h3>
-          <ul>
-            <li><a href="/profit-calculator">주식 수익률 계산기</a></li>
-            <li><a href="/average-price-calculator">주식 평단가 계산기</a></li>
-            <li><a href="/target-price-calculator">주식 목표가 계산기</a></li>
-          </ul>
-        </section>
-
-        <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "WebApplication",
-                name: "주식 손절가 계산기",
-                applicationCategory: "FinanceApplication",
-                operatingSystem: "All",
-              }),
-            }}
+      <main className="min-h-screen bg-slate-50 text-slate-900 pb-20">
+        <PageHeader
+            badge="리스크 관리"
+            title="손절가 계산기"
+            description="매수가, 수량, 손절 비율을 입력하면 손절가와 예상 손실 금액을 빠르게 계산할 수 있습니다."
         />
 
-        <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "FAQPage",
-                mainEntity: [
-                  {
-                    "@type": "Question",
-                    name: "손절가는 몇 퍼센트로 잡는 게 좋나요?",
-                    acceptedAnswer: {
-                      "@type": "Answer",
-                      text: "정답은 없지만 투자 스타일과 종목 변동성에 따라 기준이 달라집니다. 중요한 것은 일관된 원칙을 세우는 것입니다.",
-                    },
-                  },
-                  {
-                    "@type": "Question",
-                    name: "손절을 꼭 해야 하나요?",
-                    acceptedAnswer: {
-                      "@type": "Answer",
-                      text: "손절 기준이 없으면 손실이 커질 가능성이 높습니다. 특히 단기 매매에서는 손절 원칙이 중요합니다.",
-                    },
-                  },
-                  {
-                    "@type": "Question",
-                    name: "손절가 계산기와 수익률 계산기는 어떻게 다르나요?",
-                    acceptedAnswer: {
-                      "@type": "Answer",
-                      text: "수익률 계산기는 현재 손익 상태를 확인하는 용도이고, 손절가 계산기는 앞으로 손실 제한 기준 가격을 정하는 용도입니다.",
-                    },
-                  },
-                ],
-              }),
-            }}
-        />
+        <div className="mx-auto max-w-6xl px-6 py-12 md:px-8">
+          <CalculatorLayout>
+            <CalculatorCard
+                title="입력값"
+                description="손절 기준을 정하기 위한 기본 정보를 입력하세요."
+            >
+              <div className="space-y-5">
+                <InputField
+                    label="매수가 (원)"
+                    type="number"
+                    inputMode="decimal"
+                    placeholder="예: 100000"
+                    value={buyPrice}
+                    onChange={(e) => setBuyPrice(e.target.value)}
+                />
+
+                <InputField
+                    label="보유 수량 (주)"
+                    type="number"
+                    inputMode="numeric"
+                    placeholder="예: 10"
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                />
+
+                <InputField
+                    label="손절 비율 (%)"
+                    type="number"
+                    inputMode="decimal"
+                    placeholder="예: 5"
+                    value={stopLossPercent}
+                    onChange={(e) => setStopLossPercent(e.target.value)}
+                />
+              </div>
+            </CalculatorCard>
+
+            <ResultCard
+                title="계산 결과"
+                description="입력한 손절 비율 기준으로 예상 손절가와 손실 규모를 보여줍니다."
+            >
+              {result ? (
+                  <div className="space-y-4">
+                    <ResultHighlight
+                        label="손절가"
+                        value={`${formatNumber(result.stopPrice)}원`}
+                    />
+
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <ResultDetail
+                          label="1주당 손실 금액"
+                          value={`${formatNumber(result.lossPerShare)}원`}
+                      />
+                      <ResultDetail
+                          label="총 손실 금액"
+                          value={`${formatNumber(result.totalLoss)}원`}
+                      />
+                      <ResultDetail
+                          label="총 매수 금액"
+                          value={`${formatNumber(result.totalBuyAmount)}원`}
+                      />
+                      <ResultDetail
+                          label="총 손실 비율"
+                          value={`${result.lossRate.toFixed(2)}%`}
+                      />
+                    </div>
+                  </div>
+              ) : (
+                  <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm leading-relaxed text-slate-500">
+                    매수가, 보유 수량, 손절 비율을 입력하면 결과가 바로 표시됩니다.
+                  </div>
+              )}
+            </ResultCard>
+          </CalculatorLayout>
+
+          <div className="mt-10 space-y-8">
+            <SectionCard>
+              <Article title="손절가 계산기가 필요한 이유">
+                <p className="mt-2">
+                  손절은 투자에서 손실을 제한하기 위한 가장 기본적인 원칙 중 하나입니다.
+                  많은 개인 투자자는 종목이 하락할 때 막연히 “조금만 더 기다리면 오르겠지”
+                  라고 생각하다가 손실을 키우는 경우가 많습니다. 손절가 계산기를 사용하면
+                  매수 시점부터 미리 손절 기준 가격을 정해둘 수 있어 감정적인 대응을 줄이고,
+                  손실을 일정 범위 안에서 통제하는 데 도움이 됩니다.
+                </p>
+                <p className="mt-3">
+                  예를 들어 손절 비율을 5%로 설정했다면, 현재 종목이 그 가격 아래로
+                  내려왔을 때 기계적으로 대응할 수 있습니다. 이렇게 하면 한 번의 실수로
+                  계좌 전체가 흔들리는 상황을 줄일 수 있습니다. 특히 변동성이 큰 중소형주,
+                  테마주, 단기 매매에서는 손절 기준을 사전에 정하는 습관이 매우 중요합니다.
+                </p>
+              </Article>
+            </SectionCard>
+
+            <SectionCard>
+              <Article title="손절 기준은 어떻게 잡아야 하나">
+                <p className="mt-2">
+                  손절 기준은 사람마다 다르지만, 일반적으로는 자신의 매매 스타일과
+                  감당 가능한 손실 범위를 기준으로 정하는 것이 좋습니다. 단기 매매자는
+                  3~5% 수준의 짧은 손절을 선호할 수 있고, 중기 보유자는 더 넓은 기준을
+                  잡기도 합니다. 중요한 것은 손절 비율 자체보다도, 한 번 정한 원칙을
+                  일관되게 지키는 것입니다.
+                </p>
+                <p className="mt-3">
+                  또한 손절가는 단순 퍼센트 기준 외에도 지지선 이탈, 전일 저가 이탈,
+                  거래량 급감, 추세선 붕괴 같은 기술적 기준과 함께 보는 것이 좋습니다.
+                  이 계산기는 퍼센트 기준 손절가를 빠르게 계산하는 도구이므로, 실제 매매에서는
+                  차트와 함께 보조적으로 활용하는 것이 가장 현실적입니다.
+                </p>
+              </Article>
+            </SectionCard>
+
+            <SectionCard>
+              <Article title="FAQ">
+                <div className="space-y-6 mt-4">
+                  <div>
+                    <h3 className="text-base font-bold text-slate-800">
+                      Q1. 손절 비율은 몇 퍼센트가 적당한가요?
+                    </h3>
+                    <p className="mt-2 text-slate-600">
+                      정답은 없지만, 단기 매매는 보통 3~5%, 스윙 관점은 5~10% 안에서
+                      많이 설정합니다. 다만 종목 변동성과 본인의 투자 성향에 따라 달라질 수 있습니다.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-base font-bold text-slate-800">
+                      Q2. 손절가는 무조건 지켜야 하나요?
+                    </h3>
+                    <p className="mt-2 text-slate-600">
+                      손절 기준을 정했다면 특별한 이유가 없는 한 지키는 편이 좋습니다.
+                      기준이 자꾸 흔들리면 손실이 커질 가능성이 높아집니다.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-base font-bold text-slate-800">
+                      Q3. 이 계산 결과는 실제 수수료와 세금까지 반영하나요?
+                    </h3>
+                    <p className="mt-2 text-slate-600">
+                      현재 계산기는 기본 손절가와 손실 금액을 단순 계산한 참고용 결과입니다.
+                      실제 매매에서는 증권사 수수료, 세금, 체결 가격 차이 등이 발생할 수 있습니다.
+                    </p>
+                  </div>
+                </div>
+              </Article>
+            </SectionCard>
+          </div>
+        </div>
       </main>
   );
 }
