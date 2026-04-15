@@ -1,3 +1,4 @@
+// src/app/robots.ts
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
@@ -7,5 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
     },
     sitemap: "https://주식계산기.kr/sitemap.xml",
+    host: "https://주식계산기.kr",
   };
 }

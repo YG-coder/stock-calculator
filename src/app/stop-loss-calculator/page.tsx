@@ -2,7 +2,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Metadata } from "next";
 import {
   PageHeader,
   SectionCard,
@@ -14,24 +13,6 @@ import {
   ResultDetail,
   InputField,
 } from "@/components/ui/Shared";
-
-export const metadata: Metadata = {
-  title: "손절가 계산기",
-  description:
-      "매수가와 손절 비율을 입력하면 손절가와 손실 금액을 계산할 수 있는 주식 손절가 계산기입니다.",
-  alternates: {
-    canonical: "https://주식계산기.kr/stop-loss-calculator",
-  },
-  openGraph: {
-    title: "손절가 계산기 | 주식계산기.kr",
-    description:
-        "매수가와 손절 비율을 입력하면 손절가와 손실 금액을 계산할 수 있습니다.",
-    url: "https://주식계산기.kr/stop-loss-calculator",
-    siteName: "주식계산기.kr",
-    locale: "ko_KR",
-    type: "website",
-  },
-};
 
 function formatNumber(value: number) {
   if (!Number.isFinite(value)) return "-";
@@ -153,17 +134,19 @@ export default function StopLossCalculatorPage() {
             <SectionCard>
               <Article title="손절가 계산기가 필요한 이유">
                 <p className="mt-2">
-                  손절은 투자에서 손실을 제한하기 위한 가장 기본적인 원칙 중 하나입니다.
-                  많은 개인 투자자는 종목이 하락할 때 막연히 “조금만 더 기다리면 오르겠지”
-                  라고 생각하다가 손실을 키우는 경우가 많습니다. 손절가 계산기를 사용하면
-                  매수 시점부터 미리 손절 기준 가격을 정해둘 수 있어 감정적인 대응을 줄이고,
-                  손실을 일정 범위 안에서 통제하는 데 도움이 됩니다.
+                  손절은 투자에서 손실을 제한하기 위한 가장 기본적인 원칙 중
+                  하나입니다. 많은 개인 투자자는 종목이 하락할 때 막연히 “조금만 더
+                  기다리면 오르겠지”라고 생각하다가 손실을 키우는 경우가 많습니다.
+                  손절가 계산기를 사용하면 매수 시점부터 미리 손절 기준 가격을 정해둘
+                  수 있어 감정적인 대응을 줄이고, 손실을 일정 범위 안에서 통제하는 데
+                  도움이 됩니다.
                 </p>
                 <p className="mt-3">
                   예를 들어 손절 비율을 5%로 설정했다면, 현재 종목이 그 가격 아래로
-                  내려왔을 때 기계적으로 대응할 수 있습니다. 이렇게 하면 한 번의 실수로
-                  계좌 전체가 흔들리는 상황을 줄일 수 있습니다. 특히 변동성이 큰 중소형주,
-                  테마주, 단기 매매에서는 손절 기준을 사전에 정하는 습관이 매우 중요합니다.
+                  내려왔을 때 기계적으로 대응할 수 있습니다. 이렇게 하면 한 번의
+                  실수로 계좌 전체가 흔들리는 상황을 줄일 수 있습니다. 특히 변동성이
+                  큰 중소형주, 테마주, 단기 매매에서는 손절 기준을 사전에 정하는
+                  습관이 매우 중요합니다.
                 </p>
               </Article>
             </SectionCard>
@@ -172,30 +155,31 @@ export default function StopLossCalculatorPage() {
               <Article title="손절 기준은 어떻게 잡아야 하나">
                 <p className="mt-2">
                   손절 기준은 사람마다 다르지만, 일반적으로는 자신의 매매 스타일과
-                  감당 가능한 손실 범위를 기준으로 정하는 것이 좋습니다. 단기 매매자는
-                  3~5% 수준의 짧은 손절을 선호할 수 있고, 중기 보유자는 더 넓은 기준을
-                  잡기도 합니다. 중요한 것은 손절 비율 자체보다도, 한 번 정한 원칙을
-                  일관되게 지키는 것입니다.
+                  감당 가능한 손실 범위를 기준으로 정하는 것이 좋습니다. 단기
+                  매매자는 3~5% 수준의 짧은 손절을 선호할 수 있고, 중기 보유자는 더
+                  넓은 기준을 잡기도 합니다. 중요한 것은 손절 비율 자체보다도, 한 번
+                  정한 원칙을 일관되게 지키는 것입니다.
                 </p>
                 <p className="mt-3">
                   또한 손절가는 단순 퍼센트 기준 외에도 지지선 이탈, 전일 저가 이탈,
                   거래량 급감, 추세선 붕괴 같은 기술적 기준과 함께 보는 것이 좋습니다.
-                  이 계산기는 퍼센트 기준 손절가를 빠르게 계산하는 도구이므로, 실제 매매에서는
-                  차트와 함께 보조적으로 활용하는 것이 가장 현실적입니다.
+                  이 계산기는 퍼센트 기준 손절가를 빠르게 계산하는 도구이므로, 실제
+                  매매에서는 차트와 함께 보조적으로 활용하는 것이 가장 현실적입니다.
                 </p>
               </Article>
             </SectionCard>
 
             <SectionCard>
               <Article title="FAQ">
-                <div className="space-y-6 mt-4">
+                <div className="mt-4 space-y-6">
                   <div>
                     <h3 className="text-base font-bold text-slate-800">
                       Q1. 손절 비율은 몇 퍼센트가 적당한가요?
                     </h3>
                     <p className="mt-2 text-slate-600">
                       정답은 없지만, 단기 매매는 보통 3~5%, 스윙 관점은 5~10% 안에서
-                      많이 설정합니다. 다만 종목 변동성과 본인의 투자 성향에 따라 달라질 수 있습니다.
+                      많이 설정합니다. 다만 종목 변동성과 본인의 투자 성향에 따라
+                      달라질 수 있습니다.
                     </p>
                   </div>
 
@@ -214,8 +198,9 @@ export default function StopLossCalculatorPage() {
                       Q3. 이 계산 결과는 실제 수수료와 세금까지 반영하나요?
                     </h3>
                     <p className="mt-2 text-slate-600">
-                      현재 계산기는 기본 손절가와 손실 금액을 단순 계산한 참고용 결과입니다.
-                      실제 매매에서는 증권사 수수료, 세금, 체결 가격 차이 등이 발생할 수 있습니다.
+                      현재 계산기는 기본 손절가와 손실 금액을 단순 계산한 참고용
+                      결과입니다. 실제 매매에서는 증권사 수수료, 세금, 체결 가격
+                      차이 등이 발생할 수 있습니다.
                     </p>
                   </div>
                 </div>
