@@ -39,7 +39,7 @@ https://주식계산기.kr
 ---
 
 ## 📦 실행 방법
-
+₩   
 ```bash
 npm install
 npm run dev

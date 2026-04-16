@@ -1,5 +1,5 @@
-import { Metadata } from "next";
 import AveragePriceCalculator from "@/components/calculator/AveragePriceCalculator";
+import { buildMetadata } from "@/lib/metadata";
 import {
   PageHeader,
   SectionCard,
@@ -10,10 +10,11 @@ import {
   Disclaimer,
 } from "@/components/ui/Shared";
 
-export const metadata: Metadata = {
-  title: "주식 평단가 계산기 | 물타기 후 평균단가 자동 계산",
+export const metadata = buildMetadata({
+  title: "주식 평단가 계산기",
   description:
-    "주식 매수 후 물타기를 할 때 평균 매입 단가(평단가)가 어떻게 변하는지 쉽게 계산해보세요. 추가 매수 가격과 수량만 입력하면 평균 단가를 즉시 확인할 수 있습니다.",
+      "주식 매수 후 물타기를 할 때 평균 매입 단가(평단가)가 어떻게 변하는지 쉽게 계산해보세요. 추가 매수 가격과 수량만 입력하면 평균 단가를 즉시 확인할 수 있습니다.",
+  path: "/average-price-calculator",
   keywords: [
     "주식 평단가 계산기",
     "물타기 계산기",
@@ -21,90 +22,100 @@ export const metadata: Metadata = {
     "stock average price calculator",
     "추가매수 평단",
   ],
-  openGraph: {
-    title: "주식 평단가 계산기 | 물타기 후 평균단가 자동 계산",
-    description:
-      "물타기 전후의 평단가와 투자금을 정확히 계산해보세요. 주식 초보자도 쉽게 사용할 수 있는 필수 금융 계산기입니다.",
-    type: "website",
-  },
-};
+});
 
 export default function AveragePriceCalculatorPage() {
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
-      <PageHeader
-        badge="필수 금융 계산기"
-        title="주식 평단가 계산기"
-        description="주식 평단가 계산기는 추가 매수(물타기) 후 평균 매입 단가가 어떻게 달라지는지 계산하는 도구입니다. 예상 평단가를 미리 확인하면 손익분기점과 매매 전략을 더 정확하게 판단할 수 있습니다."
-      />
-
-      <div className="mx-auto max-w-5xl px-6 py-12 md:px-8 md:py-16">
-        <AveragePriceCalculator />
-
-        <SectionCard>
-          <Article title="주식 물타기와 평단가 계산의 중요성">
-            <p>
-              <strong>주식 평단가 계산기</strong>는 여러 번 나눠 매수한 주식의 평균 매입 단가를 계산하는 도구입니다.
-              물타기 전략을 사용할 때 추가 매수 후 예상 평단가를 미리 확인하면, 손익분기점까지 필요한 반등 폭과 이후 매매 전략을 더 현실적으로 판단할 수 있습니다.
-            </p>
-            <p>
-              다만 물타기는 추가 자금이 들어가는 전략이기 때문에, 무조건 유리한 방식은 아닙니다.
-              현재 보유 수량과 추가 매수 가격을 기준으로 새로운 평균 단가를 미리 계산해보고,
-              손절 기준과 목표가를 함께 검토하는 것이 중요합니다.
-            </p>
-          </Article>
-
-          <Article title="평단가 계산 방법은?">
-            <p>평단가는 총 매수 금액을 총 보유 수량으로 나누어 계산합니다.</p>
-            <div className="my-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-6">
-              <div className="mx-auto max-w-md text-center font-mono font-bold text-slate-800">
-                <div className="break-keep text-base leading-relaxed sm:text-lg">
-                  (기존 매수가 × 기존 수량) + (추가 매수가 × 추가 수량)
-                </div>
-                <div className="my-3 border-t-2 border-slate-700" />
-                <div className="break-keep text-base leading-relaxed sm:text-lg">
-                  (기존 수량 + 추가 수량)
-                </div>
-              </div>
-            </div>
-            <p>
-              여러 번 나누어 매수한 경우 단순 평균이 아니라 매수 금액 비중까지 반영해야 정확한 평균 단가를 구할 수 있습니다.
-            </p>
-          </Article>
-        </SectionCard>
-
-        <FaqSection title="자주 묻는 질문 (FAQ)">
-          <FaqItem
-            question="물타기를 하면 평단가가 항상 낮아지나요?"
-            answer="기존 매입가보다 낮은 가격에 추가 매수하면 일반적으로 평균 단가는 낮아집니다. 반대로 더 높은 가격에 추가 매수하면 평균 단가는 높아질 수 있습니다."
-          />
-          <FaqItem
-            question="평단가 계산 결과에 수수료나 세금이 포함되나요?"
-            answer="보통 평단가 계산기는 매수가와 수량 기준으로 평균 단가를 계산합니다. 실제 손익 계산에서는 수수료와 세금을 별도로 고려하는 것이 좋습니다."
-          />
-          <FaqItem
-            question="평단가 계산이 왜 중요한가요?"
-            answer="현재 손익 상태를 정확히 파악하고, 목표가나 손절가를 정할 때 기준이 되기 때문입니다. 분할 매수 전략을 사용할수록 평단가 확인이 중요합니다."
-          />
-        </FaqSection>
-
-        <RelatedCalculators
-          links={[
-            {
-              href: "/profit-calculator",
-              title: "주식 수익률 계산기",
-              desc: "새로운 평단가 기준으로 예상 수익률과 손익 확인",
-            },
-            {
-              href: "/stop-loss-calculator",
-              title: "주식 손절가 계산기",
-              desc: "리스크 관리를 위한 손절 기준 가격 계산",
-            },
-          ]}
+      <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
+        <PageHeader
+            badge="필수 투자 계산기"
+            title="주식 평단가 계산기"
+            description="추가 매수 후 평균 매입 단가가 어떻게 바뀌는지 계산할 수 있는 주식 평단가 계산기입니다. 물타기 이후 새로운 평단가를 빠르게 확인할 수 있습니다."
         />
 
-        <Disclaimer />
-      </div>
-    </main>
+        <div className="mx-auto max-w-5xl px-6 py-12 md:px-8 md:py-16">
+          <AveragePriceCalculator />
+
+          <SectionCard>
+            <Article title="주식 평단가 계산기란?">
+              <p>
+                <strong>주식 평단가 계산기</strong>는 여러 가격대에서 나누어 매수한
+                주식의 평균 매입 단가를 계산하는 도구입니다. 투자자는 보통 한 번에
+                모든 물량을 매수하지 않고, 가격이 하락할 때 추가 매수하거나 분할
+                매수를 진행하는 경우가 많습니다.
+              </p>
+              <p>
+                이때 최종적으로 내가 얼마에 사들인 것으로 봐야 하는지 정확히 알아야
+                이후 수익률, 손절가, 목표가 계산이 가능합니다. 평단가를 제대로 알지
+                못하면 수익인지 손실인지 판단이 흐려질 수 있습니다.
+              </p>
+            </Article>
+
+            <Article title="평단가 계산 공식">
+              <p>평균 매입 단가는 아래 방식으로 계산합니다.</p>
+              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 text-center my-6">
+                <p className="font-mono text-sm sm:text-lg text-slate-800 font-bold tracking-tight">
+                  총 매수 금액 ÷ 총 보유 수량
+                </p>
+              </div>
+              <p>
+                예를 들어 10주를 10,000원에 사고, 추가로 10주를 8,000원에 샀다면
+                총 매수 금액은 180,000원이고 총 수량은 20주이므로 평균 단가는
+                9,000원이 됩니다.
+              </p>
+            </Article>
+
+            <Article title="평단가 계산이 중요한 이유">
+              <p>
+                평단가는 단순 참고 숫자가 아니라, 현재 수익률을 계산하는 기준점입니다.
+                추가 매수 후 평단가가 내려가면 같은 현재가에서도 손익 구조가 크게
+                달라질 수 있습니다.
+              </p>
+              <p>
+                다만 물타기는 평단가를 낮출 수 있지만 동시에 투자 금액을 더 투입하는
+                전략이므로 종목의 펀더멘털이나 리스크를 충분히 고려한 뒤 결정하는 것이
+                좋습니다.
+              </p>
+            </Article>
+          </SectionCard>
+
+          <FaqSection title="자주 묻는 질문 (FAQ)">
+            <FaqItem
+                question="물타기 후 수익률은 어떻게 확인하나요?"
+                answer="먼저 이 계산기로 새 평단가를 구한 뒤, 수익률 계산기에서 해당 평단가를 매수가로 입력하면 됩니다."
+            />
+            <FaqItem
+                question="평단가가 낮아지면 무조건 좋은 건가요?"
+                answer="아닙니다. 평단가가 낮아져도 추가 자금이 투입된 것이므로 종목 리스크가 커질 수 있습니다. 단순히 평균가만 보고 판단하면 안 됩니다."
+            />
+            <FaqItem
+                question="수수료는 포함되나요?"
+                answer="기본 계산은 매수 단가와 수량 기준입니다. 실제 평단가는 거래 수수료까지 포함하면 약간 달라질 수 있습니다."
+            />
+          </FaqSection>
+
+          <RelatedCalculators
+              links={[
+                {
+                  href: "/profit-calculator",
+                  title: "주식 수익률 계산기",
+                  desc: "현재가 기준 실제 수익률 확인",
+                },
+                {
+                  href: "/stop-loss-calculator",
+                  title: "주식 손절가 계산기",
+                  desc: "손실 제한 가격 계산",
+                },
+                {
+                  href: "/break-even-calculator",
+                  title: "본전 회복 계산기",
+                  desc: "손실 후 회복에 필요한 상승률 계산",
+                },
+              ]}
+          />
+
+          <Disclaimer />
+        </div>
+      </main>
   );
 }
