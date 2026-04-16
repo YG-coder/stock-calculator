@@ -225,6 +225,7 @@ export const CALCULATORS: CalculatorItem[] = [
 ];
 
 export const HEADER_CALCULATORS = [
+  { href: "/calculators", label: "전체 계산기" },
   { href: "/stocks", label: "주식 계산기" },
   { href: "/crypto", label: "코인 계산기" },
   { href: "/us-stocks", label: "미국주식 계산기" },
