@@ -1,3 +1,8 @@
+/**
+ * src/app/page.tsx
+ * 역할: 홈 (애드센스 승인용 SEO + 체류시간 최적화 완료)
+ */
+
 import Link from "next/link";
 import { buildMetadata } from "@/lib/metadata";
 import { CALCULATORS } from "@/lib/constants";
@@ -29,9 +34,11 @@ export default function HomePage() {
 
   return (
       <main className="min-h-screen bg-slate-50 text-slate-900 pb-20">
+
+        {/* 🔥 히어로 */}
         <section className="border-b border-slate-200 bg-white">
           <div className="mx-auto max-w-6xl px-6 py-16 md:px-8 md:py-20">
-          <span className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold tracking-tight text-slate-600">
+          <span className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600">
             무료 투자 계산기
           </span>
 
@@ -64,6 +71,7 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* 🔥 계산기 카드 */}
         <section className="mx-auto max-w-6xl px-6 py-10 md:px-8 md:py-12">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
@@ -75,7 +83,7 @@ export default function HomePage() {
 
             <Link
                 href="/calculators"
-                className="text-sm font-semibold text-slate-700 underline-offset-2 hover:underline"
+                className="text-sm font-semibold text-slate-700 hover:underline"
             >
               전체 계산기 보기
             </Link>
@@ -89,21 +97,15 @@ export default function HomePage() {
                     className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-lg font-bold tracking-tight text-slate-900 group-hover:text-slate-700">
-                        {item.title}
-                      </p>
-                      <p className="mt-2 text-sm leading-6 text-slate-600">
-                        {item.desc}
-                      </p>
+                    <div>
+                      <p className="text-lg font-bold">{item.title}</p>
+                      <p className="mt-2 text-sm text-slate-600">{item.desc}</p>
                     </div>
 
-                    <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
-                  {item.badge}
-                </span>
+                    <span className="text-xs">{item.badge}</span>
                   </div>
 
-                  <div className="mt-4 text-sm font-semibold text-slate-800">
+                  <div className="mt-4 text-sm font-semibold">
                     계산기 열기 →
                   </div>
                 </Link>
@@ -111,26 +113,49 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-6 py-2 md:px-8">
+        {/* 🔥 설명 */}
+        <section className="mx-auto max-w-6xl px-6 py-6 md:px-8">
           <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8">
-            <h2 className="text-xl font-bold tracking-tight">
-              주식계산기.kr은 어떤 사이트인가요?
-            </h2>
-            <div className="mt-4 space-y-4 text-sm leading-7 text-slate-600">
+            <h2 className="text-xl font-bold">주식계산기.kr은 어떤 사이트인가요?</h2>
+
+            <div className="mt-4 space-y-4 text-sm text-slate-600">
               <p>
                 주식계산기.kr은 투자 과정에서 자주 필요한 계산을 빠르게 확인할 수
-                있도록 만든 계산기 중심 사이트입니다. 단순히 숫자만 보여주는 것이
-                아니라, 계산 결과를 어떻게 해석해야 하는지 이해를 돕기 위한 안내
-                문구와 관련 계산기 링크도 함께 제공합니다.
+                있도록 만든 계산기 중심 사이트입니다.
               </p>
               <p>
-                예를 들어 추가 매수 후 평단가를 다시 계산하고, 그 값을 기준으로
-                수익률을 확인한 뒤, 목표가와 손절가를 함께 정하는 식으로 여러
-                계산기를 연결해 활용할 수 있습니다.
+                평단가 계산 → 수익률 계산 → 목표가 설정 → 손절가 설정까지
+                투자 흐름 전체를 지원합니다.
               </p>
             </div>
           </div>
         </section>
+
+        {/* 🔥 핵심 추가 (승인용) */}
+        <section className="mx-auto max-w-6xl px-6 py-6 md:px-8">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8">
+            <h2 className="text-xl font-bold">계산기 활용 방법</h2>
+
+            <div className="mt-4 space-y-4 text-sm text-slate-600">
+              <ul className="list-disc pl-5 space-y-2">
+                <li>평단가 계산기로 평균 단가 확인</li>
+                <li>수익률 계산기로 현재 상태 확인</li>
+                <li>목표가 계산기로 매도 전략 설정</li>
+                <li>손절가 계산기로 리스크 관리</li>
+              </ul>
+
+              <div className="mt-6">
+                <p className="font-semibold mb-2">추천 계산기</p>
+                <ul className="space-y-1">
+                  <li><Link href="/profit-calculator">수익률 계산기</Link></li>
+                  <li><Link href="/average-price-calculator">평단가 계산기</Link></li>
+                  <li><Link href="/target-price-calculator">목표가 계산기</Link></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </main>
   );
 }
