@@ -1,5 +1,7 @@
 import PositionSizeCalculator from "@/components/calculator/PositionSizeCalculator";
 import { buildMetadata } from "@/lib/metadata";
+import SeoContent from "@/components/seo/SeoContent";
+import InternalLinks from "@/components/seo/InternalLinks";
 import {
   PageHeader,
   SectionCard,
@@ -115,6 +117,25 @@ export default function PositionSizeCalculatorPage() {
           />
 
           <Disclaimer />
+
+          <SeoContent
+              title="포지션 사이즈 계산기"
+              intro="포지션 사이즈 계산기는 전체 투자 자금 대비 허용 손실 비율을 기준으로 특정 종목에 투자할 최적 금액과 수량을 계산하는 도구입니다. 감정이 아닌 수학적 기준으로 투자 규모를 결정할 수 있습니다."
+              body="자금 관리(Money Management)는 성공적인 투자의 핵심입니다. 한 종목에 너무 많은 자금을 투입하면 한 번의 손절로 전체 계좌가 크게 흔들릴 수 있습니다. 포지션 사이즈를 계산해 리스크를 균등하게 분산하세요."
+              formula="투자 금액 = 총 자산 × 허용 손실 비율 ÷ (매수가 − 손절가) × 매수가 | 수량 = 투자 금액 ÷ 매수가"
+              formulaNote="예: 총 자산 1,000만 원, 허용 손실 1%, 매수가 10,000원, 손절가 9,500원 → 1%손실 = 100,000원, 주당 손실 500원 → 매수 수량 200주, 투자금 200만 원."
+              whenToUse="신규 종목 진입 전 몇 주를 사야 할지 결정할 때, 또는 리스크를 총 자산의 일정 비율 이하로 제한하고 싶을 때 사용합니다. 특히 여러 종목을 동시에 보유할 때 자금 배분의 기준이 됩니다."
+              example="예시: 총 자산 2,000만 원, 허용 손실 2%(40만 원), 매수가 50,000원, 손절가 47,500원(손실 2,500원/주) → 적정 매수 수량 160주, 투자금 800만 원."
+              caution="이 계산은 손절을 반드시 지킨다는 전제하에 작동합니다. 손절 없이 계속 보유하면 예상 손실을 초과할 수 있습니다."
+              relatedLinks={[
+                  { href: "/stop-loss-calculator", label: "손절가 계산기" },
+                  { href: "/risk-reward-calculator", label: "손익비 계산기" },
+                  { href: "/profit-calculator", label: "수익률 계산기" },
+                  { href: "/break-even-calculator", label: "본전 회복 계산기" },
+              ]}
+          />
+
+          <InternalLinks currentPath="/position-size-calculator" />
         </div>
       </main>
   );

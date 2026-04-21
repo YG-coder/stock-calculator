@@ -119,15 +119,24 @@ export default function AveragePriceCalculatorPage() {
 
           <Disclaimer />
 
-          {/* 🔥 SEO 강화 블록 */}
           <SeoContent
-              title="평단가 계산기"
-              description="주식 평단가 계산기는 여러 번 나누어 매수한 경우 평균 매입 단가를 계산하는 도구입니다."
-              formula="총 매수금액 / 총 수량"
+              title="주식 평단가 계산기"
+              intro="주식 평단가 계산기는 여러 가격대에서 나누어 매수한 주식의 평균 매입 단가를 계산하는 도구입니다. 물타기(추가 매수)를 진행한 후 새로운 평단가가 얼마인지 즉시 확인할 수 있습니다."
+              body="평단가를 정확히 알아야 현재 수익률 계산, 손절가 설정, 목표가 역산이 가능합니다. 물타기 이후 평단가가 얼마나 낮아졌는지 파악하면 이후 투자 전략을 더 명확하게 세울 수 있습니다."
+              formula="평단가 = 총 매수 금액 ÷ 총 보유 수량"
+              formulaNote="거래 수수료는 포함되지 않습니다. 수수료까지 반영한 정확한 평단가는 증권사 앱에서 확인하세요."
+              whenToUse="주식 물타기(추가 매수)를 진행한 후 평균 매입 단가를 확인할 때, 또는 여러 번에 걸쳐 분할 매수한 경우 정확한 평단가를 파악하고 싶을 때 사용합니다."
+              example="예시: 1차 매수 10주 × 10,000원 = 100,000원, 2차 매수 10주 × 8,000원 = 80,000원 → 총 20주, 총 180,000원 → 평단가 9,000원. 현재가 9,500원이면 수익률 +5.56%."
+              caution="물타기는 평단가를 낮출 수 있지만 투자 금액도 늘어납니다. 종목의 펀더멘털을 충분히 검토한 뒤 결정하세요."
+              relatedLinks={[
+                  { href: "/profit-calculator", label: "주식 수익률 계산기" },
+                  { href: "/stop-loss-calculator", label: "손절가 계산기" },
+                  { href: "/target-price-calculator", label: "목표가 계산기" },
+                  { href: "/break-even-calculator", label: "본전 회복 계산기" },
+              ]}
           />
 
-          {/* 🔥 내부 링크 */}
-          <InternalLinks />
+          <InternalLinks currentPath="/average-price-calculator" />
         </div>
       </main>
   );

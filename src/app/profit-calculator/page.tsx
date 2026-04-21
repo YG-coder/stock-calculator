@@ -113,15 +113,24 @@ export default function ProfitCalculatorPage() {
 
           <Disclaimer />
 
-          {/* 🔥 SEO 강화 블록 */}
           <SeoContent
               title="주식 수익률 계산기"
-              description="주식 수익률 계산기는 매수가와 현재가를 기준으로 투자 수익 또는 손실을 계산하는 도구입니다. 투자 성과를 빠르게 확인할 수 있으며, 목표 수익률 설정에도 활용됩니다."
-              formula="(현재가 - 매수가) / 매수가 × 100"
+              intro="주식 수익률 계산기는 매수가와 현재가를 기준으로 투자 수익 또는 손실을 계산하는 도구입니다. 주식, ETF, 코인 등 다양한 자산에 적용할 수 있으며 현재 투자 성과를 퍼센트와 금액으로 즉시 확인할 수 있습니다."
+              body="목표 수익률에 도달했는지 점검하거나, 손실 구간에서 손절 또는 추가 매수 여부를 판단할 때도 활용됩니다. 매수 이후의 의사결정을 더 객관적으로 만드는 기준이 됩니다."
+              formula="수익률 = (현재가 − 매수가) ÷ 매수가 × 100 | 손익금 = (현재가 − 매수가) × 보유 수량"
+              formulaNote="수수료와 세금은 포함되지 않습니다. 실제 손익은 거래 비용에 따라 달라집니다."
+              whenToUse="현재 보유 주식의 수익률을 빠르게 확인하고 싶을 때, 또는 목표가를 역산하거나 손절 기준을 점검할 때 유용합니다. 물타기 이후 평단가를 기준으로 새 수익률을 계산할 때도 사용합니다."
+              example="예시: 삼성전자 70,000원에 100주 매수 → 현재가 80,000원일 때 수익률 +14.28%, 수익금 1,000,000원. 같은 조건에서 현재가 63,000원이면 수익률 −10%, 손실금 700,000원."
+              caution="이 계산기는 단순 수익률 계산 도구입니다. 거래 수수료, 세금, 환율은 반영되지 않으며 실제 투자 결과와 다를 수 있습니다."
+              relatedLinks={[
+                  { href: "/average-price-calculator", label: "평단가 계산기" },
+                  { href: "/stop-loss-calculator", label: "손절가 계산기" },
+                  { href: "/target-price-calculator", label: "목표가 계산기" },
+                  { href: "/risk-reward-calculator", label: "손익비 계산기" },
+              ]}
           />
 
-          {/* 🔥 내부 링크 */}
-          <InternalLinks />
+          <InternalLinks currentPath="/profit-calculator" />
         </div>
       </main>
   );

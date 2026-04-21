@@ -123,15 +123,24 @@ export default function DividendCalculatorPage() {
 
                 <Disclaimer />
 
-                {/* 🔥 SEO 강화 블록 */}
                 <SeoContent
                     title="배당 수익 계산기"
-                    description="배당금과 주가를 기준으로 배당 수익률을 계산하는 도구입니다."
-                    formula="배당금 / 주가 × 100"
+                    intro="배당 수익 계산기는 보유 주식의 배당금, 주가, 수량을 입력하면 세전·세후 배당금과 배당수익률을 계산해주는 도구입니다. 배당 투자 전략을 세울 때 실수령 배당금을 미리 확인할 수 있습니다."
+                    body="배당주 투자에서는 주가 상승뿐 아니라 매년 또는 분기별로 지급되는 배당금이 중요한 수익원입니다. 배당수익률이 높더라도 세금 후 실수령액을 기준으로 수익성을 판단해야 합니다."
+                    formula="배당수익률 = 주당 배당금 ÷ 주가 × 100 | 세후 배당금 = 배당금 × (1 − 배당소득세율)"
+                    formulaNote="국내 배당소득세는 15.4%(소득세 14% + 지방소득세 1.4%)입니다. 금융소득이 연 2,000만 원을 초과하면 종합과세 대상이 될 수 있습니다."
+                    whenToUse="배당주를 매수하기 전에 예상 배당수익률을 확인하거나, 보유 중인 배당주의 연간 세후 배당 수입을 계산할 때 활용합니다. 월 배당 수입 목표를 역산할 때도 유용합니다."
+                    example="예시: 주당 배당금 1,500원, 주가 50,000원, 100주 보유 → 세전 배당금 150,000원, 세후 배당금 약 126,900원(세율 15.4% 적용), 배당수익률 3.0%."
+                    caution="배당금은 기업 실적에 따라 변동되거나 삭감될 수 있습니다. 배당수익률이 높더라도 주가 하락 리스크를 함께 고려해야 합니다."
+                    relatedLinks={[
+                        { href: "/profit-calculator", label: "수익률 계산기" },
+                        { href: "/compound-interest-calculator", label: "복리 계산기" },
+                        { href: "/overseas-stock-tax-calculator", label: "해외주식 세금 계산기" },
+                        { href: "/target-price-calculator", label: "목표가 계산기" },
+                    ]}
                 />
 
-                {/* 🔥 내부 링크 */}
-                <InternalLinks />
+                <InternalLinks currentPath="/dividend-calculator" />
             </div>
         </main>
     );

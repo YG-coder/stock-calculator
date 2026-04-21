@@ -1,5 +1,7 @@
 import BreakEvenCalculator from "@/components/calculator/BreakEvenCalculator";
 import { buildMetadata } from "@/lib/metadata";
+import SeoContent from "@/components/seo/SeoContent";
+import InternalLinks from "@/components/seo/InternalLinks";
 import {
   PageHeader,
   SectionCard,
@@ -113,6 +115,25 @@ export default function BreakEvenCalculatorPage() {
           />
 
           <Disclaimer />
+
+          <SeoContent
+              title="본전 회복 계산기"
+              intro="본전 회복 계산기는 현재 손실 상태에서 원금을 회복하기 위해 주가가 얼마나 상승해야 하는지 계산하는 도구입니다. 손실 후 회복에 필요한 상승률이 손실률보다 훨씬 높다는 것을 시각적으로 확인할 수 있습니다."
+              body="예를 들어 50% 손실을 입으면 원금 회복에는 100% 상승이 필요합니다. 이 비대칭성을 이해하면 손절의 중요성과 리스크 관리의 필요성이 더욱 명확해집니다."
+              formula="회복 필요 상승률 = (1 ÷ (1 − 손실률)) − 1 × 100"
+              formulaNote="예: 손실 30% → 회복 필요 상승률 = (1 ÷ 0.7) − 1 = 약 42.86%"
+              whenToUse="현재 손실 중인 종목을 계속 보유할지 손절할지 결정할 때, 또는 추가 매수(물타기) 후 회복 조건을 파악하고 싶을 때 활용하세요."
+              example="예시: 10,000원에 매수 후 현재가 7,000원 → 손실률 30%. 원금 회복을 위해서는 현재가 대비 42.86% 상승(10,000원 도달)이 필요합니다."
+              caution="회복 상승률이 높을수록 장기간 보유가 필요할 수 있으며, 그동안 기회비용이 발생합니다. 객관적인 판단 기준으로만 활용하세요."
+              relatedLinks={[
+                  { href: "/profit-calculator", label: "수익률 계산기" },
+                  { href: "/stop-loss-calculator", label: "손절가 계산기" },
+                  { href: "/average-price-calculator", label: "평단가 계산기" },
+                  { href: "/risk-reward-calculator", label: "손익비 계산기" },
+              ]}
+          />
+
+          <InternalLinks currentPath="/break-even-calculator" />
         </div>
       </main>
   );

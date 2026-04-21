@@ -116,15 +116,24 @@ export default function TargetPriceCalculatorPage() {
 
           <Disclaimer />
 
-          {/* 🔥 SEO 강화 블록 */}
           <SeoContent
-              title="목표가 계산기"
-              description="목표 수익률을 기준으로 매도 목표 가격을 계산하는 주식 계산기입니다."
-              formula="매수가 × (1 + 목표 수익률)"
+              title="주식 목표가 계산기"
+              intro="주식 목표가 계산기는 매수가와 원하는 목표 수익률을 입력하면 해당 수익률을 달성하기 위한 목표 매도 가격을 자동으로 계산해주는 도구입니다. 수익 실현 기준을 미리 정해두면 감정적 판단을 줄일 수 있습니다."
+              body="투자에서 '언제 팔 것인가'는 '언제 살 것인가'만큼 중요합니다. 목표가를 미리 설정해두면 주가가 오를 때 너무 일찍 팔거나 욕심 때문에 매도 타이밍을 놓치는 실수를 줄일 수 있습니다."
+              formula="목표가 = 매수가 × (1 + 목표 수익률 ÷ 100)"
+              formulaNote="수수료는 포함되지 않습니다. 수수료를 고려할 경우 목표 수익률을 약간 높게 설정하는 것이 좋습니다."
+              whenToUse="신규 매수 직후 목표 수익률(예: +15%, +20%)을 정해두고 목표가를 미리 계산해둘 때 활용하세요. 또는 분할 매도 전략을 세울 때 각 구간의 목표가를 계산하는 데 사용합니다."
+              example="예시: 삼성전자 70,000원에 매수, 목표 수익률 20% → 목표가 84,000원. 수수료 0.25% 고려 시 목표가 84,210원. 10주 보유 시 세전 수익금 약 142,000원."
+              caution="목표가는 투자 전략의 기준점이지 주가 상승을 보장하지 않습니다. 목표가 도달 여부는 시장 상황에 따라 달라집니다."
+              relatedLinks={[
+                  { href: "/profit-calculator", label: "수익률 계산기" },
+                  { href: "/stop-loss-calculator", label: "손절가 계산기" },
+                  { href: "/risk-reward-calculator", label: "손익비 계산기" },
+                  { href: "/average-price-calculator", label: "평단가 계산기" },
+              ]}
           />
 
-          {/* 🔥 내부 링크 */}
-          <InternalLinks />
+          <InternalLinks currentPath="/target-price-calculator" />
         </div>
       </main>
   );

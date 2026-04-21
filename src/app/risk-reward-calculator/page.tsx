@@ -114,15 +114,24 @@ export default function RiskRewardCalculatorPage() {
 
           <Disclaimer />
 
-          {/* 🔥 SEO 강화 블록 */}
           <SeoContent
-              title="리스크 보상 비율 계산기"
-              description="손실 대비 기대 수익을 비교하여 투자 효율성을 판단하는 계산기입니다."
-              formula="기대 수익 / 예상 손실"
+              title="손익비 계산기"
+              intro="손익비(Risk/Reward Ratio) 계산기는 하나의 트레이드에서 감수하는 위험 대비 기대하는 수익의 비율을 계산하는 도구입니다. 손익비를 미리 계산해두면 진입 전략의 타당성을 객관적으로 평가할 수 있습니다."
+              body="일반적으로 손익비 1:2 이상이면 기대값이 플러스인 전략으로 평가합니다. 같은 승률이라도 손익비가 높을수록 장기적으로 수익을 낼 가능성이 높습니다."
+              formula="손익비 = 기대 수익 ÷ 예상 손실 | 손익분기 승률 = 1 ÷ (1 + 손익비) × 100"
+              formulaNote="손익분기 승률이란 해당 손익비에서 기대값이 0이 되는 최소 승률입니다. 실제 승률이 이를 초과하면 장기적으로 수익이 납니다."
+              whenToUse="새로운 종목에 진입하기 전에 진입가, 손절가, 목표가를 정해두고 손익비를 계산해보세요. 손익비가 낮은 트레이드는 아무리 승률이 높아도 장기적으로 불리합니다."
+              example="예시: 진입가 10,000원, 손절가 9,500원(위험 500원), 목표가 11,500원(수익 1,500원) → 손익비 1:3. 이 경우 손익분기 승률은 25%로, 4번 중 1번만 성공해도 수익입니다."
+              caution="손익비가 높더라도 실현 가능성을 고려해야 합니다. 지나치게 공격적인 목표가는 달성 확률이 낮아 실제 기대값이 낮을 수 있습니다."
+              relatedLinks={[
+                  { href: "/stop-loss-calculator", label: "손절가 계산기" },
+                  { href: "/target-price-calculator", label: "목표가 계산기" },
+                  { href: "/position-size-calculator", label: "포지션 사이즈 계산기" },
+                  { href: "/profit-calculator", label: "수익률 계산기" },
+              ]}
           />
 
-          {/* 🔥 내부 링크 */}
-          <InternalLinks />
+          <InternalLinks currentPath="/risk-reward-calculator" />
         </div>
       </main>
   );
