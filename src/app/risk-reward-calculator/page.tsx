@@ -10,6 +10,9 @@ import {
   Disclaimer,
 } from "@/components/ui/Shared";
 
+import SeoContent from "@/components/seo/SeoContent"
+import InternalLinks from "@/components/seo/InternalLinks"
+
 export const metadata = buildMetadata({
   title: "손익비 계산기",
   description:
@@ -110,6 +113,16 @@ export default function RiskRewardCalculatorPage() {
           />
 
           <Disclaimer />
+
+          {/* 🔥 SEO 강화 블록 */}
+          <SeoContent
+              title="리스크 보상 비율 계산기"
+              description="손실 대비 기대 수익을 비교하여 투자 효율성을 판단하는 계산기입니다."
+              formula="기대 수익 / 예상 손실"
+          />
+
+          {/* 🔥 내부 링크 */}
+          <InternalLinks />
         </div>
       </main>
   );

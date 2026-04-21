@@ -1,3 +1,8 @@
+/**
+ * src/app/profit-calculator/page.tsx
+ * 역할: 주식 수익률 계산기 페이지 (SEO + 애드센스 최적화 완료)
+ */
+
 import ProfitCalculator from "@/components/calculator/ProfitCalculator";
 import { buildMetadata } from "@/lib/metadata";
 import {
@@ -9,6 +14,9 @@ import {
   RelatedCalculators,
   Disclaimer,
 } from "@/components/ui/Shared";
+
+import SeoContent from "@/components/seo/SeoContent";
+import InternalLinks from "@/components/seo/InternalLinks";
 
 export const metadata = buildMetadata({
   title: "주식 수익률 계산기",
@@ -35,8 +43,10 @@ export default function ProfitCalculatorPage() {
         />
 
         <div className="mx-auto max-w-5xl px-6 py-12 md:px-8 md:py-16">
+          {/* 계산기 */}
           <ProfitCalculator />
 
+          {/* 설명 */}
           <SectionCard>
             <Article title="수익률 계산기 설명">
               <p>
@@ -64,12 +74,23 @@ export default function ProfitCalculatorPage() {
             </Article>
           </SectionCard>
 
+          {/* FAQ */}
           <FaqSection title="자주 묻는 질문 (FAQ)">
-            <FaqItem question="계산 결과는 세금이 포함된 수치인가요?" answer="아니요, 현재 제공되는 수익률 계산 수식은 순수 가격 변동률만을 나타냅니다. 증권사 거래 수수료 및 제세공과금은 거래소마다 다르기 때문에, 실제 계좌에 찍히는 최종 실현 손익 문구와는 약간의 오차가 발생할 수 있습니다." />
-            <FaqItem question="마이너스(-) 수익률의 의미가 무엇인가요?" answer="입력하신 현재가가 매수하신 단가보다 낮아 손실 구간에 위치해 있음을 뜻합니다. 본 페이지에서는 한국 주식 시장의 일반적인 색상 코드에 맞추어 수익은 빨간색(Red)으로, 손실은 파란색(Blue)으로 명확하게 표시해 드립니다." />
-            <FaqItem question="물타기(추가 매수) 후의 수익률은 어떻게 구하나요?" answer="여러 번에 나뉘어 주식을 매수하신 경우, 먼저 평단가 계산기를 이용하여 정확한 최종 매입 평균 단가를 구하셔야 합니다. 그렇게 계산된 최종 평단가를 이곳 수익률 계산기의 '매수가' 항목에 기입하시면 됩니다." />
+            <FaqItem
+                question="계산 결과는 세금이 포함된 수치인가요?"
+                answer="아니요, 현재 제공되는 수익률 계산 수식은 순수 가격 변동률만을 나타냅니다. 증권사 거래 수수료 및 제세공과금은 거래소마다 다르기 때문에 실제 수익과 차이가 발생할 수 있습니다."
+            />
+            <FaqItem
+                question="마이너스(-) 수익률의 의미가 무엇인가요?"
+                answer="현재가가 매수가보다 낮아 손실 상태임을 의미합니다."
+            />
+            <FaqItem
+                question="물타기 후 수익률은 어떻게 계산하나요?"
+                answer="먼저 평단가 계산기를 이용해 평균 매입 단가를 구한 후 해당 값을 입력하세요."
+            />
           </FaqSection>
 
+          {/* 관련 계산기 */}
           <RelatedCalculators
               links={[
                 {
@@ -89,7 +110,18 @@ export default function ProfitCalculatorPage() {
                 },
               ]}
           />
+
           <Disclaimer />
+
+          {/* 🔥 SEO 강화 블록 */}
+          <SeoContent
+              title="주식 수익률 계산기"
+              description="주식 수익률 계산기는 매수가와 현재가를 기준으로 투자 수익 또는 손실을 계산하는 도구입니다. 투자 성과를 빠르게 확인할 수 있으며, 목표 수익률 설정에도 활용됩니다."
+              formula="(현재가 - 매수가) / 매수가 × 100"
+          />
+
+          {/* 🔥 내부 링크 */}
+          <InternalLinks />
         </div>
       </main>
   );

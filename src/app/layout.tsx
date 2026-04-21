@@ -1,9 +1,15 @@
-// src/app/layout.tsx
+/**
+ * src/app/layout.tsx
+ * 역할: 전체 레이아웃 + SEO + 애드센스 + JSON-LD
+ */
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { HEADER_CALCULATORS, POLICY_ROUTES } from "@/lib/constants";
 import "./globals.css";
+
+import JsonLd from "@/components/seo/JsonLd";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -77,21 +83,27 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
                                      children,
-                                   }: Readonly<{
+                                   }: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
       <html lang="ko">
       <head>
+        {/* 애드센스 */}
         <script
             async
             src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6405509957088169"
             crossOrigin="anonymous"
         />
       </head>
+
       <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 text-slate-900 flex flex-col min-h-screen`}
       >
+      {/* 🔥 JSON-LD 위치 (여기가 맞다) */}
+      <JsonLd />
+
+      {/* 헤더 */}
       <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-3 px-4 py-4 md:px-6">
           <Link
@@ -115,8 +127,10 @@ export default function RootLayout({
         </div>
       </header>
 
+      {/* 본문 */}
       <div className="flex-grow">{children}</div>
 
+      {/* 푸터 */}
       <footer className="border-t border-slate-200 bg-white py-12 text-center text-sm text-slate-500">
         <div className="mx-auto max-w-5xl px-6">
           <div className="flex flex-wrap justify-center gap-4 md:gap-8 mb-8 font-medium">
@@ -139,10 +153,10 @@ export default function RootLayout({
           <p className="mb-6">
             운영 문의:{" "}
             <a
-                href="mailto:help@주식계산기.kr"
+                href="mailto:support@주식계산기.kr"
                 className="font-medium text-slate-700 underline-offset-2 hover:underline"
             >
-              help@주식계산기.kr
+              support@주식계산기.kr
             </a>
           </p>
 

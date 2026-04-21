@@ -10,6 +10,9 @@ import {
     Disclaimer,
 } from "@/components/ui/Shared";
 
+import SeoContent from "@/components/seo/SeoContent"
+import InternalLinks from "@/components/seo/InternalLinks"
+
 export const metadata = buildMetadata({
     title: "배당 수익 계산기",
     description:
@@ -119,6 +122,16 @@ export default function DividendCalculatorPage() {
                 />
 
                 <Disclaimer />
+
+                {/* 🔥 SEO 강화 블록 */}
+                <SeoContent
+                    title="배당 수익 계산기"
+                    description="배당금과 주가를 기준으로 배당 수익률을 계산하는 도구입니다."
+                    formula="배당금 / 주가 × 100"
+                />
+
+                {/* 🔥 내부 링크 */}
+                <InternalLinks />
             </div>
         </main>
     );

@@ -75,10 +75,10 @@ export default function AboutPage() {
                 <p className="mt-4">
                   이메일:{" "}
                   <a
-                      href="mailto:help@주식계산기.kr"
+                      href="mailto:support@주식계산기.kr"
                       className="font-semibold text-slate-800 underline-offset-2 hover:underline"
                   >
-                    help@주식계산기.kr
+                    support@주식계산기.kr
                   </a>
                 </p>
               </Article>

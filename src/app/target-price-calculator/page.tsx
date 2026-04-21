@@ -10,6 +10,9 @@ import {
   Disclaimer,
 } from "@/components/ui/Shared";
 
+import SeoContent from "@/components/seo/SeoContent"
+import InternalLinks from "@/components/seo/InternalLinks"
+
 export const metadata = buildMetadata({
   title: "주식 목표가 계산기",
   description:
@@ -112,6 +115,16 @@ export default function TargetPriceCalculatorPage() {
           />
 
           <Disclaimer />
+
+          {/* 🔥 SEO 강화 블록 */}
+          <SeoContent
+              title="목표가 계산기"
+              description="목표 수익률을 기준으로 매도 목표 가격을 계산하는 주식 계산기입니다."
+              formula="매수가 × (1 + 목표 수익률)"
+          />
+
+          {/* 🔥 내부 링크 */}
+          <InternalLinks />
         </div>
       </main>
   );

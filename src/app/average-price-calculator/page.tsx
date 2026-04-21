@@ -10,6 +10,9 @@ import {
   Disclaimer,
 } from "@/components/ui/Shared";
 
+import SeoContent from "@/components/seo/SeoContent"
+import InternalLinks from "@/components/seo/InternalLinks"
+
 export const metadata = buildMetadata({
   title: "주식 평단가 계산기",
   description:
@@ -115,6 +118,16 @@ export default function AveragePriceCalculatorPage() {
           />
 
           <Disclaimer />
+
+          {/* 🔥 SEO 강화 블록 */}
+          <SeoContent
+              title="평단가 계산기"
+              description="주식 평단가 계산기는 여러 번 나누어 매수한 경우 평균 매입 단가를 계산하는 도구입니다."
+              formula="총 매수금액 / 총 수량"
+          />
+
+          {/* 🔥 내부 링크 */}
+          <InternalLinks />
         </div>
       </main>
   );

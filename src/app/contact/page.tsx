@@ -27,10 +27,10 @@ export default function ContactPage() {
 
               <div className="my-6 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center">
                 <a
-                    href="mailto:help@주식계산기.kr"
+                    href="mailto:support@주식계산기.kr"
                     className="font-mono text-xl font-bold tracking-tight text-slate-800 underline-offset-2 hover:underline"
                 >
-                  help@주식계산기.kr
+                  support@주식계산기.kr
                 </a>
               </div>
 
