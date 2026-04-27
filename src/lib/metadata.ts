@@ -1,8 +1,7 @@
-// src/lib/metadata.ts
 import type { Metadata } from "next";
 
-const SITE_NAME = "주식계산기.kr";
-const SITE_URL = "https://주식계산기.kr";
+export const SITE_NAME = "주식계산기.kr";
+export const BASE_URL = "https://주식계산기.kr";
 
 type BuildMetadataParams = {
     title: string;
@@ -23,15 +22,19 @@ export function buildMetadata({
             : `/${path}`
         : "";
 
-    const url = normalizedPath ? `${SITE_URL}${normalizedPath}` : SITE_URL;
+    const url = normalizedPath ? `${BASE_URL}${normalizedPath}` : BASE_URL;
 
     return {
+        metadataBase: new URL(BASE_URL),
+
         title,
         description,
         keywords,
+
         alternates: {
             canonical: url,
         },
+
         openGraph: {
             title: `${title} | ${SITE_NAME}`,
             description,
@@ -40,11 +43,13 @@ export function buildMetadata({
             locale: "ko_KR",
             type: "website",
         },
+
         twitter: {
             card: "summary_large_image",
             title: `${title} | ${SITE_NAME}`,
             description,
         },
+
         robots: {
             index: true,
             follow: true,

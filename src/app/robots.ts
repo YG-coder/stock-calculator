@@ -1,5 +1,5 @@
-// src/app/robots.ts
 import type { MetadataRoute } from "next";
+import { BASE_URL } from "@/lib/metadata";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://주식계산기.kr/sitemap.xml",
+    sitemap: `${BASE_URL}/sitemap.xml`,
   };
 }
