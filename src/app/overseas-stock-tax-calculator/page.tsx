@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import OverseasStockTaxCalculator from "@/components/calculator/OverseasStockTaxCalculator";
 import { calculatorPages } from "@/lib/calculatorPages";
+import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import {
     PageHeader,
     SectionCard,
@@ -17,9 +18,18 @@ const config = calculatorPages["overseas-stock-tax-calculator"];
 
 export const metadata: Metadata = config.metadata;
 
+const FAQ_ITEMS = [
+  { question: "해외주식 양도소득세는 얼마인가요?", answer: "기본공제 250만 원을 초과한 양도차익에 대해 22%의 세율이 적용됩니다. 예를 들어 수익이 500만 원이면 250만 원에 대해 22%인 55만 원의 세금이 발생합니다." },
+  { question: "환차익도 과세 대상인가요?", answer: "네, 해외주식 매매 시 환율 변동으로 발생한 환차익도 실현 손익에 포함됩니다. 환율이 높을 때 매도하면 환차익이 발생해 세금이 늘 수 있습니다." },
+  { question: "국내주식도 같은 방식으로 계산하나요?", answer: "아니요. 일반 개인투자자의 국내주식 매매차익은 현재 비과세입니다. 해외주식은 양도소득세 대상이므로 세금 구조가 다릅니다." },
+  { question: "손익 통산은 어떻게 하나요?", answer: "같은 해에 여러 해외주식 종목에서 수익과 손실이 모두 발생했다면, 이를 합산한 순수익에 기본공제를 적용합니다. 예를 들어 A종목 +700만, B종목 -200만이면 합산 수익은 500만 원이 됩니다." },
+];
+
+
 export default function OverseasStockTaxCalculatorPage() {
     return (
         <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
+        <CalculatorJsonLd config={config} path="/overseas-stock-tax-calculator" faqs={FAQ_ITEMS} />
             <PageHeader
                 badge={config.badge}
                 title={config.title}
@@ -76,22 +86,9 @@ export default function OverseasStockTaxCalculatorPage() {
                 </SectionCard>
 
                 <FaqSection title="자주 묻는 질문 (FAQ)">
-                    <FaqItem
-                        question="해외주식 양도소득세는 얼마인가요?"
-                        answer="기본공제 250만 원을 초과한 양도차익에 대해 22%의 세율이 적용됩니다. 예를 들어 수익이 500만 원이면 250만 원에 대해 22%인 55만 원의 세금이 발생합니다."
-                    />
-                    <FaqItem
-                        question="환차익도 과세 대상인가요?"
-                        answer="네, 해외주식 매매 시 환율 변동으로 발생한 환차익도 실현 손익에 포함됩니다. 환율이 높을 때 매도하면 환차익이 발생해 세금이 늘 수 있습니다."
-                    />
-                    <FaqItem
-                        question="국내주식도 같은 방식으로 계산하나요?"
-                        answer="아니요. 일반 개인투자자의 국내주식 매매차익은 현재 비과세입니다. 해외주식은 양도소득세 대상이므로 세금 구조가 다릅니다."
-                    />
-                    <FaqItem
-                        question="손익 통산은 어떻게 하나요?"
-                        answer="같은 해에 여러 해외주식 종목에서 수익과 손실이 모두 발생했다면, 이를 합산한 순수익에 기본공제를 적용합니다. 예를 들어 A종목 +700만, B종목 -200만이면 합산 수익은 500만 원이 됩니다."
-                    />
+            {FAQ_ITEMS.map((faq) => (
+              <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
+            ))}
                 </FaqSection>
 
                 <RelatedCalculators

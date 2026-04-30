@@ -1,5 +1,6 @@
 import RiskRewardCalculator from "@/components/calculator/RiskRewardCalculator";
 import { buildMetadata } from "@/lib/metadata";
+import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import {
   PageHeader,
   SectionCard,
@@ -27,9 +28,22 @@ export const metadata = buildMetadata({
   ],
 });
 
+const FAQ_ITEMS = [
+  { question: "손익비는 높을수록 무조건 좋은가요?", answer: "일반적으로 유리하지만 승률도 함께 봐야 합니다. 손익비만 높고 승률이 지나치게 낮으면 실제 성과가 나쁠 수 있습니다." },
+  { question: "손익비만 좋으면 수익이 보장되나요?", answer: "아닙니다. 손익비는 전략 구조를 보여주는 지표일 뿐이며, 실제 성과는 승률과 자금 관리까지 함께 고려해야 합니다." },
+  { question: "손절가와 목표가를 같이 정해야 하나요?", answer: "네. 손익비는 손절 기준과 목표 수익이 동시에 있어야 의미 있게 계산할 수 있습니다." },
+];
+
+
 export default function RiskRewardCalculatorPage() {
   return (
       <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
+        <CalculatorJsonLd
+            title="손익비 계산기"
+            description="투자에서 중요한 손익비(리스크 대비 수익 비율)를 계산해보세요. 목표 수익과 허용 손실을 입력하면 전략의 기대값과 필요 승률을 확인할 수 있습니다."
+            path="/risk-reward-calculator"
+            faqs={FAQ_ITEMS}
+        />
         <PageHeader
             badge="전략 검증"
             title="손익비 계산기"
@@ -78,18 +92,9 @@ export default function RiskRewardCalculatorPage() {
           </SectionCard>
 
           <FaqSection title="자주 묻는 질문 (FAQ)">
-            <FaqItem
-                question="손익비는 높을수록 무조건 좋은가요?"
-                answer="일반적으로 유리하지만 승률도 함께 봐야 합니다. 손익비만 높고 승률이 지나치게 낮으면 실제 성과가 나쁠 수 있습니다."
-            />
-            <FaqItem
-                question="손익비만 좋으면 수익이 보장되나요?"
-                answer="아닙니다. 손익비는 전략 구조를 보여주는 지표일 뿐이며, 실제 성과는 승률과 자금 관리까지 함께 고려해야 합니다."
-            />
-            <FaqItem
-                question="손절가와 목표가를 같이 정해야 하나요?"
-                answer="네. 손익비는 손절 기준과 목표 수익이 동시에 있어야 의미 있게 계산할 수 있습니다."
-            />
+            {FAQ_ITEMS.map((faq) => (
+              <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
+            ))}
           </FaqSection>
 
           <RelatedCalculators

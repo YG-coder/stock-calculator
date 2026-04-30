@@ -1,5 +1,6 @@
 import BreakEvenCalculator from "@/components/calculator/BreakEvenCalculator";
 import { buildMetadata } from "@/lib/metadata";
+import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import SeoContent from "@/components/seo/SeoContent";
 import InternalLinks from "@/components/seo/InternalLinks";
 import {
@@ -26,9 +27,22 @@ export const metadata = buildMetadata({
   ],
 });
 
+const FAQ_ITEMS = [
+  { question: "왜 -20% 손실은 +20% 상승으로 회복되지 않나요?", answer: "손실이 난 뒤에는 원금보다 줄어든 금액이 기준이 되기 때문입니다. 그래서 같은 퍼센트 상승으로는 원금에 도달하지 못합니다." },
+  { question: "물타기를 하면 회복이 쉬워지나요?", answer: "평단가를 낮추는 효과는 있지만 추가 자금이 투입되므로 리스크도 함께 커질 수 있습니다. 단순히 본전 회복만 보고 판단하면 안 됩니다." },
+  { question: "장기 투자자에게도 필요한 계산기인가요?", answer: "네. 장기 투자자도 큰 손실 구간에 들어가면 회복까지 오랜 시간이 걸릴 수 있으므로 손실 관리 감각을 익히는 데 도움이 됩니다." },
+];
+
+
 export default function BreakEvenCalculatorPage() {
   return (
       <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
+        <CalculatorJsonLd
+            title="본전 회복 계산기"
+            description="현재 손실률을 기준으로 원금을 회복하기 위해 필요한 상승률을 계산할 수 있는 본전 회복 계산기입니다."
+            path="/break-even-calculator"
+            faqs={FAQ_ITEMS}
+        />
         <PageHeader
             badge="리스크 관리"
             title="본전 회복 계산기"
@@ -80,18 +94,9 @@ export default function BreakEvenCalculatorPage() {
           </SectionCard>
 
           <FaqSection title="자주 묻는 질문 (FAQ)">
-            <FaqItem
-                question="왜 -20% 손실은 +20% 상승으로 회복되지 않나요?"
-                answer="손실이 난 뒤에는 원금보다 줄어든 금액이 기준이 되기 때문입니다. 그래서 같은 퍼센트 상승으로는 원금에 도달하지 못합니다."
-            />
-            <FaqItem
-                question="물타기를 하면 회복이 쉬워지나요?"
-                answer="평단가를 낮추는 효과는 있지만 추가 자금이 투입되므로 리스크도 함께 커질 수 있습니다. 단순히 본전 회복만 보고 판단하면 안 됩니다."
-            />
-            <FaqItem
-                question="장기 투자자에게도 필요한 계산기인가요?"
-                answer="네. 장기 투자자도 큰 손실 구간에 들어가면 회복까지 오랜 시간이 걸릴 수 있으므로 손실 관리 감각을 익히는 데 도움이 됩니다."
-            />
+            {FAQ_ITEMS.map((faq) => (
+              <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
+            ))}
           </FaqSection>
 
           <RelatedCalculators

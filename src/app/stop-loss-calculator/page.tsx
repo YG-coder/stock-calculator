@@ -1,4 +1,5 @@
 import { buildMetadata } from "@/lib/metadata";
+import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import StopLossCalculator from "@/components/calculator/StopLossCalculator";
 import {
     PageHeader,
@@ -26,9 +27,22 @@ export const metadata = buildMetadata({
     ],
 });
 
+const FAQ_ITEMS = [
+  { question: "손절 비율은 몇 퍼센트가 적당한가요?", answer: "정해진 답은 없습니다. 본인의 투자 성향과 종목 변동성에 따라 다릅니다. 일반적으로 5~10% 범위에서 설정하는 경우가 많지만, 고변동성 종목이라면 더 넓게 설정할 수도 있습니다." },
+  { question: "손절가를 지키지 않으면 어떻게 되나요?", answer: "손절 기준을 어기면 손실이 예상보다 훨씬 커질 수 있습니다. '조금만 기다리면 오르겠지'라는 심리는 많은 투자자들이 경험하는 함정입니다. 미리 정한 기준을 기계적으로 지키는 습관이 장기적으로 계좌를 지킵니다." },
+  { question: "손절 후 다시 반등하면 어떻게 하나요?", answer: "손절 후 주가가 반등하는 경우도 있습니다. 하지만 그것은 결과론적 판단입니다. 손절은 최악의 경우를 막기 위한 보험과 같습니다. 반등이 있더라도 손절 기준을 지키는 것이 전체 포트폴리오 관리에는 유리합니다." },
+];
+
+
 export default function StopLossCalculatorPage() {
     return (
         <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
+        <CalculatorJsonLd
+            title="주식 손절가 계산기"
+            description="매수가, 보유 수량, 손절 비율을 입력하면 손절가와 예상 손실 금액을 빠르게 계산할 수 있는 손절가 계산기입니다."
+            path="/stop-loss-calculator"
+            faqs={FAQ_ITEMS}
+        />
             <PageHeader
                 badge="리스크 관리"
                 title="주식 손절가 계산기"
@@ -82,18 +96,9 @@ export default function StopLossCalculatorPage() {
                 </SectionCard>
 
                 <FaqSection title="자주 묻는 질문 (FAQ)">
-                    <FaqItem
-                        question="손절 비율은 몇 퍼센트가 적당한가요?"
-                        answer="정해진 답은 없습니다. 본인의 투자 성향과 종목 변동성에 따라 다릅니다. 일반적으로 5~10% 범위에서 설정하는 경우가 많지만, 고변동성 종목이라면 더 넓게 설정할 수도 있습니다."
-                    />
-                    <FaqItem
-                        question="손절가를 지키지 않으면 어떻게 되나요?"
-                        answer="손절 기준을 어기면 손실이 예상보다 훨씬 커질 수 있습니다. '조금만 기다리면 오르겠지'라는 심리는 많은 투자자들이 경험하는 함정입니다. 미리 정한 기준을 기계적으로 지키는 습관이 장기적으로 계좌를 지킵니다."
-                    />
-                    <FaqItem
-                        question="손절 후 다시 반등하면 어떻게 하나요?"
-                        answer="손절 후 주가가 반등하는 경우도 있습니다. 하지만 그것은 결과론적 판단입니다. 손절은 최악의 경우를 막기 위한 보험과 같습니다. 반등이 있더라도 손절 기준을 지키는 것이 전체 포트폴리오 관리에는 유리합니다."
-                    />
+            {FAQ_ITEMS.map((faq) => (
+              <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
+            ))}
                 </FaqSection>
 
                 <RelatedCalculators

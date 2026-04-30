@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import USDividendCalculator from "@/components/calculator/USDividendCalculator";
 import CalculatorPageTemplate from "@/components/calculator/CalculatorPageTemplate";
+import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import { calculatorPages } from "@/lib/calculatorPages";
 
 const config = calculatorPages["us-dividend-calculator"];
@@ -10,11 +11,14 @@ export const metadata: Metadata = config.metadata;
 export default function USDividendPage() {
     return (
         <CalculatorPageTemplate config={config}>
+            <CalculatorJsonLd config={config} path="/us-stocks/dividend" />
             <USDividendCalculator />
             {/* SEO 콘텐츠 */}
             <section className="mt-14 space-y-6 text-sm text-slate-600 leading-relaxed border-t border-slate-200 pt-10">
                 <h2 className="text-xl font-bold text-slate-800">미국주식 배당 계산기에 대해 더 알아보기</h2>
                 <p>미국주식 배당 계산기는 미국 배당주의 주당 배당금, 주가, 보유 수량을 기준으로 세전·세후 배당금과 배당수익률을 계산하는 도구입니다.</p>
+                <h3 className="text-base font-semibold text-slate-800">이 계산기가 필요한 이유</h3>
+                <p>미국주식 배당은 한국과 달리 분기 배당이 일반적이고 원천징수세(15%)가 자동으로 차감됩니다. 세전·세후 금액을 함께 계산해두면 실제 통장에 들어오는 배당 수입을 정확히 파악할 수 있어, 배당 투자 포트폴리오 설계에 도움이 됩니다.</p>
                 <h3 className="text-base font-semibold text-slate-800">언제 사용하면 좋을까요?</h3>
                 <p>미국 배당주(코카콜라, 리얼티인컴 등)나 배당 ETF(SCHD, VYM 등) 투자를 고려할 때 예상 배당 수입을 미리 계산해두면 투자 결정에 도움이 됩니다.</p>
                 <h3 className="text-base font-semibold text-slate-800">사용 예시</h3>

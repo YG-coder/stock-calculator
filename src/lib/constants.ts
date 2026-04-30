@@ -142,8 +142,8 @@ export const CALCULATORS: CalculatorItem[] = [
   {
     href: "/crypto/entry",
     label: "진입",
-    title: "코인 100배 진입 계산기",
-    desc: "권장 배율 및 주문 금액 계산",
+    title: "코인 레버리지 진입 계산기",
+    desc: "손절폭 기준 권장 배율 및 주문 금액 계산",
     badge: "진입 전략",
     kind: "calculator",
     groups: ["crypto"],

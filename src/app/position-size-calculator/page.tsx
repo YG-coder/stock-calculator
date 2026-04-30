@@ -1,5 +1,6 @@
 import PositionSizeCalculator from "@/components/calculator/PositionSizeCalculator";
 import { buildMetadata } from "@/lib/metadata";
+import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import SeoContent from "@/components/seo/SeoContent";
 import InternalLinks from "@/components/seo/InternalLinks";
 import {
@@ -26,9 +27,22 @@ export const metadata = buildMetadata({
   ],
 });
 
+const FAQ_ITEMS = [
+  { question: "포지션은 작을수록 좋은가요?", answer: "무조건 작은 것이 좋은 것은 아닙니다. 중요한 것은 계좌 대비 감당 가능한 손실 범위 안에서 일관된 비중을 유지하는 것입니다." },
+  { question: "손절가가 없으면 계산이 어렵나요?", answer: "네. 포지션 사이즈는 진입가와 손절가 차이를 기준으로 계산하므로 손절 기준이 있어야 정확한 계산이 가능합니다." },
+  { question: "초보 투자자도 꼭 써야 하나요?", answer: "그렇습니다. 오히려 초보 투자자일수록 감정적인 비중 조절을 막기 위해 포지션 사이즈 계산 습관이 중요합니다." },
+];
+
+
 export default function PositionSizeCalculatorPage() {
   return (
       <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
+        <CalculatorJsonLd
+            title="포지션 사이즈 계산기"
+            description="총 투자금, 허용 손실률, 진입가와 손절가를 기준으로 적절한 매수 수량과 투자 금액을 계산하는 포지션 사이즈 계산기입니다."
+            path="/position-size-calculator"
+            faqs={FAQ_ITEMS}
+        />
         <PageHeader
             badge="자금 관리"
             title="포지션 사이즈 계산기"
@@ -82,18 +96,9 @@ export default function PositionSizeCalculatorPage() {
           </SectionCard>
 
           <FaqSection title="자주 묻는 질문 (FAQ)">
-            <FaqItem
-                question="포지션은 작을수록 좋은가요?"
-                answer="무조건 작은 것이 좋은 것은 아닙니다. 중요한 것은 계좌 대비 감당 가능한 손실 범위 안에서 일관된 비중을 유지하는 것입니다."
-            />
-            <FaqItem
-                question="손절가가 없으면 계산이 어렵나요?"
-                answer="네. 포지션 사이즈는 진입가와 손절가 차이를 기준으로 계산하므로 손절 기준이 있어야 정확한 계산이 가능합니다."
-            />
-            <FaqItem
-                question="초보 투자자도 꼭 써야 하나요?"
-                answer="그렇습니다. 오히려 초보 투자자일수록 감정적인 비중 조절을 막기 위해 포지션 사이즈 계산 습관이 중요합니다."
-            />
+            {FAQ_ITEMS.map((faq) => (
+              <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
+            ))}
           </FaqSection>
 
           <RelatedCalculators

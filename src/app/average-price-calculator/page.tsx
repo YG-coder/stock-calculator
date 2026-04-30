@@ -1,5 +1,6 @@
 import AveragePriceCalculator from "@/components/calculator/AveragePriceCalculator";
 import { buildMetadata } from "@/lib/metadata";
+import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import {
   PageHeader,
   SectionCard,
@@ -27,9 +28,22 @@ export const metadata = buildMetadata({
   ],
 });
 
+const FAQ_ITEMS = [
+  { question: "물타기 후 수익률은 어떻게 확인하나요?", answer: "먼저 이 계산기로 새 평단가를 구한 뒤, 수익률 계산기에서 해당 평단가를 매수가로 입력하면 됩니다." },
+  { question: "평단가가 낮아지면 무조건 좋은 건가요?", answer: "아닙니다. 평단가가 낮아져도 추가 자금이 투입된 것이므로 종목 리스크가 커질 수 있습니다. 단순히 평균가만 보고 판단하면 안 됩니다." },
+  { question: "수수료는 포함되나요?", answer: "기본 계산은 매수 단가와 수량 기준입니다. 실제 평단가는 거래 수수료까지 포함하면 약간 달라질 수 있습니다." },
+];
+
+
 export default function AveragePriceCalculatorPage() {
   return (
       <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
+        <CalculatorJsonLd
+            title="주식 평단가 계산기"
+            description="주식 매수 후 물타기를 할 때 평균 매입 단가(평단가)가 어떻게 변하는지 쉽게 계산해보세요. 추가 매수 가격과 수량만 입력하면 평균 단가를 즉시 확인할 수 있습니다."
+            path="/average-price-calculator"
+            faqs={FAQ_ITEMS}
+        />
         <PageHeader
             badge="필수 투자 계산기"
             title="주식 평단가 계산기"
@@ -83,18 +97,9 @@ export default function AveragePriceCalculatorPage() {
           </SectionCard>
 
           <FaqSection title="자주 묻는 질문 (FAQ)">
-            <FaqItem
-                question="물타기 후 수익률은 어떻게 확인하나요?"
-                answer="먼저 이 계산기로 새 평단가를 구한 뒤, 수익률 계산기에서 해당 평단가를 매수가로 입력하면 됩니다."
-            />
-            <FaqItem
-                question="평단가가 낮아지면 무조건 좋은 건가요?"
-                answer="아닙니다. 평단가가 낮아져도 추가 자금이 투입된 것이므로 종목 리스크가 커질 수 있습니다. 단순히 평균가만 보고 판단하면 안 됩니다."
-            />
-            <FaqItem
-                question="수수료는 포함되나요?"
-                answer="기본 계산은 매수 단가와 수량 기준입니다. 실제 평단가는 거래 수수료까지 포함하면 약간 달라질 수 있습니다."
-            />
+            {FAQ_ITEMS.map((faq) => (
+              <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
+            ))}
           </FaqSection>
 
           <RelatedCalculators

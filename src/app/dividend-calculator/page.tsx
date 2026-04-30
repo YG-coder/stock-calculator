@@ -1,5 +1,6 @@
 import DividendCalculator from "@/components/calculator/DividendCalculator";
 import { buildMetadata } from "@/lib/metadata";
+import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import {
     PageHeader,
     SectionCard,
@@ -28,9 +29,22 @@ export const metadata = buildMetadata({
     ],
 });
 
+const FAQ_ITEMS = [
+  { question: "세후 배당금은 어떻게 계산되나요?", answer: "세전 배당금에 국가별 배당소득세를 반영해 계산합니다. 실제 세율은 국가, 계좌 유형, 제출 서류 등에 따라 달라질 수 있습니다." },
+  { question: "배당수익률이 높으면 무조건 좋은 종목인가요?", answer: "아닙니다. 일시적으로 주가가 급락해 배당수익률이 높아 보일 수도 있으므로, 배당 안정성과 기업 실적을 함께 확인해야 합니다." },
+  { question: "미국 주식 배당도 계산할 수 있나요?", answer: "네. 미국 주식도 보유 수량과 1주당 배당금이 있다면 세전·세후 배당금과 배당수익률을 계산하는 데 활용할 수 있습니다." },
+];
+
+
 export default function DividendCalculatorPage() {
     return (
         <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
+        <CalculatorJsonLd
+            title="배당 수익 계산기"
+            description="보유 주식 수와 1주당 배당금을 기준으로 세전·세후 배당금과 배당수익률을 계산하는 배당 수익 계산기입니다. 국내 주식과 미국 주식 배당을 쉽게 비교할 수 있습니다."
+            path="/dividend-calculator"
+            faqs={FAQ_ITEMS}
+        />
             <PageHeader
                 badge="현금 흐름 분석"
                 title="배당 수익 계산기"
@@ -87,18 +101,9 @@ export default function DividendCalculatorPage() {
                 </SectionCard>
 
                 <FaqSection title="자주 묻는 질문 (FAQ)">
-                    <FaqItem
-                        question="세후 배당금은 어떻게 계산되나요?"
-                        answer="세전 배당금에 국가별 배당소득세를 반영해 계산합니다. 실제 세율은 국가, 계좌 유형, 제출 서류 등에 따라 달라질 수 있습니다."
-                    />
-                    <FaqItem
-                        question="배당수익률이 높으면 무조건 좋은 종목인가요?"
-                        answer="아닙니다. 일시적으로 주가가 급락해 배당수익률이 높아 보일 수도 있으므로, 배당 안정성과 기업 실적을 함께 확인해야 합니다."
-                    />
-                    <FaqItem
-                        question="미국 주식 배당도 계산할 수 있나요?"
-                        answer="네. 미국 주식도 보유 수량과 1주당 배당금이 있다면 세전·세후 배당금과 배당수익률을 계산하는 데 활용할 수 있습니다."
-                    />
+            {FAQ_ITEMS.map((faq) => (
+              <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
+            ))}
                 </FaqSection>
 
                 <RelatedCalculators

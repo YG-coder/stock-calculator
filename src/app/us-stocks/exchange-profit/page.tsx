@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import USExchangeProfitCalculator from "@/components/calculator/USExchangeProfitCalculator";
 import CalculatorPageTemplate from "@/components/calculator/CalculatorPageTemplate";
+import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import { calculatorPages } from "@/lib/calculatorPages";
 
 const config = calculatorPages["us-exchange-profit-calculator"];
@@ -10,11 +11,14 @@ export const metadata: Metadata = config.metadata;
 export default function USExchangeProfitPage() {
     return (
         <CalculatorPageTemplate config={config}>
+            <CalculatorJsonLd config={config} path="/us-stocks/exchange-profit" />
             <USExchangeProfitCalculator />
             {/* SEO 콘텐츠 */}
             <section className="mt-14 space-y-6 text-sm text-slate-600 leading-relaxed border-t border-slate-200 pt-10">
                 <h2 className="text-xl font-bold text-slate-800">환율 반영 수익 계산기에 대해 더 알아보기</h2>
                 <p>환율 반영 수익 계산기는 미국 주식 매매 시 매수·매도 시점의 환율 차이까지 반영한 실제 원화 기준 수익과 수익률을 계산하는 도구입니다.</p>
+                <h3 className="text-base font-semibold text-slate-800">이 계산기가 필요한 이유</h3>
+                <p>미국주식은 매수와 매도 시점의 환율이 다르기 때문에 달러 기준 수익률과 원화 기준 수익률이 차이가 납니다. 환차익 또는 환차손까지 반영해야 실제 통장에 입금되는 원화 수익을 알 수 있어, 달러 기준 손익만 보면 놓칠 수 있는 부분을 보완할 수 있습니다.</p>
                 <h3 className="text-base font-semibold text-slate-800">언제 사용하면 좋을까요?</h3>
                 <p>미국 주식을 매도한 후 주가 변동과 환율 변동이 복합적으로 영향을 준 경우, 실제 원화 기준 수익이 얼마인지 정확히 파악하고 싶을 때 활용합니다.</p>
                 <h3 className="text-base font-semibold text-slate-800">사용 예시</h3>

@@ -1,5 +1,6 @@
 import TargetPriceCalculator from "@/components/calculator/TargetPriceCalculator";
 import { buildMetadata } from "@/lib/metadata";
+import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import {
   PageHeader,
   SectionCard,
@@ -27,9 +28,22 @@ export const metadata = buildMetadata({
   ],
 });
 
+const FAQ_ITEMS = [
+  { question: "수수료와 세금이 반영된 목표가인가요?", answer: "아니요. 현재 계산값은 순수 가격 기준입니다. 실제 매도 시에는 수수료와 세금 등을 함께 고려해야 합니다." },
+  { question: "현재가를 기준으로도 계산할 수 있나요?", answer: "네. 현재가를 기준값으로 넣으면 지금 가격에서 원하는 수익률 상승 시 도달하는 가격을 계산하는 용도로도 활용할 수 있습니다." },
+  { question: "목표가만 정하면 충분한가요?", answer: "아닙니다. 목표가와 함께 손절가, 포지션 사이즈까지 정해야 전략이 더 완성도 있게 됩니다." },
+];
+
+
 export default function TargetPriceCalculatorPage() {
   return (
       <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
+        <CalculatorJsonLd
+            title="주식 목표가 계산기"
+            description="매수가와 목표 수익률을 기준으로 목표 매도 가격을 계산할 수 있는 주식 목표가 계산기입니다."
+            path="/target-price-calculator"
+            faqs={FAQ_ITEMS}
+        />
         <PageHeader
             badge="수익 실현 툴"
             title="주식 목표가 계산기"
@@ -80,18 +94,9 @@ export default function TargetPriceCalculatorPage() {
           </SectionCard>
 
           <FaqSection title="자주 묻는 질문 (FAQ)">
-            <FaqItem
-                question="수수료와 세금이 반영된 목표가인가요?"
-                answer="아니요. 현재 계산값은 순수 가격 기준입니다. 실제 매도 시에는 수수료와 세금 등을 함께 고려해야 합니다."
-            />
-            <FaqItem
-                question="현재가를 기준으로도 계산할 수 있나요?"
-                answer="네. 현재가를 기준값으로 넣으면 지금 가격에서 원하는 수익률 상승 시 도달하는 가격을 계산하는 용도로도 활용할 수 있습니다."
-            />
-            <FaqItem
-                question="목표가만 정하면 충분한가요?"
-                answer="아닙니다. 목표가와 함께 손절가, 포지션 사이즈까지 정해야 전략이 더 완성도 있게 됩니다."
-            />
+            {FAQ_ITEMS.map((faq) => (
+              <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
+            ))}
           </FaqSection>
 
           <RelatedCalculators

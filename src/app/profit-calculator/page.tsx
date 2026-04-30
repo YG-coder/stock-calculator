@@ -5,6 +5,7 @@
 
 import ProfitCalculator from "@/components/calculator/ProfitCalculator";
 import { buildMetadata } from "@/lib/metadata";
+import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import {
   PageHeader,
   SectionCard,
@@ -33,9 +34,22 @@ export const metadata = buildMetadata({
   ],
 });
 
+const FAQ_ITEMS = [
+  { question: "계산 결과는 세금이 포함된 수치인가요?", answer: "아니요, 현재 제공되는 수익률 계산 수식은 순수 가격 변동률만을 나타냅니다. 증권사 거래 수수료 및 제세공과금은 거래소마다 다르기 때문에 실제 수익과 차이가 발생할 수 있습니다." },
+  { question: "마이너스(-) 수익률의 의미가 무엇인가요?", answer: "현재가가 매수가보다 낮아 손실 상태임을 의미합니다." },
+  { question: "물타기 후 수익률은 어떻게 계산하나요?", answer: "먼저 평단가 계산기를 이용해 평균 매입 단가를 구한 후 해당 값을 입력하세요." },
+];
+
+
 export default function ProfitCalculatorPage() {
   return (
       <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
+        <CalculatorJsonLd
+            title="주식 수익률 계산기"
+            description="내가 매수한 주식의 현재가 또는 목표가를 입력하면 예상되는 수익률과 1주당 손익을 즉시 계산해주는 주식 수익률 계산기입니다."
+            path="/profit-calculator"
+            faqs={FAQ_ITEMS}
+        />
         <PageHeader
             badge="필수 금융 계산기"
             title="주식 수익률 계산기"
@@ -76,18 +90,9 @@ export default function ProfitCalculatorPage() {
 
           {/* FAQ */}
           <FaqSection title="자주 묻는 질문 (FAQ)">
-            <FaqItem
-                question="계산 결과는 세금이 포함된 수치인가요?"
-                answer="아니요, 현재 제공되는 수익률 계산 수식은 순수 가격 변동률만을 나타냅니다. 증권사 거래 수수료 및 제세공과금은 거래소마다 다르기 때문에 실제 수익과 차이가 발생할 수 있습니다."
-            />
-            <FaqItem
-                question="마이너스(-) 수익률의 의미가 무엇인가요?"
-                answer="현재가가 매수가보다 낮아 손실 상태임을 의미합니다."
-            />
-            <FaqItem
-                question="물타기 후 수익률은 어떻게 계산하나요?"
-                answer="먼저 평단가 계산기를 이용해 평균 매입 단가를 구한 후 해당 값을 입력하세요."
-            />
+            {FAQ_ITEMS.map((faq) => (
+              <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
+            ))}
           </FaqSection>
 
           {/* 관련 계산기 */}

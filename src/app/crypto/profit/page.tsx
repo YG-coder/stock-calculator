@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import CryptoProfitCalculator from "@/components/calculator/CryptoProfitCalculator";
 import CalculatorPageTemplate from "@/components/calculator/CalculatorPageTemplate";
+import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import { calculatorPages } from "@/lib/calculatorPages";
 
 const config = calculatorPages["crypto-profit-calculator"];
@@ -10,11 +11,14 @@ export const metadata: Metadata = config.metadata;
 export default function CryptoProfitPage() {
     return (
         <CalculatorPageTemplate config={config}>
+            <CalculatorJsonLd config={config} path="/crypto/profit" />
             <CryptoProfitCalculator />
             {/* SEO 콘텐츠 */}
             <section className="mt-14 space-y-6 text-sm text-slate-600 leading-relaxed border-t border-slate-200 pt-10">
                 <h2 className="text-xl font-bold text-slate-800">코인 수익 계산기에 대해 더 알아보기</h2>
                 <p>코인 수익 계산기는 암호화폐 매수가와 매도가를 입력하면 레버리지 없이 현물 거래에서 발생한 순수익과 수익률을 계산하는 도구입니다.</p>
+                <h3 className="text-base font-semibold text-slate-800">이 계산기가 필요한 이유</h3>
+                <p>코인은 24시간 거래되고 가격 변동성이 높기 때문에 매수·매도 타이밍에 따라 수익이 크게 달라집니다. 단순 가격만 보면 실제 수익이 얼마인지 감이 잘 안 잡히는 경우가 많은데, 정확한 수익금과 수익률을 즉시 확인하면 매도 의사결정이 명확해집니다.</p>
                 <h3 className="text-base font-semibold text-slate-800">언제 사용하면 좋을까요?</h3>
                 <p>비트코인, 이더리움 등 현물 코인 거래 후 실제 수익금을 확인하거나, 매도 목표가를 설정할 때 활용합니다.</p>
                 <h3 className="text-base font-semibold text-slate-800">사용 예시</h3>

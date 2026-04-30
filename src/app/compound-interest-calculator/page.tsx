@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import CompoundInterestCalculator from "@/components/calculator/CompoundInterestCalculator";
 import { calculatorPages } from "@/lib/calculatorPages";
+import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import {
     PageHeader,
     SectionCard,
@@ -17,9 +18,17 @@ const config = calculatorPages["compound-interest-calculator"];
 
 export const metadata: Metadata = config.metadata;
 
+const FAQ_ITEMS = [
+  { question: "복리와 단리의 차이는 무엇인가요?", answer: "단리는 원금에만 이자가 붙지만, 복리는 원금과 누적된 이익에 다시 이익이 붙습니다. 투자 기간이 길어질수록 복리 효과가 훨씬 크게 나타납니다." },
+  { question: "매월 추가 투자금도 반영되나요?", answer: "네, 이 계산기는 매월 일정 금액을 추가 납입하는 조건도 반영해 예상 최종 금액을 계산합니다. 적립식 투자 시뮬레이션에도 활용할 수 있습니다." },
+  { question: "예상 수익률은 실제 수익을 보장하나요?", answer: "아니요. 계산 결과는 입력한 가정에 따른 시뮬레이션이며, 실제 투자 성과는 시장 상황에 따라 다를 수 있습니다. 참고용으로만 활용하세요." },
+];
+
+
 export default function CompoundInterestCalculatorPage() {
     return (
         <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
+        <CalculatorJsonLd config={config} path="/compound-interest-calculator" faqs={FAQ_ITEMS} />
             <PageHeader
                 badge={config.badge}
                 title={config.title}
@@ -75,18 +84,9 @@ export default function CompoundInterestCalculatorPage() {
                 </SectionCard>
 
                 <FaqSection title="자주 묻는 질문 (FAQ)">
-                    <FaqItem
-                        question="복리와 단리의 차이는 무엇인가요?"
-                        answer="단리는 원금에만 이자가 붙지만, 복리는 원금과 누적된 이익에 다시 이익이 붙습니다. 투자 기간이 길어질수록 복리 효과가 훨씬 크게 나타납니다."
-                    />
-                    <FaqItem
-                        question="매월 추가 투자금도 반영되나요?"
-                        answer="네, 이 계산기는 매월 일정 금액을 추가 납입하는 조건도 반영해 예상 최종 금액을 계산합니다. 적립식 투자 시뮬레이션에도 활용할 수 있습니다."
-                    />
-                    <FaqItem
-                        question="예상 수익률은 실제 수익을 보장하나요?"
-                        answer="아니요. 계산 결과는 입력한 가정에 따른 시뮬레이션이며, 실제 투자 성과는 시장 상황에 따라 다를 수 있습니다. 참고용으로만 활용하세요."
-                    />
+            {FAQ_ITEMS.map((faq) => (
+              <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
+            ))}
                 </FaqSection>
 
                 <RelatedCalculators
