@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/Shared";
 import SeoContent from "@/components/seo/SeoContent";
 import InternalLinks from "@/components/seo/InternalLinks";
+import GuideLinks from "@/components/seo/GuideLinks";
 
 const config = calculatorPages["compound-interest-calculator"];
 
@@ -82,6 +83,8 @@ export default function CompoundInterestCalculatorPage() {
                         </p>
                     </Article>
                 </SectionCard>
+
+                <GuideLinks slugs={["compound-investing"]} />
 
                 <FaqSection title="자주 묻는 질문 (FAQ)">
             {FAQ_ITEMS.map((faq) => (

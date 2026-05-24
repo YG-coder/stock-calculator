@@ -13,6 +13,7 @@ import {
 
 import SeoContent from "@/components/seo/SeoContent"
 import InternalLinks from "@/components/seo/InternalLinks"
+import GuideLinks from "@/components/seo/GuideLinks"
 
 export const metadata = buildMetadata({
   title: "주식 평단가 계산기",
@@ -95,6 +96,8 @@ export default function AveragePriceCalculatorPage() {
               </p>
             </Article>
           </SectionCard>
+
+                <GuideLinks slugs={["when-not-to-average-down", "average-price-meaning"]} />
 
           <FaqSection title="자주 묻는 질문 (FAQ)">
             {FAQ_ITEMS.map((faq) => (

@@ -3,6 +3,7 @@ import { buildMetadata } from "@/lib/metadata";
 import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import SeoContent from "@/components/seo/SeoContent";
 import InternalLinks from "@/components/seo/InternalLinks";
+import GuideLinks from "@/components/seo/GuideLinks";
 import {
   PageHeader,
   SectionCard,
@@ -94,6 +95,8 @@ export default function PositionSizeCalculatorPage() {
               </p>
             </Article>
           </SectionCard>
+
+                <GuideLinks slugs={["stop-loss-ratio"]} />
 
           <FaqSection title="자주 묻는 질문 (FAQ)">
             {FAQ_ITEMS.map((faq) => (

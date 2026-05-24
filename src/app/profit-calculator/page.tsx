@@ -18,6 +18,7 @@ import {
 
 import SeoContent from "@/components/seo/SeoContent";
 import InternalLinks from "@/components/seo/InternalLinks";
+import GuideLinks from "@/components/seo/GuideLinks";
 
 export const metadata = buildMetadata({
   title: "주식 수익률 계산기",
@@ -87,6 +88,8 @@ export default function ProfitCalculatorPage() {
               </p>
             </Article>
           </SectionCard>
+
+                <GuideLinks slugs={["profit-calculator-guide"]} />
 
           {/* FAQ */}
           <FaqSection title="자주 묻는 질문 (FAQ)">
