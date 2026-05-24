@@ -134,6 +134,12 @@ export default function RootLayout({
       <footer className="border-t border-slate-200 bg-white py-12 text-center text-sm text-slate-500">
         <div className="mx-auto max-w-5xl px-6">
           <div className="flex flex-wrap justify-center gap-4 md:gap-8 mb-8 font-medium">
+            <Link
+                href="/guides"
+                className="hover:text-slate-900 transition"
+            >
+              투자 가이드
+            </Link>
             {POLICY_ROUTES.map((policy) => (
                 <Link
                     key={policy.href}

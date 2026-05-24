@@ -229,6 +229,7 @@ export const HEADER_CALCULATORS = [
   { href: "/stocks", label: "주식 계산기" },
   { href: "/crypto", label: "코인 계산기" },
   { href: "/us-stocks", label: "미국주식 계산기" },
+  { href: "/guides", label: "투자 가이드" },
 ];
 
 export const POLICY_ROUTES = [
