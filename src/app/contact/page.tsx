@@ -21,9 +21,8 @@ export default function ContactPage() {
           <SectionCard>
             <Article title="이메일 문의">
               <p>
-                주식계산기.kr은 인컴랩이 개발·운영하는 서비스입니다. 사이트 이용과
-                관련한 문의 사항(오류 제보, 기능 추가 제안, 제휴 문의 등)은 아래
-                이메일로 보내주시기 바랍니다.
+                사이트 이용과 관련한 문의 사항(오류 제보, 기능 추가 제안, 제휴 문의
+                등)은 아래 이메일로 보내주시기 바랍니다.
               </p>
 
               <div className="my-6 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center">
