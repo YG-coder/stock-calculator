@@ -20,19 +20,16 @@ function formatNumber(value: number) {
 export default function OverseasStockTaxCalculator() {
     const [buyAmount, setBuyAmount] = useState("");
     const [sellAmount, setSellAmount] = useState("");
-    const [exchangeGain, setExchangeGain] = useState("");
-    const [deduction, setDeduction] = useState("");
+    const [deduction, setDeduction] = useState("2500000");
 
     const result = useMemo(() => {
         const buy = Number(buyAmount);
         const sell = Number(sellAmount);
-        const fx = Number(exchangeGain || "0");
         const basicDeduction = Number(deduction);
 
         if (
             !Number.isFinite(buy) ||
             !Number.isFinite(sell) ||
-            !Number.isFinite(fx) ||
             !Number.isFinite(basicDeduction) ||
             buy < 0 ||
             sell < 0 ||
@@ -59,7 +56,7 @@ export default function OverseasStockTaxCalculator() {
             };
         }
 
-        const grossGain = sell - buy + fx;
+        const grossGain = sell - buy;
         const taxableGain = Math.max(0, grossGain - basicDeduction);
         const taxAmount = taxableGain * 0.22;
         const netGain = grossGain - taxAmount;
@@ -73,7 +70,7 @@ export default function OverseasStockTaxCalculator() {
             netGain,
             effectiveRate,
         };
-    }, [buyAmount, sellAmount, exchangeGain, deduction]);
+    }, [buyAmount, sellAmount, deduction]);
 
     const tone =
         result.taxAmount > 0 ? "negative" : result.taxAmount < 0 ? "positive" : "default";
@@ -82,11 +79,19 @@ export default function OverseasStockTaxCalculator() {
         <CalculatorLayout>
             <CalculatorCard
                 title="해외주식 양도소득세 입력"
-                description="매수 금액, 매도 금액, 환차익, 기본공제를 입력하면 예상 과세 대상 금액과 세금을 계산할 수 있습니다."
+                description="매수 금액, 매도 금액, 기본공제를 입력하면 예상 과세 대상 금액과 세금을 계산할 수 있습니다."
             >
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-relaxed text-slate-600">
+                    이 계산기는 입력한 거래 기준의 예상값이며, 실제 해외주식 양도소득세는 해당 연도 전체
+                    해외주식 손익을 통산한 뒤 기본공제를 적용해 계산합니다. 총 매수 금액은 매수 당시
+                    환율이 반영된 실제 원화 취득금액을, 총 매도 금액은 매도 당시 환율이 반영된 실제
+                    원화 양도가액을 입력하세요. 환율 변동 효과는 두 금액의 차이에 이미 포함되므로
+                    별도로 환차익을 더하지 않습니다.
+                </div>
+
                 <InputField
                     id="buyAmount"
-                    label="총 매수 금액"
+                    label="총 매수 금액 (매수 시점 환율 반영 원화)"
                     type="number"
                     placeholder="예: 10000000"
                     unit="원"
@@ -95,21 +100,12 @@ export default function OverseasStockTaxCalculator() {
                 />
                 <InputField
                     id="sellAmount"
-                    label="총 매도 금액"
+                    label="총 매도 금액 (매도 시점 환율 반영 원화)"
                     type="number"
                     placeholder="예: 15000000"
                     unit="원"
                     value={sellAmount}
                     onChange={(e) => setSellAmount(e.target.value)}
-                />
-                <InputField
-                    id="exchangeGain"
-                    label="환차익"
-                    type="number"
-                    placeholder="예: 300000"
-                    unit="원"
-                    value={exchangeGain}
-                    onChange={(e) => setExchangeGain(e.target.value)}
                 />
                 <InputField
                     id="deduction"
@@ -132,7 +128,7 @@ export default function OverseasStockTaxCalculator() {
                 isValid={result.valid}
             >
                 <ResultHighlight
-                    label="예상 세금"
+                    label="입력값 기준 예상 세금"
                     value={formatNumber(result.taxAmount)}
                     unit="원"
                     tone={tone}
@@ -158,6 +154,10 @@ export default function OverseasStockTaxCalculator() {
                         value={formatNumber(result.effectiveRate)}
                         unit="%"
                     />
+                </div>
+
+                <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    연간 손익통산 전 예상값이며 실제 신고세액과 다를 수 있습니다.
                 </div>
             </ResultCard>
         </CalculatorLayout>

@@ -119,7 +119,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
         badge: "세금 분석",
         title: "해외주식 세금 계산기",
         headerDescription:
-            "해외주식 세금 계산기는 매수 금액, 매도 금액, 환차익과 기본공제를 기준으로 예상 양도소득세와 세후 수익을 계산하는 도구입니다.",
+            "해외주식 세금 계산기는 매수 금액, 매도 금액, 기본공제를 기준으로 예상 양도소득세와 세후 수익을 계산하는 도구입니다.",
         articleTitle: "해외주식 세금 계산기란?",
         articleIntro:
             "해외주식 매매 시 발생하는 양도차익에 대해 예상 세금과 실제 세후 수익을 계산하는 도구입니다.",
@@ -138,7 +138,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
             {
                 question: "환차익도 과세 대상인가요?",
                 answer:
-                    "네, 해외주식 매매 시 발생한 환차익과 환차손도 실제 손익 계산에 영향을 줄 수 있습니다.",
+                    "네, 환율 변동 손익도 과세 대상 양도차익에 포함됩니다. 매수 금액과 매도 금액을 각각 그 시점 환율로 환산한 실제 원화 금액으로 입력하면 환율 변동 효과가 자동으로 반영되므로, 별도로 환차익을 더할 필요는 없습니다.",
             },
             {
                 question: "국내주식도 같은 방식으로 계산하나요?",

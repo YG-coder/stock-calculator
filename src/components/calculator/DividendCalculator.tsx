@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ChangeEvent } from "react";
 import {
     CalculatorLayout,
     CalculatorCard,
@@ -12,6 +12,14 @@ import {
 import CurrencyToggle from "@/components/calculator/CurrencyToggle";
 
 type Currency = "KRW" | "USD";
+
+// 국내 배당소득세(15.4%, 소득세 14% + 지방소득세 1.4%)와 달리
+// 미국 배당은 한미 조세조약에 따른 현지 원천징수세율(15%)을 기본값으로 사용합니다.
+// (사이트 내 "미국주식 배당 계산기" 안내 기준과 동일)
+const DEFAULT_TAX_RATE: Record<Currency, string> = {
+    KRW: "15.4",
+    USD: "15",
+};
 
 function formatNumber(value: number, maximumFractionDigits = 2) {
     if (!Number.isFinite(value)) return "0";
@@ -27,9 +35,25 @@ export default function DividendCalculator() {
     const [shares, setShares] = useState("100");
     const [dividendPerShare, setDividendPerShare] = useState("500");
     const [buyPrice, setBuyPrice] = useState("10000");
-    const [taxRate, setTaxRate] = useState("15.4");
+    const [taxRate, setTaxRate] = useState(DEFAULT_TAX_RATE.KRW);
+    // 사용자가 세율을 직접 수정했는지 여부.
+    // 직접 수정한 적이 없다면 통화를 전환할 때 국가별 기본 세율로 자동 갱신하고,
+    // 직접 수정한 적이 있다면 통화를 전환해도 사용자가 입력한 값을 그대로 유지합니다.
+    const [taxRateTouched, setTaxRateTouched] = useState(false);
 
     const moneyUnit = currency === "KRW" ? "원" : "USD";
+
+    const handleCurrencyChange = (next: Currency) => {
+        setCurrency(next);
+        if (!taxRateTouched) {
+            setTaxRate(DEFAULT_TAX_RATE[next]);
+        }
+    };
+
+    const handleTaxRateChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setTaxRateTouched(true);
+        setTaxRate(e.target.value);
+    };
 
     const result = useMemo(() => {
         const qty = Number(shares);
@@ -87,7 +111,7 @@ export default function DividendCalculator() {
             >
                 <CurrencyToggle
                     value={currency}
-                    onChange={setCurrency}
+                    onChange={handleCurrencyChange}
                     options={["KRW", "USD"] as const}
                 />
 
@@ -125,16 +149,18 @@ export default function DividendCalculator() {
                         id="taxRate"
                         label="세율"
                         type="number"
-                        placeholder="예: 15.4"
+                        placeholder={`예: ${DEFAULT_TAX_RATE[currency]}`}
                         unit="%"
                         value={taxRate}
-                        onChange={(e) => setTaxRate(e.target.value)}
+                        onChange={handleTaxRateChange}
                     />
                 </div>
 
                 <p className="text-sm leading-relaxed text-slate-500">
                     KRW / USD 토글은 환율 자동 변환 기능이 아니라 계산 기준 통화를 선택하는 기능입니다.
-                    국내주식은 원화, 미국주식은 달러 기준으로 입력하면 됩니다.
+                    국내주식은 원화, 미국주식은 달러 기준으로 입력하면 됩니다. 세율은 국내 15.4%,
+                    미국 15%(현지 원천징수 기준)를 기본값으로 자동 반영하며, 직접 수정하면 그 값을
+                    유지합니다.
                 </p>
             </CalculatorCard>
 
@@ -176,6 +202,11 @@ export default function DividendCalculator() {
                         value={formatNumber(result.netYield)}
                         unit="%"
                     />
+                </div>
+
+                <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    연간 이자·배당 금융소득 합계가 2,000만원을 초과하면 금융소득종합과세 대상이 될 수
+                    있으며 실제 세금은 달라질 수 있습니다.
                 </div>
             </ResultCard>
         </CalculatorLayout>
