@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { formatNumber, parsePositive } from "@/lib/number";
+import { parsePositive } from "@/lib/number";
 import {
   CalculatorLayout,
   CalculatorCard,
@@ -20,6 +20,14 @@ export default function TargetPriceCalculator() {
   const [targetRate, setTargetRate] = useState("");
 
   const moneyUnit = currency === "KRW" ? "원" : "USD";
+
+  // 통화별 표시 정밀도: USD는 소수점 2자리, KRW는 정수.
+  // 공용 formatNumber()를 바꾸지 않고 컴포넌트 단위로만 처리(다른 KRW 계산기 회귀 방지).
+  const priceDigits = currency === "USD" ? 2 : 0;
+  const fmtMoney = (v: number) =>
+    Number.isFinite(v)
+      ? new Intl.NumberFormat("ko-KR", { maximumFractionDigits: priceDigits }).format(v)
+      : "-";
 
   const result = useMemo(() => {
     const buy = parsePositive(buyPrice);
@@ -86,13 +94,13 @@ export default function TargetPriceCalculator() {
         >
           <ResultHighlight
               label="목표 가격"
-              value={formatNumber(result.targetPrice)}
+              value={fmtMoney(result.targetPrice)}
               unit={moneyUnit}
           />
           <div className="grid gap-4 sm:grid-cols-2">
             <ResultDetail
                 label="주당 예상 수익"
-                value={formatNumber(result.expectedProfitPerShare)}
+                value={fmtMoney(result.expectedProfitPerShare)}
                 unit={moneyUnit}
             />
             <ResultDetail

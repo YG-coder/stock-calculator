@@ -60,7 +60,10 @@ export default function OverseasStockTaxCalculator() {
         const taxableGain = Math.max(0, grossGain - basicDeduction);
         const taxAmount = taxableGain * 0.22;
         const netGain = grossGain - taxAmount;
-        const effectiveRate = sell > 0 ? (taxAmount / sell) * 100 : 0;
+        // 실효세율 = 세금 ÷ 양도차익(총 손익) × 100. 라벨('실효 세율')과 정의를 일치시킴.
+        // (매도금액을 분모로 쓰면 '매도금액 대비 세부담률'이 되어 라벨과 불일치)
+        // 양도차익이 기본공제 이하이면 세금이 0이므로 실효세율도 0%로 표시됨.
+        const effectiveRate = grossGain > 0 ? (taxAmount / grossGain) * 100 : 0;
 
         return {
             valid: true,

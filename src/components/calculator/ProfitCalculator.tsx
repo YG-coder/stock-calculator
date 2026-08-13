@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { formatNumber, parsePositive } from "@/lib/number";
+import { parsePositive } from "@/lib/number";
 import {
   CalculatorLayout,
   CalculatorCard,
@@ -21,6 +21,14 @@ export default function ProfitCalculator() {
   const [quantity, setQuantity] = useState("");
 
   const moneyUnit = currency === "KRW" ? "원" : "USD";
+
+  // 통화별 표시 정밀도: USD는 소수점 2자리, KRW는 정수.
+  // 공용 formatNumber()를 바꾸지 않고 컴포넌트 단위로만 처리.
+  const priceDigits = currency === "USD" ? 2 : 0;
+  const fmtMoney = (v: number) =>
+    Number.isFinite(v)
+      ? new Intl.NumberFormat("ko-KR", { maximumFractionDigits: priceDigits }).format(v)
+      : "-";
 
   const result = useMemo(() => {
     const buy = parsePositive(buyPrice);
@@ -101,12 +109,12 @@ export default function ProfitCalculator() {
           <div className="grid gap-4 sm:grid-cols-2">
             <ResultDetail
                 label="평가 손익"
-                value={`${result.profitAmount > 0 ? "+" : ""}${formatNumber(result.profitAmount)}`}
+                value={`${result.profitAmount > 0 ? "+" : ""}${fmtMoney(result.profitAmount)}`}
                 unit={moneyUnit}
             />
             <ResultDetail
                 label="평가 금액"
-                value={formatNumber(result.evalAmount)}
+                value={fmtMoney(result.evalAmount)}
                 unit={moneyUnit}
             />
           </div>

@@ -56,9 +56,13 @@ export default function CompoundInterestCalculator() {
         }
 
         const n = 12;
+        // 수익률 0%일 때는 r/n = 0 나눗셈으로 NaN이 되므로 별도 분기.
+        // 0%에서는 최종 자산 = 초기 원금 + 총 납입액(원금 합계).
         const total =
-            P * Math.pow(1 + r / n, n * t) +
-            PMT * ((Math.pow(1 + r / n, n * t) - 1) / (r / n));
+            r === 0
+                ? P + PMT * n * t
+                : P * Math.pow(1 + r / n, n * t) +
+                  PMT * ((Math.pow(1 + r / n, n * t) - 1) / (r / n));
 
         const principal = P + PMT * n * t;
         const profit = total - principal;

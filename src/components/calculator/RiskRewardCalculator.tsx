@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { formatNumber, parsePositive } from "@/lib/number";
+import { parsePositive } from "@/lib/number";
 import {
   CalculatorLayout,
   CalculatorCard,
@@ -22,6 +22,14 @@ export default function RiskRewardCalculator() {
 
   const moneyUnit = currency === "KRW" ? "원" : "USD";
 
+  // 통화별 표시 정밀도: USD는 소수점 2자리, KRW는 정수.
+  // 공용 formatNumber()를 바꾸지 않고 컴포넌트 단위로만 처리.
+  const priceDigits = currency === "USD" ? 2 : 0;
+  const fmtMoney = (v: number) =>
+    Number.isFinite(v)
+      ? new Intl.NumberFormat("ko-KR", { maximumFractionDigits: priceDigits }).format(v)
+      : "-";
+
   const result = useMemo(() => {
     const entry = parsePositive(entryPrice);
     const stop = parsePositive(stopPrice);
@@ -33,6 +41,7 @@ export default function RiskRewardCalculator() {
         riskAmount: 0,
         rewardAmount: 0,
         riskRewardRatio: 0,
+        breakevenWinRate: 0,
       };
     }
 
@@ -45,16 +54,20 @@ export default function RiskRewardCalculator() {
         riskAmount: 0,
         rewardAmount: 0,
         riskRewardRatio: 0,
+        breakevenWinRate: 0,
       };
     }
 
     const riskRewardRatio = rewardAmount / riskAmount;
+    // 손익분기 승률 = 1 ÷ (1 + 손익비) × 100. 이 승률을 넘어야 장기 기대값이 (+).
+    const breakevenWinRate = (1 / (1 + riskRewardRatio)) * 100;
 
     return {
       valid: true,
       riskAmount,
       rewardAmount,
       riskRewardRatio,
+      breakevenWinRate,
     };
   }, [entryPrice, stopPrice, targetPrice]);
 
@@ -62,7 +75,7 @@ export default function RiskRewardCalculator() {
       <CalculatorLayout>
         <CalculatorCard
             title="진입/손절/목표가 입력"
-            description="진입가, 손절가, 목표가를 입력하면 손익비를 계산할 수 있습니다."
+            description="진입가, 손절가, 목표가를 입력하면 손익비와 손익분기 승률을 계산할 수 있습니다."
         >
           <CurrencyToggle
               value={currency}
@@ -116,15 +129,23 @@ export default function RiskRewardCalculator() {
           <div className="grid gap-4 sm:grid-cols-2">
             <ResultDetail
                 label="리스크 금액"
-                value={formatNumber(result.riskAmount)}
+                value={fmtMoney(result.riskAmount)}
                 unit={moneyUnit}
             />
             <ResultDetail
                 label="보상 금액"
-                value={formatNumber(result.rewardAmount)}
+                value={fmtMoney(result.rewardAmount)}
                 unit={moneyUnit}
             />
+            <ResultDetail
+                label="손익분기 승률"
+                value={result.breakevenWinRate.toFixed(1)}
+                unit="%"
+            />
           </div>
+          <p className="mt-4 text-sm leading-relaxed text-slate-500">
+            실제 승률이 손익분기 승률(<span className="font-semibold text-slate-700">{result.breakevenWinRate.toFixed(1)}%</span>)을 넘어야 장기적으로 기대값이 플러스가 됩니다.
+          </p>
         </ResultCard>
       </CalculatorLayout>
   );
