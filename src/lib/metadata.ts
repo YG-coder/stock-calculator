@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 export const SITE_NAME = "주식계산기.kr";
 export const BASE_URL = "https://주식계산기.kr";
+export const OG_IMAGE = "/og-image.png";
 
 type BuildMetadataParams = {
     title: string;
@@ -42,12 +43,21 @@ export function buildMetadata({
             siteName: SITE_NAME,
             locale: "ko_KR",
             type: "website",
+            images: [
+                {
+                    url: OG_IMAGE,
+                    width: 1200,
+                    height: 630,
+                    alt: `${title} | ${SITE_NAME}`,
+                },
+            ],
         },
 
         twitter: {
             card: "summary_large_image",
             title: `${title} | ${SITE_NAME}`,
             description,
+            images: [OG_IMAGE],
         },
 
         robots: {

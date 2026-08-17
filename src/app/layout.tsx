@@ -60,12 +60,21 @@ export const metadata: Metadata = {
     siteName: "주식계산기.kr",
     locale: "ko_KR",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "주식계산기.kr - 무료 주식 투자 계산기 모음",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "주식 계산기 모음 | 손익, 평단가, 리스크 관리 종합 툴",
     description:
         "수익률, 평단가, 손절가, 배당, 복리 계산기를 한 곳에서 확인하세요.",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
