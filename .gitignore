@@ -41,3 +41,6 @@ next-env.d.ts
 .idea
 *.zip
 .dev.vars
+
+# 삭제 대기 (수동 삭제 후 이 줄 제거 가능)
+_to_delete/
