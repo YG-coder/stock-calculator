@@ -85,7 +85,7 @@ export function CalculatorLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="grid gap-6">{children}</div>;
+  return <div className="grid grid-cols-[minmax(0,1fr)] gap-6">{children}</div>;
 }
 
 export function CalculatorCard({

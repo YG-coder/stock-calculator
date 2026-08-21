@@ -237,11 +237,12 @@ export default function CryptoEntryCalculator() {
 
             {result.valid ? (
                 <CalculatorCard
+                    className="min-w-0"
                     title="손익비별 목표가"
                     description="같은 손절폭에서 손익비를 1:1.1부터 1:10까지 잡았을 때의 목표가와 예상 수익입니다. 현재 입력한 손익비 행은 강조 표시됩니다."
                 >
                     <div className="-mx-2 overflow-x-auto">
-                        <table className="w-full min-w-[420px] border-collapse text-sm">
+                        <table className="w-full min-w-[300px] border-collapse text-sm">
                             <thead>
                                 <tr className="border-b border-slate-200 text-left text-slate-500">
                                     <th className="px-2 py-2 font-medium">손익비</th>
@@ -280,11 +281,12 @@ export default function CryptoEntryCalculator() {
 
             {result.valid ? (
                 <CalculatorCard
+                    className="min-w-0"
                     title="연속 익절 / 연속 손절 시뮬레이션"
                     description={`매 회차 시드의 ${formatNumber(result.risk, 2)}%를 리스크로 잡고 손익비 1:${formatNumber(result.rr, 2)}로 거래했을 때, 10회 연속 익절한 경우와 10회 연속 손절한 경우의 시드 변화입니다.`}
                 >
                     <div className="-mx-2 overflow-x-auto">
-                        <table className="w-full min-w-[420px] border-collapse text-sm">
+                        <table className="w-full min-w-[300px] border-collapse text-sm">
                             <thead>
                                 <tr className="border-b border-slate-200 text-left text-slate-500">
                                     <th className="px-2 py-2 font-medium">회차</th>
