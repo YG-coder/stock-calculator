@@ -20,7 +20,7 @@ export default function CryptoEntryPage() {
                 <p>
                     레버리지 거래는 원금 손실 가능성이 매우 높은 고위험 투자입니다.
                     작은 가격 변동만으로도 단시간에 청산되어 원금 전액을 잃을 수 있으며,
-                    본 계산기에서 제시되는 권장 배율은 이론적 최대치이므로 실제로는
+                    본 계산기의 이론 배율은 손절폭만으로 역산한 최대치라 거래소가 지원하는 최대 배율을 넘는 값이 나올 수도 있습니다. 실제로는
                     더 보수적인 배율과 리스크 비율을 사용하는 것을 권장합니다.
                 </p>
             </section>
@@ -29,7 +29,7 @@ export default function CryptoEntryPage() {
             <section className="mt-14 space-y-6 text-sm text-slate-600 leading-relaxed border-t border-slate-200 pt-10">
                 <h2 className="text-xl font-bold text-slate-800">코인 레버리지 진입 계산기에 대해 더 알아보기</h2>
                 <p>
-                    코인 레버리지 진입 계산기는 진입가와 손절가의 차이(손절폭)를 기준으로 권장 레버리지 배율과
+                    코인 레버리지 진입 계산기는 진입가와 손절가의 차이(손절폭)를 기준으로 이론 배율과
                     포지션 진입 금액을 계산하는 도구입니다. 단순한 수익률 계산이 아니라, 손실 한도를 먼저 정하고
                     그에 맞는 진입 금액을 역산하는 방식이라 리스크 관리에 유용합니다.
                 </p>
@@ -45,14 +45,14 @@ export default function CryptoEntryPage() {
                 <h3 className="text-base font-semibold text-slate-800">언제 사용하면 좋을까요?</h3>
                 <p>
                     선물 포지션에 진입하기 직전, 손절가가 정해졌고 시드와 감수 가능한 리스크 비율을
-                    알고 있을 때 가장 유용합니다. 권장 배율은 이론적 최대치이므로 실제 진입은
+                    알고 있을 때 가장 유용합니다. 이론 배율은 손절폭만으로 역산한 최대치이므로 실제 진입은
                     이보다 낮은 배율을 사용하는 것이 일반적입니다.
                 </p>
 
                 <h3 className="text-base font-semibold text-slate-800">사용 예시</h3>
                 <p>
                     예시: 시드 100 USDT, 진입가 10,000 USDT, 손절가 9,800 USDT (손절폭 2%),
-                    리스크 비율 3%인 경우 → 권장 배율 50배, 리스크 금액 3 USDT,
+                    리스크 비율 3%인 경우 → 이론 배율 50배, 리스크 금액 3 USDT,
                     주문 명목가치 150 USDT로 계산됩니다.
                 </p>
 
