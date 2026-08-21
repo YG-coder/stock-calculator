@@ -1,9 +1,10 @@
 import { Metadata } from "next";
+import { withPageMetadata } from "@/lib/metadata";
 import Link from "next/link";
 import { SectionCard, Article } from "@/components/ui/Shared";
 import { CALCULATORS } from "@/lib/constants";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withPageMetadata({
     title: "주식 계산기 모음 | 수익률, 평단가, 손절가, 목표가, 배당, 복리 계산",
     description:
         "국내주식 투자에 필요한 수익률 계산기, 평단가 계산기, 손절가 계산기, 목표가 계산기, 배당 수익 계산기, 복리 계산기를 한 곳에서 확인하세요.",
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
             "국내주식 투자에 필요한 핵심 계산기를 한 곳에서 빠르게 확인하세요.",
         type: "website",
     },
-};
+}, "/stocks");
 
 export default function StocksPage() {
     const order = [

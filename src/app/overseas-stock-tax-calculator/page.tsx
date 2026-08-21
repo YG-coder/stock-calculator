@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import OverseasStockTaxCalculator from "@/components/calculator/OverseasStockTaxCalculator";
 import { calculatorPages } from "@/lib/calculatorPages";
+import { withPageMetadata } from "@/lib/metadata";
 import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import {
     PageHeader,
@@ -16,7 +17,7 @@ import InternalLinks from "@/components/seo/InternalLinks";
 
 const config = calculatorPages["overseas-stock-tax-calculator"];
 
-export const metadata: Metadata = config.metadata;
+export const metadata: Metadata = withPageMetadata(config.metadata, "/overseas-stock-tax-calculator");
 
 const FAQ_ITEMS = [
   { question: "해외주식 양도소득세는 얼마인가요?", answer: "기본공제 250만 원을 초과한 양도차익에 대해 22%의 세율이 적용됩니다. 예를 들어 수익이 500만 원이면 250만 원에 대해 22%인 55만 원의 세금이 발생합니다." },

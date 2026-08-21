@@ -4,9 +4,10 @@ import CalculatorPageTemplate from "@/components/calculator/CalculatorPageTempla
 import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import { calculatorPages } from "@/lib/calculatorPages";
 
+import { withPageMetadata } from "@/lib/metadata";
 const config = calculatorPages["crypto-entry-calculator"];
 
-export const metadata: Metadata = config.metadata;
+export const metadata: Metadata = withPageMetadata(config.metadata, "/crypto/entry");
 
 export default function CryptoEntryPage() {
     return (

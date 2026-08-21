@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import CompoundInterestCalculator from "@/components/calculator/CompoundInterestCalculator";
 import { calculatorPages } from "@/lib/calculatorPages";
+import { withPageMetadata } from "@/lib/metadata";
 import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import {
     PageHeader,
@@ -17,7 +18,7 @@ import GuideLinks from "@/components/seo/GuideLinks";
 
 const config = calculatorPages["compound-interest-calculator"];
 
-export const metadata: Metadata = config.metadata;
+export const metadata: Metadata = withPageMetadata(config.metadata, "/compound-interest-calculator");
 
 const FAQ_ITEMS = [
   { question: "복리와 단리의 차이는 무엇인가요?", answer: "단리는 원금에만 이자가 붙지만, 복리는 원금과 누적된 이익에 다시 이익이 붙습니다. 투자 기간이 길어질수록 복리 효과가 훨씬 크게 나타납니다." },
