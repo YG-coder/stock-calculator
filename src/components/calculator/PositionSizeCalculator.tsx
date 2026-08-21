@@ -26,10 +26,15 @@ export default function PositionSizeCalculator() {
     if (!capital || !risk || !entry || !stop || stop >= entry) {
       return {
         valid: false,
+        capital: 0,
         maxLoss: 0,
         recommendQty: 0,
         positionSize: 0,
         capitalTakeup: 0,
+        actualLoss: 0,
+        actualLossRate: 0,
+        affordableQty: 0,
+        exceedsCapital: false,
       };
     }
 
@@ -38,13 +43,23 @@ export default function PositionSizeCalculator() {
     const recommendQty = Math.floor(maxLoss / lossPerShare);
     const positionSize = recommendQty * entry;
     const capitalTakeup = (positionSize / capital) * 100;
+    // 수량을 내림 처리한 뒤의 실제 손실액 (허용 리스크 금액과 다를 수 있다)
+    const actualLoss = recommendQty * lossPerShare;
+    const actualLossRate = (actualLoss / capital) * 100;
+    // 자본금 안에서 실제로 매수 가능한 최대 수량
+    const affordableQty = Math.floor(capital / entry);
 
     return {
       valid: true,
+      capital,
       maxLoss,
       recommendQty,
       positionSize,
       capitalTakeup,
+      actualLoss,
+      actualLossRate,
+      affordableQty,
+      exceedsCapital: positionSize > capital,
     };
   }, [totalCapital, riskPercent, entryPrice, stopLossPrice]);
 
@@ -123,15 +138,43 @@ export default function PositionSizeCalculator() {
             unit="%"
           />
         </div>
-        <div className="rounded-xl bg-blue-50/50 border border-blue-100 p-5 shadow-sm mt-2">
-          <p className="text-sm font-medium text-slate-700 leading-relaxed">
-            손절가 도달 시 계좌 총 손실액은 정확히{" "}
-            <strong className="text-blue-600">
-              -{formatNumber(result.maxLoss)}원 ({riskPercent}%)
-            </strong>
-            으로 제한됩니다.
-          </p>
-        </div>
+        {result.recommendQty === 0 ? (
+          <div
+            role="alert"
+            className="rounded-xl border border-amber-200 bg-amber-50 p-5 shadow-sm mt-2"
+          >
+            <p className="text-sm font-medium text-amber-900 leading-relaxed">
+              허용 리스크 금액({formatNumber(result.maxLoss)}원)이 1주당 손실보다 작아
+              이 조건에서는 매수할 수 있는 수량이 없습니다. 손절 폭을 좁히거나 허용 리스크를
+              높여야 합니다.
+            </p>
+          </div>
+        ) : result.exceedsCapital ? (
+          <div
+            role="alert"
+            className="rounded-xl border border-amber-200 bg-amber-50 p-5 shadow-sm mt-2"
+          >
+            <p className="text-sm font-semibold text-amber-900 leading-relaxed">
+              손절 폭이 좁아 권장 수량이 총 자본금을 초과합니다.
+            </p>
+            <p className="mt-2 text-sm text-amber-900 leading-relaxed">
+              리스크 한도만 보면 {formatNumber(result.recommendQty)}주이지만, 자본금{" "}
+              {formatNumber(result.capital)}원으로 실제 매수 가능한 최대 수량은{" "}
+              <strong>{formatNumber(result.affordableQty)}주</strong>입니다. 미수·신용을
+              쓰지 않는다면 손절 폭을 넓히거나 허용 리스크를 낮춰 다시 계산하세요.
+            </p>
+          </div>
+        ) : (
+          <div className="rounded-xl bg-blue-50/50 border border-blue-100 p-5 shadow-sm mt-2">
+            <p className="text-sm font-medium text-slate-700 leading-relaxed">
+              손절가 도달 시 계좌 총 손실액은 최대{" "}
+              <strong className="text-blue-600">
+                -{formatNumber(result.actualLoss)}원 ({result.actualLossRate.toFixed(2)}%)
+              </strong>
+              으로 제한됩니다.
+            </p>
+          </div>
+        )}
       </ResultCard>
     </CalculatorLayout>
   );
