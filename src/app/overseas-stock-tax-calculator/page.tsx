@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import SourceNote from "@/components/ui/SourceNote";
+import { OVERSEAS_STOCK_TAX, TAX_BASIS_YEAR, TAX_REVIEWED_AT } from "@/lib/taxRates";
 import OverseasStockTaxCalculator from "@/components/calculator/OverseasStockTaxCalculator";
 import { calculatorPages } from "@/lib/calculatorPages";
 import { withPageMetadata } from "@/lib/metadata";
@@ -39,6 +41,23 @@ export default function OverseasStockTaxCalculatorPage() {
 
             <div className="mx-auto max-w-5xl px-6 py-12 md:px-8 md:py-16">
                 <OverseasStockTaxCalculator />
+
+                <SourceNote
+                    basisYear={TAX_BASIS_YEAR}
+                    reviewedAt={TAX_REVIEWED_AT}
+                    applied={[
+                        { label: "적용 세율", value: `${OVERSEAS_STOCK_TAX.rateDisplay} (${OVERSEAS_STOCK_TAX.rateBreakdown})` },
+                        { label: "기본공제", value: `연 ${OVERSEAS_STOCK_TAX.basicDeductionDisplay} (연 1회, 전 증권사 합산)` },
+                        { label: "신고 시기", value: OVERSEAS_STOCK_TAX.filingPeriod },
+                    ]}
+                    conditions={[
+                        "매매 수수료 등 필요경비는 계산에 반영되지 않았습니다. 실제 신고 시에는 차감할 수 있습니다.",
+                        "이 계산기는 거래 1건 기준입니다. 실제 과세는 같은 해 전체 손익을 통산한 뒤 기본공제를 적용합니다.",
+                        "원화 환산은 세법상 결제일 기준환율을 적용합니다. 체결일 환율이나 우대 환율과는 다를 수 있습니다.",
+                        "국내주식 중 양도세 과세 대상(대주주·장외·비상장) 손익과의 통산은 반영되지 않았습니다.",
+                    ]}
+                    sources={OVERSEAS_STOCK_TAX.sources}
+                />
 
                 <SectionCard>
                     <Article title="해외주식 세금 계산기란?">

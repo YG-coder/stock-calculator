@@ -1,4 +1,6 @@
 import DividendCalculator from "@/components/calculator/DividendCalculator";
+import SourceNote from "@/components/ui/SourceNote";
+import { DOMESTIC_DIVIDEND_TAX, FINANCIAL_INCOME_THRESHOLD, TAX_BASIS_YEAR, TAX_REVIEWED_AT } from "@/lib/taxRates";
 import { buildMetadata } from "@/lib/metadata";
 import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import {
@@ -53,6 +55,23 @@ export default function DividendCalculatorPage() {
 
             <div className="mx-auto max-w-5xl px-6 py-12 md:px-8 md:py-16">
                 <DividendCalculator />
+
+
+        <SourceNote
+          basisYear={TAX_BASIS_YEAR}
+          reviewedAt={TAX_REVIEWED_AT}
+          applied={[
+            { label: "국내 배당소득세", value: `${DOMESTIC_DIVIDEND_TAX.rateDisplay} (${DOMESTIC_DIVIDEND_TAX.rateBreakdown})` },
+            { label: "금융소득종합과세 기준", value: `연 ${FINANCIAL_INCOME_THRESHOLD.amountDisplay}` },
+          ]}
+          conditions={[
+            "세율은 기본값이며 직접 수정할 수 있습니다. 계좌 종류와 소득 구간에 따라 실제 세율이 달라질 수 있습니다.",
+            "이자·배당을 합한 연간 금융소득이 2,000만 원을 넘으면 초과분이 종합과세 대상이 될 수 있습니다.",
+            "매수 수수료는 총 투자금에 반영되지 않았습니다.",
+            "배당 지급 주기(연·반기·분기·월)는 입력한 주당 배당금에 이미 반영되어 있다고 가정합니다.",
+          ]}
+          sources={DOMESTIC_DIVIDEND_TAX.sources}
+        />
 
                 <SectionCard>
                     <Article title="배당 수익 계산기란?">
