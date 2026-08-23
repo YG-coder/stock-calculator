@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, type ChangeEvent } from "react";
+import { DOMESTIC_DIVIDEND_TAX, US_DIVIDEND_WITHHOLDING } from "@/lib/taxRates";
 import {
     CalculatorLayout,
     CalculatorCard,
@@ -17,8 +18,8 @@ type Currency = "KRW" | "USD";
 // 미국 배당은 한미 조세조약에 따른 현지 원천징수세율(15%)을 기본값으로 사용합니다.
 // (사이트 내 "미국주식 배당 계산기" 안내 기준과 동일)
 const DEFAULT_TAX_RATE: Record<Currency, string> = {
-    KRW: "15.4",
-    USD: "15",
+    KRW: String(DOMESTIC_DIVIDEND_TAX.ratePercent),
+    USD: String(US_DIVIDEND_WITHHOLDING.ratePercent),
 };
 
 function formatNumber(value: number, maximumFractionDigits = 2) {

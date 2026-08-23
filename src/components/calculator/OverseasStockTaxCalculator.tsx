@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { OVERSEAS_STOCK_TAX } from "@/lib/taxRates";
 import {
     CalculatorLayout,
     CalculatorCard,
@@ -20,7 +21,7 @@ function formatNumber(value: number) {
 export default function OverseasStockTaxCalculator() {
     const [buyAmount, setBuyAmount] = useState("");
     const [sellAmount, setSellAmount] = useState("");
-    const [deduction, setDeduction] = useState("2500000");
+    const [deduction, setDeduction] = useState(String(OVERSEAS_STOCK_TAX.basicDeduction));
 
     const result = useMemo(() => {
         const buy = Number(buyAmount);
@@ -58,7 +59,7 @@ export default function OverseasStockTaxCalculator() {
 
         const grossGain = sell - buy;
         const taxableGain = Math.max(0, grossGain - basicDeduction);
-        const taxAmount = taxableGain * 0.22;
+        const taxAmount = taxableGain * OVERSEAS_STOCK_TAX.rate;
         const netGain = grossGain - taxAmount;
         // 실효세율 = 세금 ÷ 양도차익(총 손익) × 100. 라벨('실효 세율')과 정의를 일치시킴.
         // (매도금액을 분모로 쓰면 '매도금액 대비 세부담률'이 되어 라벨과 불일치)
