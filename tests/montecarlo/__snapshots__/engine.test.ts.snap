@@ -1,0 +1,9 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`경고·스냅샷 > 고정 시드 백분위 스냅샷 (리팩터링 회귀 감지) 1`] = `
+{
+  "p10": 32873015,
+  "p50": 55151136,
+  "p90": 98054373,
+}
+`;
