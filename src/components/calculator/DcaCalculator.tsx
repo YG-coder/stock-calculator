@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { CalculatorCard, CalculatorLayout, InputField, ResultDetail, ResultHighlight } from "@/components/ui/Shared";
 import { useMonteCarlo } from "@/hooks/useMonteCarlo";
-import { buildDcaInput, nominalContributionsFromInput, type DcaFormValues } from "@/lib/dca";
+import { buildDcaInput, contributionsFromInput, type DcaFormValues } from "@/lib/dca";
 import { DEFAULT_INFLATION } from "@/lib/montecarlo/presets";
 import type { PercentileBand } from "@/lib/montecarlo/types";
 
@@ -34,7 +34,7 @@ const won = (value: number) => Number.isFinite(value)
 function FanChart({ bands }: { bands: PercentileBand[] }) {
   const width = 800;
   const height = 300;
-  const pad = 34;
+  const pad = 76;
   const max = Math.max(...bands.map((b) => b.p90), 1);
   const x = (index: number) => pad + (index / Math.max(1, bands.length - 1)) * (width - pad * 2);
   const y = (value: number) => height - pad - (value / max) * (height - pad * 2);
@@ -43,11 +43,14 @@ function FanChart({ bands }: { bands: PercentileBand[] }) {
     ...bands.map((b, i) => `${x(bands.length - 1 - i)},${y(Number(bands[bands.length - 1 - i][lower]))}`),
   ].join(" ");
   const median = bands.map((b, i) => `${x(i)},${y(b.p50)}`).join(" ");
+  const axisLabel = (value: number) => value >= 100_000_000 ? `${(value / 100_000_000).toFixed(1)}억` : value >= 10_000 ? `${Math.round(value / 10_000).toLocaleString("ko-KR")}만` : Math.round(value).toLocaleString("ko-KR");
+  const yTicks = [0, max / 2, max];
 
   return (
     <div className="overflow-x-auto" role="img" aria-label="투자 기간별 자산 분포 팬 차트">
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full" aria-hidden="true">
         <line x1={pad} y1={height - pad} x2={width - pad} y2={height - pad} stroke="#cbd5e1" />
+        {yTicks.map((tick) => <g key={tick}><line x1={pad} y1={y(tick)} x2={width - pad} y2={y(tick)} stroke="#e2e8f0" /><text x={pad - 8} y={y(tick) + 4} textAnchor="end" fontSize="12" fill="#64748b">{axisLabel(tick)}원</text></g>)}
         <polygon points={polygon("p90", "p10")} fill="#dbeafe" />
         <polygon points={polygon("p75", "p25")} fill="#93c5fd" />
         <polyline points={median} fill="none" stroke="#0f172a" strokeWidth="3" />
@@ -79,7 +82,7 @@ export default function DcaCalculator() {
 
   const start = useCallback(() => run(buildDcaInput(values)), [run, values]);
   const progressPct = progress && progress.total ? progress.completed / progress.total * 100 : 0;
-  const principal = result ? nominalContributionsFromInput(result.input) : 0;
+  const principal = result ? contributionsFromInput(result.input) : 0;
 
   return (
     <CalculatorLayout>
@@ -123,7 +126,7 @@ export default function DcaCalculator() {
           <div className="grid gap-4 sm:grid-cols-2">
             <ResultDetail label="보수적 범위(P10)" value={won(result.terminal.p10)} unit="원" />
             <ResultDetail label="낙관적 범위(P90)" value={won(result.terminal.p90)} unit="원" />
-            <ResultDetail label="명목 납입 원금" value={won(principal)} unit="원" />
+            <ResultDetail label={result.input.reportBasis === "real" ? "납입 원금(각 납입 시점 현재가치)" : "명목 납입 원금"} value={won(principal)} unit="원" />
             <ResultDetail label="표시 기준" value={result.input.reportBasis === "real" ? "현재 가치" : "미래 금액"} />
           </div>
           <p className="text-xs leading-relaxed text-slate-500">P10은 결과의 하위 10% 지점이며 최저값이나 손실 한도가 아닙니다. 평균값은 두꺼운 꼬리 분포에서 불안정해 강조하지 않습니다.</p>

@@ -40,6 +40,10 @@ export function nominalContributions(values: DcaFormValues): number {
 }
 
 export function nominalContributionsFromInput(input: SimulationInput): number {
+  return contributionsFromInput(input, "nominal");
+}
+
+export function contributionsFromInput(input: SimulationInput, basis: Basis = input.reportBasis): number {
   let total = input.initialBalance;
   const { cashFlow, inflationRate, months } = input;
   const fromMonth = cashFlow.fromMonth ?? 0;
@@ -49,7 +53,9 @@ export function nominalContributionsFromInput(input: SimulationInput): number {
     const factor = cashFlow.inflationIndexed
       ? Math.pow(1 + inflationRate, Math.floor(month / 12))
       : 1;
-    total += cashFlow.monthlyAmount * factor + (cashFlow.overrides?.[month] ?? 0);
+    const contribution = cashFlow.monthlyAmount * factor + (cashFlow.overrides?.[month] ?? 0);
+    const discount = basis === "real" ? Math.pow(1 + inflationRate, month / 12) : 1;
+    total += contribution / discount;
   }
   return total;
 }

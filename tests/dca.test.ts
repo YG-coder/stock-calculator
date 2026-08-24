@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildDcaInput, nominalContributions, nominalContributionsFromInput, type DcaFormValues } from "@/lib/dca";
+import { buildDcaInput, contributionsFromInput, nominalContributions, nominalContributionsFromInput, type DcaFormValues } from "@/lib/dca";
 
 const base: DcaFormValues = { seed: 1, paths: 10000, years: 20, initialBalance: 10_000_000, monthlyAmount: 500_000, expectedReturnPercent: 7, volatilityPercent: 15, inflationPercent: 2, timing: "end", inflationIndexed: false, reportBasis: "real" };
 
@@ -14,5 +14,10 @@ describe("DCA 공개 계산기 입력 변환", () => {
   });
   it("화면 입력이 바뀌어도 실행 당시 엔진 입력에서 납입 원금을 재현한다", () => {
     expect(nominalContributionsFromInput(buildDcaInput(base))).toBe(130_000_000);
+  });
+  it("실질 표시에서는 각 납입 시점의 현재가치 원금을 계산한다", () => {
+    const input = buildDcaInput({ ...base, years: 1, initialBalance: 0, monthlyAmount: 100, inflationPercent: 12 });
+    const expected = Array.from({ length: 12 }, (_, month) => 100 / Math.pow(1.12, month / 12)).reduce((sum, value) => sum + value, 0);
+    expect(contributionsFromInput(input)).toBeCloseTo(expected, 10);
   });
 });
