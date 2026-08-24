@@ -81,7 +81,6 @@ export const metadata: Metadata = {
     follow: true,
   },
   verification: {
-    google: "_UQf8pcWBmQP9bzljNpCHIzFnkC5LzOwoCLCMz6_t9c",
     other: {
       "naver-site-verification":
           "ce4f0aad0e7935dd7c085660b734744be0894e61",
@@ -97,15 +96,6 @@ export default function RootLayout({
 }) {
   return (
       <html lang="ko">
-      <head>
-        {/* 애드센스 */}
-        <script
-            async
-            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6405509957088169"
-            crossOrigin="anonymous"
-        />
-      </head>
-
       <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 text-slate-900 flex flex-col min-h-screen`}
       >
