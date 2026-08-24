@@ -21,7 +21,7 @@ function formatNumber(value: number) {
 export default function OverseasStockTaxCalculator() {
     const [buyAmount, setBuyAmount] = useState("");
     const [sellAmount, setSellAmount] = useState("");
-    const [deduction, setDeduction] = useState(String(OVERSEAS_STOCK_TAX.basicDeduction));
+    const [deduction, setDeduction] = useState("");
 
     const result = useMemo(() => {
         const buy = Number(buyAmount);

@@ -33,26 +33,18 @@ function formatNumber(value: number, maximumFractionDigits = 2) {
 export default function DividendCalculator() {
     const [currency, setCurrency] = useState<Currency>("KRW");
 
-    const [shares, setShares] = useState("100");
-    const [dividendPerShare, setDividendPerShare] = useState("500");
-    const [buyPrice, setBuyPrice] = useState("10000");
-    const [taxRate, setTaxRate] = useState(DEFAULT_TAX_RATE.KRW);
-    // 사용자가 세율을 직접 수정했는지 여부.
-    // 직접 수정한 적이 없다면 통화를 전환할 때 국가별 기본 세율로 자동 갱신하고,
-    // 직접 수정한 적이 있다면 통화를 전환해도 사용자가 입력한 값을 그대로 유지합니다.
-    const [taxRateTouched, setTaxRateTouched] = useState(false);
+    const [shares, setShares] = useState("");
+    const [dividendPerShare, setDividendPerShare] = useState("");
+    const [buyPrice, setBuyPrice] = useState("");
+    const [taxRate, setTaxRate] = useState("");
 
     const moneyUnit = currency === "KRW" ? "원" : "USD";
 
     const handleCurrencyChange = (next: Currency) => {
         setCurrency(next);
-        if (!taxRateTouched) {
-            setTaxRate(DEFAULT_TAX_RATE[next]);
-        }
     };
 
     const handleTaxRateChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setTaxRateTouched(true);
         setTaxRate(e.target.value);
     };
 

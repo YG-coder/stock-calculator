@@ -4,7 +4,6 @@ import { useCallback, useMemo, useState } from "react";
 import { CalculatorCard, CalculatorLayout, InputField, ResultDetail, ResultHighlight } from "@/components/ui/Shared";
 import { useMonteCarlo } from "@/hooks/useMonteCarlo";
 import { buildDcaInput, contributionsFromInput, type DcaFormValues } from "@/lib/dca";
-import { DEFAULT_INFLATION } from "@/lib/montecarlo/presets";
 import type { PercentileBand } from "@/lib/montecarlo/types";
 
 type Fields = Record<"seed" | "paths" | "years" | "initialBalance" | "monthlyAmount" | "expectedReturn" | "volatility" | "inflation", string> & {
@@ -14,14 +13,14 @@ type Fields = Record<"seed" | "paths" | "years" | "initialBalance" | "monthlyAmo
 };
 
 const INITIAL: Fields = {
-  seed: "20260824",
-  paths: "10000",
-  years: "20",
-  initialBalance: "10000000",
-  monthlyAmount: "500000",
-  expectedReturn: "7",
-  volatility: "15",
-  inflation: String(DEFAULT_INFLATION.value * 100),
+  seed: "",
+  paths: "",
+  years: "",
+  initialBalance: "",
+  monthlyAmount: "",
+  expectedReturn: "",
+  volatility: "",
+  inflation: "",
   timing: "end",
   inflationIndexed: false,
   reportBasis: "real",

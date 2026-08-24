@@ -38,11 +38,11 @@ function formatFixed(value: number, digits = 2) {
 
 export default function CryptoEntryCalculator() {
     const [currency, setCurrency] = useState<Currency>("USDT");
-    const [entryPrice, setEntryPrice] = useState("10000");
-    const [stopPrice, setStopPrice] = useState("9900");
-    const [seed, setSeed] = useState("100");
-    const [riskPercent, setRiskPercent] = useState("5");
-    const [rewardRatio, setRewardRatio] = useState("1.5");
+    const [entryPrice, setEntryPrice] = useState("");
+    const [stopPrice, setStopPrice] = useState("");
+    const [seed, setSeed] = useState("");
+    const [riskPercent, setRiskPercent] = useState("");
+    const [rewardRatio, setRewardRatio] = useState("");
 
     const moneyUnit = currency === "KRW" ? "원" : "USDT";
 

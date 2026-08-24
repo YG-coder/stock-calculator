@@ -26,8 +26,8 @@ export default function CryptoProfitCalculator() {
     const [buyPrice, setBuyPrice] = useState("");
     const [sellPrice, setSellPrice] = useState("");
     const [quantity, setQuantity] = useState("");
-    const [buyFeeRate, setBuyFeeRate] = useState("0.05");
-    const [sellFeeRate, setSellFeeRate] = useState("0.05");
+    const [buyFeeRate, setBuyFeeRate] = useState("");
+    const [sellFeeRate, setSellFeeRate] = useState("");
 
     const moneyUnit = currency === "KRW" ? "원" : "USDT";
 

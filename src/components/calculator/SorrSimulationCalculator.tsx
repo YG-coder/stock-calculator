@@ -6,7 +6,7 @@ import { useMonteCarlo } from "@/hooks/useMonteCarlo";
 import { buildSorrSimulationInput, sorrSurvivalRate, type SorrSimulationValues } from "@/lib/sorr";
 
 type Fields = Record<"seed" | "paths" | "years" | "initialAssets" | "monthlyWithdrawal" | "expectedReturn" | "volatility" | "inflation", string>;
-const initialFields: Fields = { seed: "20260824", paths: "10000", years: "30", initialAssets: "1000000000", monthlyWithdrawal: "3000000", expectedReturn: "7", volatility: "15", inflation: "2" };
+const initialFields: Fields = { seed: "", paths: "", years: "", initialAssets: "", monthlyWithdrawal: "", expectedReturn: "", volatility: "", inflation: "" };
 const won = (value: number) => new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 }).format(value);
 const percent = (value: number) => `${(value * 100).toFixed(1)}%`;
 

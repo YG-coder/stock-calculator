@@ -3,10 +3,9 @@ import { useCallback, useMemo, useState } from "react";
 import { CalculatorCard, CalculatorLayout, InputField, ResultDetail, ResultHighlight } from "@/components/ui/Shared";
 import { useMonteCarlo } from "@/hooks/useMonteCarlo";
 import { buildFireInput, fireSuccessRate, type FireValues } from "@/lib/fire";
-import { DEFAULT_INFLATION } from "@/lib/montecarlo/presets";
 
 type Fields = Record<"seed"|"paths"|"currentAge"|"retirementAge"|"planToAge"|"currentAssets"|"monthlyContribution"|"monthlyExpenses"|"expectedReturn"|"volatility"|"inflation", string>;
-const INITIAL: Fields = { seed:"20260824", paths:"10000", currentAge:"35", retirementAge:"55", planToAge:"90", currentAssets:"100000000", monthlyContribution:"2000000", monthlyExpenses:"3000000", expectedReturn:"7", volatility:"15", inflation:String(DEFAULT_INFLATION.value*100) };
+const INITIAL: Fields = { seed:"", paths:"", currentAge:"", retirementAge:"", planToAge:"", currentAssets:"", monthlyContribution:"", monthlyExpenses:"", expectedReturn:"", volatility:"", inflation:"" };
 const won=(v:number)=>Number.isFinite(v)?new Intl.NumberFormat("ko-KR",{maximumFractionDigits:0}).format(v):"-";
 const pct=(v:number)=>Number.isFinite(v)?`${(v*100).toFixed(1)}%`:"-";
 
@@ -14,7 +13,8 @@ export default function FireCalculator(){
   const [f,setF]=useState<Fields>(INITIAL); const {status,result,progress,error,run,cancel}=useMonteCarlo(0);
   const set=useCallback(<K extends keyof Fields>(k:K,v:Fields[K])=>setF(p=>({...p,[k]:v})),[]);
   const values=useMemo<FireValues>(()=>({seed:Number(f.seed),paths:Number(f.paths),currentAge:Number(f.currentAge),retirementAge:Number(f.retirementAge),planToAge:Number(f.planToAge),currentAssets:Number(f.currentAssets),monthlyContribution:Number(f.monthlyContribution),monthlyExpenses:Number(f.monthlyExpenses),expectedReturnPercent:Number(f.expectedReturn),volatilityPercent:Number(f.volatility),inflationPercent:Number(f.inflation)}),[f]);
-  const localError=values.retirementAge<=values.currentAge?"은퇴 나이는 현재 나이보다 커야 합니다.":values.planToAge<=values.retirementAge?"계획 종료 나이는 은퇴 나이보다 커야 합니다.":null;
+  const hasAgeInput=f.currentAge!==""||f.retirementAge!==""||f.planToAge!=="";
+  const localError=!hasAgeInput?null:values.retirementAge<=values.currentAge?"은퇴 나이는 현재 나이보다 커야 합니다.":values.planToAge<=values.retirementAge?"계획 종료 나이는 은퇴 나이보다 커야 합니다.":null;
   const start=useCallback(()=>{if(!localError)run(buildFireInput(values));},[localError,run,values]);
   const progressPct=progress&&progress.total?progress.completed/progress.total*100:0;
   const success=result?fireSuccessRate(result):0;

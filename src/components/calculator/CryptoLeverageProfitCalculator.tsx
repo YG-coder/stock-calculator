@@ -28,7 +28,7 @@ export default function CryptoLeverageProfitCalculator() {
     const [margin, setMargin] = useState("");
     const [leverage, setLeverage] = useState("");
     const [positionType, setPositionType] = useState<"long" | "short">("long");
-    const [feeRate, setFeeRate] = useState("0.05");
+    const [feeRate, setFeeRate] = useState("");
 
     const moneyUnit = currency === "KRW" ? "원" : "USDT";
 

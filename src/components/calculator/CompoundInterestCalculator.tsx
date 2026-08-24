@@ -24,10 +24,10 @@ function formatNumber(value: number, maximumFractionDigits = 0) {
 export default function CompoundInterestCalculator() {
     const [currency, setCurrency] = useState<Currency>("KRW");
 
-    const [initial, setInitial] = useState("1000000");
-    const [monthly, setMonthly] = useState("100000");
-    const [rate, setRate] = useState("10");
-    const [years, setYears] = useState("10");
+    const [initial, setInitial] = useState("");
+    const [monthly, setMonthly] = useState("");
+    const [rate, setRate] = useState("");
+    const [years, setYears] = useState("");
 
     const moneyUnit = currency === "KRW" ? "원" : "USD";
 

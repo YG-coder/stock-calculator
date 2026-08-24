@@ -25,7 +25,7 @@ export default function CryptoFundingFeeCalculator() {
     const [currency, setCurrency] = useState<Currency>("USDT");
     const [positionSize, setPositionSize] = useState("");
     const [fundingRate, setFundingRate] = useState("");
-    const [fundingCount, setFundingCount] = useState("1");
+    const [fundingCount, setFundingCount] = useState("");
     const [positionType, setPositionType] = useState<"long" | "short">("long");
 
     const moneyUnit = currency === "KRW" ? "원" : "USDT";

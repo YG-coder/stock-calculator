@@ -6,17 +6,18 @@ import { calculatePortfolio, type PortfolioAsset } from "@/lib/portfolio";
 
 type AssetInput = { name: string; weight: string; expectedReturn: string; volatility: string };
 const defaults: AssetInput[] = [
-  { name: "주식", weight: "60", expectedReturn: "8", volatility: "20" },
-  { name: "채권", weight: "30", expectedReturn: "3", volatility: "8" },
-  { name: "현금", weight: "10", expectedReturn: "2", volatility: "1" },
+  { name: "주식", weight: "", expectedReturn: "", volatility: "" },
+  { name: "채권", weight: "", expectedReturn: "", volatility: "" },
+  { name: "현금", weight: "", expectedReturn: "", volatility: "" },
 ];
 
 export default function PortfolioCalculator() {
   const [assets, setAssets] = useState(defaults);
-  const [correlations, setCorrelations] = useState(["0.20", "0.00", "0.10"]);
+  const [correlations, setCorrelations] = useState(["", "", ""]);
   const parsed = useMemo<PortfolioAsset[]>(() => assets.map((asset) => ({ name: asset.name, weight: Number(asset.weight) / 100, expectedReturn: Number(asset.expectedReturn) / 100, volatility: Number(asset.volatility) / 100 })), [assets]);
   const matrix = useMemo(() => [[1, Number(correlations[0]), Number(correlations[1])], [Number(correlations[0]), 1, Number(correlations[2])], [Number(correlations[1]), Number(correlations[2]), 1]], [correlations]);
   const calculated = useMemo(() => { try { return { result: calculatePortfolio(parsed, matrix), error: "" }; } catch (error) { return { result: null, error: error instanceof Error ? error.message : "입력값을 확인해 주세요." }; } }, [parsed, matrix]);
+  const hasInput = assets.some((asset) => asset.weight !== "" || asset.expectedReturn !== "" || asset.volatility !== "") || correlations.some((value) => value !== "");
   const updateAsset = (index: number, key: keyof AssetInput, value: string) => setAssets((items) => items.map((item, itemIndex) => itemIndex === index ? { ...item, [key]: value } : item));
   const updateCorrelation = (index: number, value: string) => setCorrelations((items) => items.map((item, itemIndex) => itemIndex === index ? value : item));
 
@@ -29,7 +30,7 @@ export default function PortfolioCalculator() {
         <InputField id={`portfolio-volatility-${index}`} label="연 변동성" type="number" value={asset.volatility} onChange={(event) => updateAsset(index, "volatility", event.target.value)} unit="%" />
       </div>)}
       <div className="grid gap-4 sm:grid-cols-3"><InputField id="correlation-01" label={`${assets[0].name}–${assets[1].name} 상관계수`} type="number" value={correlations[0]} onChange={(event) => updateCorrelation(0, event.target.value)} /><InputField id="correlation-02" label={`${assets[0].name}–${assets[2].name} 상관계수`} type="number" value={correlations[1]} onChange={(event) => updateCorrelation(1, event.target.value)} /><InputField id="correlation-12" label={`${assets[1].name}–${assets[2].name} 상관계수`} type="number" value={correlations[2]} onChange={(event) => updateCorrelation(2, event.target.value)} /></div>
-      {!calculated.result ? <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{calculated.error}</div> : null}
+      {hasInput && !calculated.result ? <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{calculated.error}</div> : null}
     </CalculatorCard>
     {calculated.result ? <><CalculatorCard title="포트폴리오 분석 결과"><div className="grid gap-4 sm:grid-cols-2"><ResultHighlight label="연 기대수익률" value={(calculated.result.expectedReturn * 100).toFixed(2)} unit="%" tone="positive" /><ResultHighlight label="연 변동성" value={(calculated.result.volatility * 100).toFixed(2)} unit="%" /></div><ResultDetail label="상관관계를 무시한 가중 변동성" value={((calculated.result.volatility + calculated.result.diversificationBenefit) * 100).toFixed(2)} unit="%" /><ResultDetail label="분산투자 변동성 감소분" value={(calculated.result.diversificationBenefit * 100).toFixed(2)} unit="%p" /><p className="text-xs leading-relaxed text-slate-500">변동성은 공분산 공식 √(wᵀΣw)로 계산합니다. 기대수익률과 변동성은 같은 기간·통화·빈도의 자료로 추정해야 비교가 의미 있습니다.</p></CalculatorCard><CalculatorCard title="주의사항"><p className="text-sm leading-relaxed text-slate-600">과거 자료로 추정한 수익률·변동성·상관관계는 미래에 달라질 수 있습니다. 세금·수수료·환율·리밸런싱 비용은 포함하지 않습니다.</p></CalculatorCard></> : null}
   </CalculatorLayout>;

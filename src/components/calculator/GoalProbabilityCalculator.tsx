@@ -5,10 +5,9 @@ import { CalculatorCard, CalculatorLayout, InputField, ResultDetail, ResultHighl
 import { useMonteCarlo } from "@/hooks/useMonteCarlo";
 import { buildGoalProbabilityInput, type GoalProbabilityValues } from "@/lib/goal-probability";
 import { probabilityForContribution, requiredForProbability, type RequiredContributions } from "@/lib/montecarlo";
-import { DEFAULT_INFLATION } from "@/lib/montecarlo/presets";
 
 type Fields = Record<"seed" | "paths" | "years" | "initialBalance" | "monthlyAmount" | "expectedReturn" | "volatility" | "inflation" | "targetAmount" | "targetProbability", string> & { reportBasis: "nominal" | "real" };
-const INITIAL: Fields = { seed: "20260824", paths: "10000", years: "20", initialBalance: "10000000", monthlyAmount: "500000", expectedReturn: "7", volatility: "15", inflation: String(DEFAULT_INFLATION.value * 100), targetAmount: "500000000", targetProbability: "80", reportBasis: "real" };
+const INITIAL: Fields = { seed: "", paths: "", years: "", initialBalance: "", monthlyAmount: "", expectedReturn: "", volatility: "", inflation: "", targetAmount: "", targetProbability: "", reportBasis: "real" };
 const won = (v: number) => Number.isFinite(v) ? new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 }).format(Math.ceil(v)) : "-";
 const pct = (v: number) => Number.isFinite(v) ? `${(v * 100).toFixed(1)}%` : "-";
 

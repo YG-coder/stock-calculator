@@ -27,7 +27,7 @@ export default function CryptoLiquidationCalculator() {
     const [leverage, setLeverage] = useState("");
     const [marginType, setMarginType] = useState<"isolated" | "cross">("isolated");
     const [positionType, setPositionType] = useState<"long" | "short">("long");
-    const [maintenanceMarginRate, setMaintenanceMarginRate] = useState("0.5");
+    const [maintenanceMarginRate, setMaintenanceMarginRate] = useState("");
 
     const priceUnit = currency === "KRW" ? "원" : "USDT";
 
