@@ -130,6 +130,17 @@ export const CALCULATORS: CalculatorItem[] = [
     isCommon: true,
     featured: true,
   },
+  {
+    href: "/fire-calculator",
+    label: "FIRE",
+    title: "FIRE 은퇴 시뮬레이션",
+    desc: "은퇴 전 적립과 은퇴 후 생활비 인출 성공 시나리오 계산",
+    badge: "은퇴 설계",
+    kind: "calculator",
+    groups: ["stocks"],
+    isCommon: true,
+    featured: true,
+  },
 
   // ===== 미국 주식 (전용만) =====
   {
