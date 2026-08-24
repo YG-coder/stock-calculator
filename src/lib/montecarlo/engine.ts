@@ -62,7 +62,6 @@ export function createRunner(input: SimulationInput): SimulationRunner {
   const { paths, months, initialBalance, inflationRate, reportBasis } = input;
   const cf = input.cashFlow;
   const c = cf.monthlyAmount;
-  const timingStart = cf.timing === "start";
 
   const rng: Rng = createRng(input.seed);
   const generator: ReturnGenerator = createReturnGenerator(input.returns);
@@ -79,21 +78,35 @@ export function createRunner(input: SimulationInput): SimulationRunner {
 
   // 현금흐름 형상. shape[m] 은 "월 1원 납입"이 m 월에 얼마로 들어가는지(스칼라 c 에 비례).
   // fixed[m] 은 overrides — c 와 무관한 절대 금액이라 아핀 분해에서 상수항으로 간다.
-  const shape = new Float64Array(months);
-  const fixed = new Float64Array(months);
-  const fromMonth = cf.fromMonth ?? 0;
-  const toMonth = cf.toMonth ?? months;
-  for (let m = 0; m < months; m++) {
-    if (m >= fromMonth && m < toMonth) {
-      shape[m] = cf.inflationIndexed
-        ? Math.pow(1 + inflationRate, Math.floor(m / 12))
-        : 1;
+  const shapeBefore = new Float64Array(months);
+  const shapeAfter = new Float64Array(months);
+  const fixedBefore = new Float64Array(months);
+  const fixedAfter = new Float64Array(months);
+  if (cf.phases?.length) {
+    for (const phase of cf.phases) {
+      for (let m = phase.fromMonth; m < phase.toMonth; m++) {
+        const factor = phase.inflationIndexed ? Math.pow(1 + inflationRate, Math.floor(m / 12)) : 1;
+        const target = phase.timing === "start" ? fixedBefore : fixedAfter;
+        target[m] += phase.monthlyAmount * factor;
+      }
+    }
+  } else {
+    const fromMonth = cf.fromMonth ?? 0;
+    const toMonth = cf.toMonth ?? months;
+    for (let m = 0; m < months; m++) {
+      if (m >= fromMonth && m < toMonth) {
+        const target = cf.timing === "start" ? shapeBefore : shapeAfter;
+        target[m] = cf.inflationIndexed ? Math.pow(1 + inflationRate, Math.floor(m / 12)) : 1;
+      }
     }
   }
   if (cf.overrides) {
     for (const [key, value] of Object.entries(cf.overrides)) {
       const m = Number(key);
-      if (m >= 0 && m < months) fixed[m] += value;
+      if (m >= 0 && m < months) {
+        const target = cf.timing === "start" ? fixedBefore : fixedAfter;
+        target[m] += value;
+      }
     }
   }
 
@@ -104,7 +117,7 @@ export function createRunner(input: SimulationInput): SimulationRunner {
   const factors = new Float64Array(months);
 
   const goal = input.goal;
-  const wantsAffine = goal?.kind === "terminal-target";
+  const wantsAffine = goal?.kind === "terminal-target" && !cf.phases?.length;
   const A = wantsAffine ? new Float64Array(paths) : null;
   const B = wantsAffine ? new Float64Array(paths) : null;
 
@@ -134,29 +147,26 @@ export function createRunner(input: SimulationInput): SimulationRunner {
 
     let depleted = -1;
     for (let m = 0; m < months; m++) {
-      const unit = shape[m];
-      const abs = fixed[m];
-      const flow = c * unit + abs;
+      const beforeUnit = shapeBefore[m];
+      const afterUnit = shapeAfter[m];
+      const beforeAbs = fixedBefore[m];
+      const afterAbs = fixedAfter[m];
       const r = factors[m];
 
-      if (timingStart) {
-        bal += flow;
-        if (wantsAffine) {
-          a += abs;
-          b += unit;
-        }
+      bal += c * beforeUnit + beforeAbs;
+      if (wantsAffine) {
+        a += beforeAbs;
+        b += beforeUnit;
       }
       bal *= r;
       if (wantsAffine) {
         a *= r;
         b *= r;
       }
-      if (!timingStart) {
-        bal += flow;
-        if (wantsAffine) {
-          a += abs;
-          b += unit;
-        }
+      bal += c * afterUnit + afterAbs;
+      if (wantsAffine) {
+        a += afterAbs;
+        b += afterUnit;
       }
 
       if (bal < 0 || (bal === 0 && everPositive)) {

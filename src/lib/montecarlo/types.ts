@@ -65,6 +65,17 @@ export interface CashFlowSpec {
    * 목표 역산의 스칼라 c 에 비례하지 않으므로 아핀 분해에서 상수항(A)에 들어간다.
    */
   overrides?: Record<number, number>;
+  /** FIRE·SoRR용 비중첩 다단계 현금흐름. 있으면 기본 월 현금흐름 구간 대신 사용한다. */
+  phases?: CashFlowPhase[];
+}
+
+export interface CashFlowPhase {
+  fromMonth: number;
+  toMonth: number;
+  monthlyAmount: number;
+  timing: "start" | "end";
+  inflationIndexed: boolean;
+  label?: string;
 }
 
 export type ReturnSpec =

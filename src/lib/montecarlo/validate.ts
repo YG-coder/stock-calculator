@@ -107,6 +107,21 @@ export function validateInput(input: SimulationInput): ValidationIssue[] {
         }
       }
     }
+    if (cf.phases) {
+      if (!Array.isArray(cf.phases) || cf.phases.length === 0) {
+        bad("cashFlow.phases", "다단계 현금흐름은 한 개 이상의 구간이 필요합니다.");
+      } else {
+        const sorted = [...cf.phases].sort((a, b) => a.fromMonth - b.fromMonth);
+        sorted.forEach((phase, index) => {
+          const field = `cashFlow.phases.${index}`;
+          if (!Number.isInteger(phase.fromMonth) || !Number.isInteger(phase.toMonth) || phase.fromMonth < 0 || phase.toMonth > months || phase.fromMonth >= phase.toMonth) bad(field, `구간은 0~${months} 안의 유효한 반열림 범위여야 합니다.`);
+          if (!isNum(phase.monthlyAmount)) bad(`${field}.monthlyAmount`, "월 금액은 유한한 숫자여야 합니다.");
+          if (phase.timing !== "start" && phase.timing !== "end") bad(`${field}.timing`, '적용 시점은 "start" 또는 "end" 여야 합니다.');
+          if (typeof phase.inflationIndexed !== "boolean") bad(`${field}.inflationIndexed`, "물가 연동 여부는 true/false 여야 합니다.");
+          if (index > 0 && sorted[index - 1].toMonth > phase.fromMonth) bad("cashFlow.phases", "다단계 현금흐름 구간은 서로 겹칠 수 없습니다.");
+        });
+      }
+    }
   }
 
   // ---- 수익률 ----
@@ -204,10 +219,12 @@ export function collectWarnings(input: SimulationInput): string[] {
     warnings.push("물가상승률이 0이므로 실질 기준과 명목 기준이 같습니다.");
   }
   const hasOverride = Object.values(input.cashFlow?.overrides ?? {}).some((v) => v !== 0);
+  const hasPhaseFlow = input.cashFlow?.phases?.some((phase) => phase.monthlyAmount !== 0) ?? false;
   if (
     input.initialBalance === 0 &&
     input.cashFlow?.monthlyAmount === 0 &&
-    !hasOverride
+    !hasOverride &&
+    !hasPhaseFlow
   ) {
     warnings.push("초기 자산과 현금흐름이 모두 0이라 모든 경로가 0으로 유지됩니다.");
   }

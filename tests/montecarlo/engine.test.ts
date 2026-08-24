@@ -23,6 +23,30 @@ function baseInput(over: Partial<SimulationInput> = {}): SimulationInput {
   };
 }
 
+describe("다단계 현금흐름", () => {
+  it("적립 단계와 인출 단계를 한 경로에서 순서대로 처리한다", () => {
+    const result = runSimulation(baseInput({
+      paths: 1,
+      months: 24,
+      initialBalance: 0,
+      returns: { kind: "parametric", expectedReturn: 0, volatility: 0 },
+      cashFlow: { monthlyAmount: 0, timing: "end", inflationIndexed: false, phases: [
+        { fromMonth: 0, toMonth: 12, monthlyAmount: 100, timing: "end", inflationIndexed: false },
+        { fromMonth: 12, toMonth: 24, monthlyAmount: -50, timing: "start", inflationIndexed: false },
+      ] },
+    }));
+    expect(result.terminal.p50).toBeCloseTo(600, 8);
+    expect(result.depletion).toBeUndefined();
+  });
+
+  it("겹치는 현금흐름 단계는 거부한다", () => {
+    expect(() => runSimulation(baseInput({ cashFlow: { monthlyAmount: 0, timing: "end", inflationIndexed: false, phases: [
+      { fromMonth: 0, toMonth: 10, monthlyAmount: 1, timing: "end", inflationIndexed: false },
+      { fromMonth: 9, toMonth: 12, monthlyAmount: -1, timing: "start", inflationIndexed: false },
+    ] } }))).toThrow(/겹칠 수 없습니다/);
+  });
+});
+
 /* ============================================================
    1. 결정적 재현성
    ============================================================ */
