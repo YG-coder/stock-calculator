@@ -141,6 +141,7 @@ export const CALCULATORS: CalculatorItem[] = [
     isCommon: true,
     featured: true,
   },
+  { href: "/sequence-risk-calculator", label: "순서 위험", title: "수익률 순서 위험 계산기", desc: "같은 평균수익률의 발생 순서에 따른 은퇴 결과 비교", badge: "은퇴 위험", kind: "calculator", groups: ["stocks"], isCommon: true },
 
   // ===== 미국 주식 (전용만) =====
   {
