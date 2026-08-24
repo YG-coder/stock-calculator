@@ -45,6 +45,21 @@ describe("다단계 현금흐름", () => {
       { fromMonth: 9, toMonth: 12, monthlyAmount: -1, timing: "start", inflationIndexed: false },
     ] } }))).toThrow(/겹칠 수 없습니다/);
   });
+
+  it("phases와 0이 아닌 최상위 monthlyAmount를 함께 전달하면 거부한다", () => {
+    expect(() => runSimulation(baseInput({ cashFlow: { monthlyAmount: 999_999, timing: "end", inflationIndexed: false, phases: [
+      { fromMonth: 0, toMonth: 12, monthlyAmount: 100, timing: "end", inflationIndexed: false },
+    ] } }))).toThrow(/monthlyAmount는 0/);
+  });
+
+  it("phases에서 지원하지 않는 필요 납입액 역산 요청을 명시적으로 거부한다", () => {
+    expect(() => runSimulation(baseInput({
+      goal: { kind: "terminal-target", targetAmount: 10_000_000, targetProbability: 0.8 },
+      cashFlow: { monthlyAmount: 0, timing: "end", inflationIndexed: false, phases: [
+        { fromMonth: 0, toMonth: 12, monthlyAmount: 100, timing: "end", inflationIndexed: false },
+      ] },
+    }))).toThrow(/역산은 아직 지원하지 않습니다/);
+  });
 });
 
 /* ============================================================

@@ -121,6 +121,9 @@ export function validateInput(input: SimulationInput): ValidationIssue[] {
           if (index > 0 && sorted[index - 1].toMonth > phase.fromMonth) bad("cashFlow.phases", "다단계 현금흐름 구간은 서로 겹칠 수 없습니다.");
         });
       }
+      if (cf.monthlyAmount !== 0) {
+        bad("cashFlow.monthlyAmount", "다단계 현금흐름(phases)을 사용할 때 monthlyAmount는 0이어야 합니다. 각 구간의 monthlyAmount를 사용하세요.");
+      }
     }
   }
 
@@ -198,6 +201,9 @@ export function validateInput(input: SimulationInput): ValidationIssue[] {
         bad("goal.targetProbability", "목표 확률은 유한한 숫자여야 합니다.");
       } else if (goal.targetProbability <= 0 || goal.targetProbability >= 1) {
         bad("goal.targetProbability", "목표 확률은 0과 1 사이여야 합니다.");
+      }
+      if (input.cashFlow?.phases?.length) {
+        bad("goal.targetProbability", "다단계 현금흐름의 필요 납입액 역산은 아직 지원하지 않습니다. 단일 현금흐름을 사용하세요.");
       }
     }
   }
