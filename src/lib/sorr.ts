@@ -1,3 +1,5 @@
+import type { SimulationInput, SimulationResult } from "@/lib/montecarlo/types";
+
 export interface SorrResult {
   balances: number[];
   terminal: number;
@@ -69,4 +71,3 @@ export function buildSorrSimulationInput(values: SorrSimulationValues): Simulati
 export function sorrSurvivalRate(result: SimulationResult): number {
   return 1 - (result.depletion?.rate ?? 0);
 }
-import type { SimulationInput, SimulationResult } from "@/lib/montecarlo/types";

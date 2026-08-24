@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const SITE_NAME = "주식계산기.kr";
-export const BASE_URL = "https://주식계산기.kr";
+export const BASE_URL = "https://xn--989a00a691bv6b3zl.kr";
 export const OG_IMAGE = "/og-image.png";
 
 type BuildMetadataParams = {
