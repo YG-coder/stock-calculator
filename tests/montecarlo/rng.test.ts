@@ -37,11 +37,15 @@ describe("rng — 결정론", () => {
 
   it("nextFloat 는 (0,1) 개구간이다", () => {
     const r = createRng(7);
+    let minimum = 1;
+    let maximum = 0;
     for (let i = 0; i < 200_000; i++) {
       const v = r.nextFloat();
-      expect(v).toBeGreaterThan(0);
-      expect(v).toBeLessThan(1);
+      minimum = Math.min(minimum, v);
+      maximum = Math.max(maximum, v);
     }
+    expect(minimum).toBeGreaterThan(0);
+    expect(maximum).toBeLessThan(1);
   });
 });
 
