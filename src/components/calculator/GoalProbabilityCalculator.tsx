@@ -33,16 +33,16 @@ export default function GoalProbabilityCalculator() {
   return <CalculatorLayout>
     <CalculatorCard title="목표와 투자 조건" description="목표금액과 기간, 현재 월 투자금을 입력하면 달성 시나리오 비율과 원하는 목표 확률에 필요한 최소 월 투자금을 계산합니다.">
       <div className="grid gap-4 sm:grid-cols-2">
-        <InputField id="goal-target" label="목표 금액" type="number" value={fields.targetAmount} onChange={(e) => set("targetAmount", e.target.value)} unit="원" />
-        <InputField id="goal-probability" label="목표 시나리오 비율" type="number" value={fields.targetProbability} onChange={(e) => set("targetProbability", e.target.value)} unit="%" />
-        <InputField id="goal-years" label="목표 기간" type="number" value={fields.years} onChange={(e) => set("years", e.target.value)} unit="년" />
-        <InputField id="goal-initial" label="현재 투자금" type="number" value={fields.initialBalance} onChange={(e) => set("initialBalance", e.target.value)} unit="원" />
-        <InputField id="goal-monthly" label="현재 월 투자금" type="number" value={fields.monthlyAmount} onChange={(e) => set("monthlyAmount", e.target.value)} unit="원" />
-        <InputField id="goal-return" label="연 기대수익률(CAGR)" type="number" value={fields.expectedReturn} onChange={(e) => set("expectedReturn", e.target.value)} unit="%" />
-        <InputField id="goal-volatility" label="연 변동성" type="number" value={fields.volatility} onChange={(e) => set("volatility", e.target.value)} unit="%" />
-        <InputField id="goal-inflation" label="연 물가상승률" type="number" value={fields.inflation} onChange={(e) => set("inflation", e.target.value)} unit="%" />
-        <InputField id="goal-paths" label="시뮬레이션 경로 수" type="number" value={fields.paths} onChange={(e) => set("paths", e.target.value)} unit="개" />
-        <InputField id="goal-seed" label="재현 시드" type="number" value={fields.seed} onChange={(e) => set("seed", e.target.value)} />
+        <InputField id="goal-target" label="목표 금액" type="number" value={fields.targetAmount} onChange={(e) => set("targetAmount", e.target.value)} unit="원" placeholder="예: 500000000" />
+        <InputField id="goal-probability" label="목표 시나리오 비율" type="number" value={fields.targetProbability} onChange={(e) => set("targetProbability", e.target.value)} unit="%" placeholder="예: 80" />
+        <InputField id="goal-years" label="목표 기간" type="number" value={fields.years} onChange={(e) => set("years", e.target.value)} unit="년" placeholder="예: 20" />
+        <InputField id="goal-initial" label="현재 투자금" type="number" value={fields.initialBalance} onChange={(e) => set("initialBalance", e.target.value)} unit="원" placeholder="예: 10000000" />
+        <InputField id="goal-monthly" label="현재 월 투자금" type="number" value={fields.monthlyAmount} onChange={(e) => set("monthlyAmount", e.target.value)} unit="원" placeholder="예: 500000" />
+        <InputField id="goal-return" label="연 기대수익률(CAGR)" type="number" value={fields.expectedReturn} onChange={(e) => set("expectedReturn", e.target.value)} unit="%" placeholder="예: 7" />
+        <InputField id="goal-volatility" label="연 변동성" type="number" value={fields.volatility} onChange={(e) => set("volatility", e.target.value)} unit="%" placeholder="예: 15" />
+        <InputField id="goal-inflation" label="연 물가상승률" type="number" value={fields.inflation} onChange={(e) => set("inflation", e.target.value)} unit="%" placeholder="예: 2" />
+        <InputField id="goal-paths" label="시뮬레이션 경로 수" type="number" value={fields.paths} onChange={(e) => set("paths", e.target.value)} unit="개" placeholder="예: 10000" />
+        <InputField id="goal-seed" label="재현 시드" type="number" value={fields.seed} onChange={(e) => set("seed", e.target.value)} placeholder="예: 20260824" />
       </div>
       <label className="space-y-2 text-sm font-semibold text-slate-700">목표금액 기준
         <select className="block w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 font-normal" value={fields.reportBasis} onChange={(e) => set("reportBasis", e.target.value as Fields["reportBasis"])}><option value="real">현재 가치(실질)</option><option value="nominal">미래 금액(명목)</option></select>

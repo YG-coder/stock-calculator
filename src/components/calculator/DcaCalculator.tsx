@@ -87,14 +87,14 @@ export default function DcaCalculator() {
     <CalculatorLayout>
       <CalculatorCard title="적립식 투자 조건" description="초기 자산과 월 투자금, 기간, 수익률 가정을 입력해 여러 시장 경로에서 장기 결과의 범위를 확인합니다.">
         <div className="grid gap-4 sm:grid-cols-2">
-          <InputField id="dca-initial" label="초기 투자금" type="number" value={fields.initialBalance} onChange={(e) => set("initialBalance", e.target.value)} unit="원" />
-          <InputField id="dca-monthly" label="월 투자금" type="number" value={fields.monthlyAmount} onChange={(e) => set("monthlyAmount", e.target.value)} unit="원" />
-          <InputField id="dca-years" label="투자 기간" type="number" value={fields.years} onChange={(e) => set("years", e.target.value)} unit="년" />
-          <InputField id="dca-return" label="연 기대수익률(CAGR)" type="number" value={fields.expectedReturn} onChange={(e) => set("expectedReturn", e.target.value)} unit="%" />
-          <InputField id="dca-volatility" label="연 변동성" type="number" value={fields.volatility} onChange={(e) => set("volatility", e.target.value)} unit="%" />
-          <InputField id="dca-inflation" label="연 물가상승률" type="number" value={fields.inflation} onChange={(e) => set("inflation", e.target.value)} unit="%" />
-          <InputField id="dca-paths" label="시뮬레이션 경로 수" type="number" value={fields.paths} onChange={(e) => set("paths", e.target.value)} unit="개" />
-          <InputField id="dca-seed" label="재현 시드" type="number" value={fields.seed} onChange={(e) => set("seed", e.target.value)} />
+          <InputField id="dca-initial" label="초기 투자금" type="number" value={fields.initialBalance} onChange={(e) => set("initialBalance", e.target.value)} unit="원" placeholder="예: 10000000" />
+          <InputField id="dca-monthly" label="월 투자금" type="number" value={fields.monthlyAmount} onChange={(e) => set("monthlyAmount", e.target.value)} unit="원" placeholder="예: 500000" />
+          <InputField id="dca-years" label="투자 기간" type="number" value={fields.years} onChange={(e) => set("years", e.target.value)} unit="년" placeholder="예: 20" />
+          <InputField id="dca-return" label="연 기대수익률(CAGR)" type="number" value={fields.expectedReturn} onChange={(e) => set("expectedReturn", e.target.value)} unit="%" placeholder="예: 7" />
+          <InputField id="dca-volatility" label="연 변동성" type="number" value={fields.volatility} onChange={(e) => set("volatility", e.target.value)} unit="%" placeholder="예: 15" />
+          <InputField id="dca-inflation" label="연 물가상승률" type="number" value={fields.inflation} onChange={(e) => set("inflation", e.target.value)} unit="%" placeholder="예: 2" />
+          <InputField id="dca-paths" label="시뮬레이션 경로 수" type="number" value={fields.paths} onChange={(e) => set("paths", e.target.value)} unit="개" placeholder="예: 10000" />
+          <InputField id="dca-seed" label="재현 시드" type="number" value={fields.seed} onChange={(e) => set("seed", e.target.value)} placeholder="예: 20260824" />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="space-y-2 text-sm font-semibold text-slate-700">납입 시점

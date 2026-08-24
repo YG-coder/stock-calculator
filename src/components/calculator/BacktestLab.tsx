@@ -19,8 +19,8 @@ export default function BacktestLab() {
 
   return <CalculatorLayout>
     <CalculatorCard title="월별 수익률 자료" description="시간순 월 수익률을 % 단위로 붙여넣으세요. 기본 숫자는 사용법 확인용 가상 예시이며 실제 시장 자료가 아닙니다.">
-      <label className="block space-y-2 text-sm font-semibold text-slate-700">월별 수익률(%, 쉼표·공백·줄바꿈 구분)<textarea className="min-h-36 w-full rounded-2xl border border-slate-300 p-4 font-mono font-normal" value={returnsText} onChange={(event) => setReturnsText(event.target.value)} /></label>
-      <div className="grid gap-4 sm:grid-cols-3"><InputField id="lab-horizon" label="투자기간" type="number" value={horizon} onChange={(event) => setHorizon(event.target.value)} unit="개월" /><InputField id="lab-initial" label="초기 투자금" type="number" value={initial} onChange={(event) => setInitial(event.target.value)} unit="원" /><InputField id="lab-monthly" label="월 투자금" type="number" value={monthly} onChange={(event) => setMonthly(event.target.value)} unit="원" /></div>
+      <label className="block space-y-2 text-sm font-semibold text-slate-700">월별 수익률(%, 쉼표·공백·줄바꿈 구분)<textarea className="min-h-36 w-full rounded-2xl border border-slate-300 p-4 font-mono font-normal" value={returnsText} onChange={(event) => setReturnsText(event.target.value)} placeholder="예: 2.1, -1.2, 3.4, 0.8" /></label>
+      <div className="grid gap-4 sm:grid-cols-3"><InputField id="lab-horizon" label="투자기간" type="number" value={horizon} onChange={(event) => setHorizon(event.target.value)} unit="개월" placeholder="예: 12" /><InputField id="lab-initial" label="초기 투자금" type="number" value={initial} onChange={(event) => setInitial(event.target.value)} unit="원" placeholder="예: 10000000" /><InputField id="lab-monthly" label="월 투자금" type="number" value={monthly} onChange={(event) => setMonthly(event.target.value)} unit="원" placeholder="예: 500000" /></div>
       <ResultDetail label="인식한 자료" value={String(calculated.returns.length)} unit="개월" />
       {hasInput && !calculated.result ? <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{calculated.error}</div> : null}
     </CalculatorCard>

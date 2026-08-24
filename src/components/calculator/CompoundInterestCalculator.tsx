@@ -95,6 +95,7 @@ export default function CompoundInterestCalculator() {
                         value={initial}
                         onChange={(e) => setInitial(e.target.value)}
                         unit={moneyUnit}
+                        placeholder={currency === "KRW" ? "예: 1000000" : "예: 1000"}
                     />
                     <InputField
                         id="monthly"
@@ -103,6 +104,7 @@ export default function CompoundInterestCalculator() {
                         value={monthly}
                         onChange={(e) => setMonthly(e.target.value)}
                         unit={moneyUnit}
+                        placeholder={currency === "KRW" ? "예: 100000" : "예: 100"}
                     />
                 </div>
 
@@ -114,6 +116,7 @@ export default function CompoundInterestCalculator() {
                         value={rate}
                         onChange={(e) => setRate(e.target.value)}
                         unit="%"
+                        placeholder="예: 10"
                     />
                     <InputField
                         id="years"
@@ -122,6 +125,7 @@ export default function CompoundInterestCalculator() {
                         value={years}
                         onChange={(e) => setYears(e.target.value)}
                         unit="년"
+                        placeholder="예: 10"
                     />
                 </div>
 

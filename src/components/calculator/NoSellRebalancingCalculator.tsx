@@ -29,10 +29,10 @@ export default function NoSellRebalancingCalculator() {
     <CalculatorCard title="보유 자산과 목표 비중" description="매도하지 않고 새 투자금만 배분합니다. 목표 비중의 합은 100%여야 합니다.">
       <div className="space-y-5">{assets.map((asset, index) => <div key={index} className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
         <label className="space-y-2 text-sm font-semibold text-slate-700">자산명<input className="w-full rounded-xl border border-slate-300 bg-white px-3 py-3 font-normal" value={asset.name} onChange={(event) => update(index, "name", event.target.value)} /></label>
-        <InputField id={`asset-value-${index}`} label="현재 평가금액" type="number" value={asset.currentValue} onChange={(event) => update(index, "currentValue", event.target.value)} unit="원" />
-        <InputField id={`asset-weight-${index}`} label="목표 비중" type="number" value={asset.targetWeight} onChange={(event) => update(index, "targetWeight", event.target.value)} unit="%" />
+        <InputField id={`asset-value-${index}`} label="현재 평가금액" type="number" value={asset.currentValue} onChange={(event) => update(index, "currentValue", event.target.value)} unit="원" placeholder="예: 50000000" />
+        <InputField id={`asset-weight-${index}`} label="목표 비중" type="number" value={asset.targetWeight} onChange={(event) => update(index, "targetWeight", event.target.value)} unit="%" placeholder="예: 40" />
       </div>)}</div>
-      <div className="grid gap-4 sm:grid-cols-2"><InputField id="rebalancing-contribution" label="새 투자금" type="number" value={contribution} onChange={(event) => setContribution(event.target.value)} unit="원" /><ResultDetail label="목표 비중 합계" value={(weightSum * 100).toFixed(1)} unit="%" /></div>
+      <div className="grid gap-4 sm:grid-cols-2"><InputField id="rebalancing-contribution" label="새 투자금" type="number" value={contribution} onChange={(event) => setContribution(event.target.value)} unit="원" placeholder="예: 10000000" /><ResultDetail label="목표 비중 합계" value={(weightSum * 100).toFixed(1)} unit="%" /></div>
       {hasInput && !result ? <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">평가금액과 투자금은 0 이상, 목표 비중 합계는 100%로 입력해 주세요.</div> : null}
     </CalculatorCard>
     {result ? <>
