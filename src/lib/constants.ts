@@ -108,6 +108,28 @@ export const CALCULATORS: CalculatorItem[] = [
     isCommon: true,
     featured: true,
   },
+  {
+    href: "/dca-calculator",
+    label: "적립식 시뮬레이션",
+    title: "적립식 투자 시뮬레이션",
+    desc: "수익률과 변동성을 반영한 장기 자산 분포 확인",
+    badge: "투자 시뮬레이션",
+    kind: "calculator",
+    groups: ["stocks"],
+    isCommon: true,
+    featured: true,
+  },
+  {
+    href: "/goal-probability-calculator",
+    label: "목표달성확률",
+    title: "투자 목표달성확률 계산기",
+    desc: "목표금액 달성 시나리오 비율과 필요 월 투자금 계산",
+    badge: "재무 목표",
+    kind: "calculator",
+    groups: ["stocks"],
+    isCommon: true,
+    featured: true,
+  },
 
   // ===== 미국 주식 (전용만) =====
   {
