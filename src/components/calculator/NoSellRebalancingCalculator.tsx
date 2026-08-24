@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CalculatorCard, CalculatorLayout, InputField, ResultDetail, ResultHighlight } from "@/components/ui/Shared";
+import { CalculatorCard, CalculatorLayout, InputField, ResultCard, ResultDetail, ResultHighlight } from "@/components/ui/Shared";
 import { allocateWithoutSelling, type RebalancingAsset, totalWeightDeviation } from "@/lib/noSellRebalancing";
 
 type AssetInput = { name: string; currentValue: string; targetWeight: string };
@@ -27,10 +27,10 @@ export default function NoSellRebalancingCalculator() {
 
   return <CalculatorLayout>
     <CalculatorCard title="보유 자산과 목표 비중" description="매도하지 않고 새 투자금만 배분합니다. 목표 비중의 합은 100%여야 합니다.">
-      <div className="space-y-5">{assets.map((asset, index) => <div key={index} className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
-        <label className="space-y-2 text-sm font-semibold text-slate-700">자산명<input className="w-full rounded-xl border border-slate-300 bg-white px-3 py-3 font-normal" value={asset.name} onChange={(event) => update(index, "name", event.target.value)} /></label>
-        <InputField id={`asset-value-${index}`} label="현재 평가금액" type="number" value={asset.currentValue} onChange={(event) => update(index, "currentValue", event.target.value)} unit="원" placeholder="예: 50000000" />
-        <InputField id={`asset-weight-${index}`} label="목표 비중" type="number" value={asset.targetWeight} onChange={(event) => update(index, "targetWeight", event.target.value)} unit="%" placeholder="예: 40" />
+      <div className="space-y-5">{assets.map((asset, index) => <div key={index} className="grid gap-3 border-b border-slate-100 pb-5 last:border-0 sm:grid-cols-3">
+        <InputField id={`asset-name-${index}`} label="자산명" value={asset.name} onChange={(event) => update(index, "name", event.target.value)} placeholder={index === 0 ? "예: 국내주식" : index === 1 ? "예: 해외주식" : "예: 채권·현금"} />
+        <InputField id={`asset-value-${index}`} label="현재 평가금액" type="number" value={asset.currentValue} onChange={(event) => update(index, "currentValue", event.target.value)} unit="원" placeholder={`예: ${[50000000, 30000000, 20000000][index]}`} />
+        <InputField id={`asset-weight-${index}`} label="목표 비중" type="number" value={asset.targetWeight} onChange={(event) => update(index, "targetWeight", event.target.value)} unit="%" placeholder={`예: ${[40, 40, 20][index]}`} />
       </div>)}</div>
       <div className="grid gap-4 sm:grid-cols-2"><InputField id="rebalancing-contribution" label="새 투자금" type="number" value={contribution} onChange={(event) => setContribution(event.target.value)} unit="원" placeholder="예: 10000000" /><ResultDetail label="목표 비중 합계" value={(weightSum * 100).toFixed(1)} unit="%" /></div>
       {hasInput && !result ? <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">평가금액과 투자금은 0 이상, 목표 비중 합계는 100%로 입력해 주세요.</div> : null}
@@ -41,6 +41,6 @@ export default function NoSellRebalancingCalculator() {
         <p className="text-xs leading-relaxed text-slate-500">목표보다 부족한 자산의 부족액에 비례해 우선 배분합니다. 투자금이 충분해 부족분을 모두 채우고 남으면 목표 비중대로 배분합니다.</p>
       </CalculatorCard>
       <CalculatorCard title="주의사항"><p className="text-sm leading-relaxed text-slate-600">세금·수수료·최소 주문금액·주식 수량 단위는 반영하지 않습니다. 실제 주문 전 거래 가능 단위에 맞게 금액을 조정하세요.</p></CalculatorCard>
-    </> : null}
+    </> : <ResultCard title="추천 매수 배분" isValid={false} emptyMessage="보유 자산과 목표 비중을 입력하면 결과가 표시됩니다." />}
   </CalculatorLayout>;
 }

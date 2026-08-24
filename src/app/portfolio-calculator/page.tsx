@@ -3,7 +3,7 @@ import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import { Article, Disclaimer, FaqItem, FaqSection, PageHeader, RelatedCalculators, SectionCard } from "@/components/ui/Shared";
 import { buildMetadata } from "@/lib/metadata";
 
-const title = "포트폴리오 기대수익률·변동성 계산기";
+const title = "포트폴리오 계산기";
 const description = "자산별 비중과 기대수익률, 변동성, 상관계수를 입력해 포트폴리오의 기대수익률과 공분산 기반 변동성을 계산합니다.";
 const faqs = [{ question: "상관계수는 무엇인가요?", answer: "두 자산의 수익률이 함께 움직이는 정도로 -1부터 1 사이입니다. 낮을수록 포트폴리오 변동성을 낮추는 분산효과가 커질 수 있습니다." }, { question: "기본 입력값을 그대로 사용해도 되나요?", answer: "아니요. 기본값은 계산 예시이며 최신 시장 전망이나 권장 자산배분이 아닙니다. 같은 기준으로 추정한 본인의 가정값을 입력하세요." }];
 export const metadata = buildMetadata({ title, description, path: "/portfolio-calculator", keywords: ["포트폴리오 계산기", "자산배분 계산기", "포트폴리오 변동성"] });

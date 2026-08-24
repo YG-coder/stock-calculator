@@ -130,7 +130,7 @@ export function ResultCard({
   isValid = true,
 }: {
   title?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
   emptyMessage?: string;
   isValid?: boolean;
@@ -231,6 +231,7 @@ type InputFieldProps = {
   step?: number | string;
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   disabled?: boolean;
+  grouping?: boolean;
 };
 
 export function InputField({
@@ -247,6 +248,7 @@ export function InputField({
   step,
   inputMode,
   disabled = false,
+  grouping = true,
 }: InputFieldProps) {
   const isNumeric =
     type === "number" ||
@@ -254,7 +256,7 @@ export function InputField({
     inputMode === "decimal";
 
   const rawValue = String(value ?? "");
-  const displayValue = isNumeric ? formatWithCommas(rawValue) : rawValue;
+  const displayValue = isNumeric && grouping ? formatWithCommas(rawValue) : rawValue;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!isNumeric) {
@@ -295,7 +297,7 @@ export function InputField({
           id={id}
           type="text"
           inputMode={inputMode ?? (isNumeric ? "decimal" : undefined)}
-          placeholder={isNumeric ? formatPlaceholder(placeholder) : placeholder}
+          placeholder={isNumeric && grouping ? formatPlaceholder(placeholder) : placeholder}
           value={displayValue}
           onChange={handleChange}
           min={min}
@@ -313,6 +315,32 @@ export function InputField({
       </div>
     </div>
   );
+}
+
+type SelectFieldProps = {
+  id?: string;
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  children: React.ReactNode;
+  className?: string;
+};
+
+export function SelectField({ id, label, value, onChange, children, className = "" }: SelectFieldProps) {
+  return <div className={`space-y-2 ${className}`}><label htmlFor={id} className="block text-sm font-semibold text-slate-700">{label}</label><select id={id} value={value} onChange={onChange} className="block min-h-[50px] w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none transition focus:border-slate-500">{children}</select></div>;
+}
+
+type TextareaFieldProps = {
+  id?: string;
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  placeholder?: string;
+  className?: string;
+};
+
+export function TextareaField({ id, label, value, onChange, placeholder, className = "" }: TextareaFieldProps) {
+  return <div className={`space-y-2 ${className}`}><label htmlFor={id} className="block text-sm font-semibold text-slate-700">{label}</label><textarea id={id} value={value} onChange={onChange} placeholder={placeholder} className="min-h-32 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500" /></div>;
 }
 
 /* =========================

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { CalculatorCard, CalculatorLayout, InputField, ResultDetail, ResultHighlight } from "@/components/ui/Shared";
+import { CalculatorCard, CalculatorLayout, InputField, ResultCard, ResultDetail, ResultHighlight, SelectField } from "@/components/ui/Shared";
 import { useMonteCarlo } from "@/hooks/useMonteCarlo";
 import { buildDcaInput, contributionsFromInput, type DcaFormValues } from "@/lib/dca";
 import type { PercentileBand } from "@/lib/montecarlo/types";
@@ -94,21 +94,13 @@ export default function DcaCalculator() {
           <InputField id="dca-volatility" label="연 변동성" type="number" value={fields.volatility} onChange={(e) => set("volatility", e.target.value)} unit="%" placeholder="예: 15" />
           <InputField id="dca-inflation" label="연 물가상승률" type="number" value={fields.inflation} onChange={(e) => set("inflation", e.target.value)} unit="%" placeholder="예: 2" />
           <InputField id="dca-paths" label="시뮬레이션 경로 수" type="number" value={fields.paths} onChange={(e) => set("paths", e.target.value)} unit="개" placeholder="예: 10000" />
-          <InputField id="dca-seed" label="재현 시드" type="number" value={fields.seed} onChange={(e) => set("seed", e.target.value)} placeholder="예: 20260824" />
+          <InputField id="dca-seed" label="재현 시드" type="number" value={fields.seed} onChange={(e) => set("seed", e.target.value)} placeholder="예: 20260824" grouping={false} />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="space-y-2 text-sm font-semibold text-slate-700">납입 시점
-            <select className="block w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 font-normal" value={fields.timing} onChange={(e) => set("timing", e.target.value as Fields["timing"])}>
-              <option value="end">매월 말</option><option value="start">매월 초</option>
-            </select>
-          </label>
-          <label className="space-y-2 text-sm font-semibold text-slate-700">결과 기준
-            <select className="block w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 font-normal" value={fields.reportBasis} onChange={(e) => set("reportBasis", e.target.value as Fields["reportBasis"])}>
-              <option value="real">현재 가치(실질)</option><option value="nominal">미래 금액(명목)</option>
-            </select>
-          </label>
+          <SelectField id="dca-timing" label="납입 시점" value={fields.timing} onChange={(e) => set("timing", e.target.value as Fields["timing"])}><option value="end">매월 말</option><option value="start">매월 초</option></SelectField>
+          <SelectField id="dca-basis" label="결과 기준" value={fields.reportBasis} onChange={(e) => set("reportBasis", e.target.value as Fields["reportBasis"])}><option value="real">현재 가치(실질)</option><option value="nominal">미래 금액(명목)</option></SelectField>
         </div>
-        <label className="flex min-h-11 items-center gap-3 text-sm text-slate-700">
+        <label className="flex min-h-11 items-center gap-3 text-sm font-semibold text-slate-700">
           <input type="checkbox" checked={fields.inflationIndexed} onChange={(e) => set("inflationIndexed", e.target.checked)} /> 매년 월 투자금을 물가상승률만큼 증액
         </label>
         <div className="flex flex-wrap gap-3">
@@ -138,7 +130,7 @@ export default function DcaCalculator() {
             {result.meta.warnings.map((warning) => <li key={warning}>{warning}</li>)}
           </ul>
         </CalculatorCard>
-      </> : null}
+      </> : <ResultCard title="적립식 투자 시뮬레이션 결과" isValid={false} emptyMessage="값을 입력하고 시뮬레이션을 실행하면 결과가 표시됩니다." />}
     </CalculatorLayout>
   );
 }
