@@ -139,7 +139,7 @@ export default function DcaCalculator() {
           </div>
         </AdvancedPanel>
 
-        <p className="text-sm leading-relaxed text-slate-500">수익률을 높이면 전체 결과가 커지고, 오르내림 정도를 높이면 좋지 않은 경우와 좋은 경우의 차이가 커집니다. 기간이 길어지면 복리 효과와 불확실성이 함께 커집니다.</p>
+        <p className="text-sm leading-relaxed text-slate-500">수익률을 높이면 전체 결과가 커지고, 수익률이 흔들리는 정도를 높이면 좋지 않은 경우와 좋은 경우의 차이가 커집니다. 기간이 길어지면 복리 효과와 불확실성이 함께 커집니다.</p>
         <div className="flex flex-wrap gap-3">
           <button type="button" onClick={start} disabled={status === "running"} className="min-h-11 rounded-2xl bg-slate-900 px-5 py-3 font-semibold text-white disabled:opacity-50">예상 금액 범위 계산하기</button>
           <button type="button" onClick={cancel} disabled={status !== "running"} className="min-h-11 rounded-2xl border border-slate-300 px-5 py-3 font-semibold text-slate-700 disabled:opacity-40">취소</button>

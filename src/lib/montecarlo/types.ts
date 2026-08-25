@@ -14,7 +14,7 @@
  *   3) ProgressFn / RunOptions / SimulationRunner 진입점 시그니처
  */
 
-export const ENGINE_VERSION = "1.0.0";
+export const ENGINE_VERSION = "1.0.1";
 
 /* ============================================================
    입력

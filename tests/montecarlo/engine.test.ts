@@ -84,7 +84,7 @@ describe("결정적 재현성", () => {
     const r = runSimulation(baseInput({ seed: 987654 }));
     expect(r.meta.seed).toBe(987654);
     expect(r.input.seed).toBe(987654);
-    expect(r.meta.engineVersion).toBe("1.0.0");
+    expect(r.meta.engineVersion).toBe("1.0.1");
     expect(r.meta.months).toBe(120);
     expect(r.meta.pathsRun).toBe(2_000);
   });
