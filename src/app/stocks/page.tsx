@@ -37,6 +37,7 @@ export default function StocksPage() {
         "/position-size-calculator",
         "/dividend-calculator",
         "/compound-interest-calculator",
+        "/stock-transaction-tax-calculator",
     ];
 
     const calculators = CALCULATORS

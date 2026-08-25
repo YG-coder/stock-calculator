@@ -109,6 +109,16 @@ export const CALCULATORS: CalculatorItem[] = [
     featured: true,
   },
   {
+    href: "/stock-transaction-tax-calculator",
+    label: "증권거래세",
+    title: "증권거래세 계산기",
+    desc: "시장별 매도금액 기준 증권거래세 계산",
+    badge: "세금 분석",
+    kind: "calculator",
+    groups: ["stocks"],
+    isCommon: true,
+  },
+  {
     href: "/dca-calculator",
     label: "적립식 시뮬레이션",
     title: "적립식 투자 시뮬레이션",

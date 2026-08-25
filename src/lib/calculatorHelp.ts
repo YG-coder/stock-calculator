@@ -60,6 +60,12 @@ export const CALCULATOR_HELP_BY_PATH: Readonly<Record<string, CalculatorHelpCopy
     read: "계산된 가격은 단순 기준값입니다. 실제 주문에서는 호가 단위와 체결 오차를 고려하세요.",
     example: "매수가 50,000원, 10주, 허용 손실률 5%",
   },
+  "/stock-transaction-tax-calculator": {
+    what: "국내주식을 팔 때 매도금액을 기준으로 발생하는 증권거래세를 계산합니다.",
+    input: "주식을 거래한 시장과 총 매도금액을 입력하세요.",
+    read: "증권거래세와 농어촌특별세를 구분하고, 두 세금을 뺀 금액을 확인하세요.",
+    example: "코스피 주식 총 1,000만 원 매도",
+  },
   "/target-price-calculator": {
     what: "매수가에서 원하는 수익률을 달성하려면 주가가 얼마가 되어야 하는지 계산합니다.",
     input: "매수가격과 목표 수익률을 입력하세요.",
