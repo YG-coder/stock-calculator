@@ -10,6 +10,14 @@ describe("증권거래세 계산", () => {
     expect(result.netProceeds).toBe(9_980_000);
   });
 
+  it("코스피는 세목별 원 미만을 절사한 뒤 합산한다", () => {
+    const result = calculateStockTransactionTax(999_999, "kospi");
+    expect(result.transactionTax).toBe(499);
+    expect(result.ruralTax).toBe(1_499);
+    expect(result.totalTax).toBe(1_998);
+    expect(result.netProceeds).toBe(998_001);
+  });
+
   it.each([
     ["kosdaq", 20_000],
     ["konex", 10_000],

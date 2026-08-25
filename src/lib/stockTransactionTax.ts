@@ -62,8 +62,10 @@ export function calculateStockTransactionTax(
   const rate = STOCK_TRANSACTION_TAX_RATES[market];
   if (!rate) throw new Error("지원하지 않는 시장 구분입니다.");
 
-  const transactionTax = saleAmount * rate.transactionTaxRate;
-  const ruralTax = saleAmount * rate.ruralTaxRate;
+  // 실제 징수 방식에 맞춰 각 세목에서 원 미만을 먼저 버린 뒤 합산한다.
+  // 코스피는 증권거래세와 농어촌특별세를 따로 절사해야 합계가 정확하다.
+  const transactionTax = Math.floor(saleAmount * rate.transactionTaxRate);
+  const ruralTax = Math.floor(saleAmount * rate.ruralTaxRate);
   const totalTax = transactionTax + ruralTax;
 
   return {

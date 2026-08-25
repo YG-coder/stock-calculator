@@ -53,6 +53,7 @@ export default function StockTransactionTaxPage() {
           conditions={[
             `${STOCK_TRANSACTION_TAX_EFFECTIVE_AT} 시행 세율 기준입니다.`,
             "양도소득세와 증권사 매매 수수료는 포함하지 않습니다.",
+            "증권거래세와 농어촌특별세는 각 세목에서 원 미만을 절사한 뒤 합산합니다.",
             "ETF·ETN 등 상품 종류나 비과세 거래 여부에 따라 실제 징수액이 다를 수 있습니다.",
           ]}
           sources={[
