@@ -5,7 +5,7 @@ import { SectionCard, Article } from "@/components/ui/Shared";
 import { CALCULATORS } from "@/lib/constants";
 
 export const metadata: Metadata = withPageMetadata({
-    title: "주식 계산기 모음 | 수익률, 평단가, 손절가, 목표가, 배당, 복리 계산",
+    title: "주식 계산기 모음 | 수익률·평단가·손절가",
     description:
         "국내주식 투자에 필요한 수익률 계산기, 평단가 계산기, 손절가 계산기, 목표가 계산기, 배당 수익 계산기, 복리 계산기를 한 곳에서 확인하세요.",
     keywords: [

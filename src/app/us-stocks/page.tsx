@@ -5,7 +5,7 @@ import { SectionCard, Article } from "@/components/ui/Shared";
 import { CALCULATORS } from "@/lib/constants";
 
 export const metadata: Metadata = withPageMetadata({
-    title: "미국주식 계산기 모음 | 세금, 환율, 배당 계산",
+    title: "미국주식 계산기 | 세금·환율·배당",
     description:
         "미국주식 투자에 필요한 세금 계산기, 환율 수익 계산기, 배당 계산기를 한 곳에서 확인하세요. 실제 세후 수익과 환율 영향을 반영한 계산이 가능합니다.",
     keywords: [

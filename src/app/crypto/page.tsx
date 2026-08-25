@@ -5,7 +5,7 @@ import { SectionCard, Article } from "@/components/ui/Shared";
 import { CALCULATORS } from "@/lib/constants";
 
 export const metadata: Metadata = withPageMetadata({
-    title: "코인 계산기 모음 | 청산가, 수익률, 레버리지, 물타기 계산기",
+    title: "코인 계산기 모음 | 청산가·레버리지·수익률",
     description:
         "비트코인, 이더리움 등 암호화폐 투자에 필요한 청산가 계산기, 레버리지 수익 계산기, 수익률 계산기, 펀딩비 계산기, 물타기 계산기를 한 곳에서 확인하세요.",
     keywords: [

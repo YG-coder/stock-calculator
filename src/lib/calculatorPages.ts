@@ -31,7 +31,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "compound-interest-calculator": {
         slug: "compound-interest-calculator",
         metadata: {
-            title: "복리 계산기 | 복리 투자 수익 및 최종 금액 계산",
+            title: "복리 계산기 | 투자금 복리 계산",
             description:
                 "초기 투자금, 매월 추가 투자금, 예상 수익률, 투자 기간을 기준으로 최종 금액과 복리 수익을 계산하는 복리 계산기입니다.",
             keywords: [
@@ -42,7 +42,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "compound interest calculator",
             ],
             openGraph: {
-                title: "복리 계산기 | 복리 투자 수익 및 최종 금액 계산",
+                title: "복리 계산기 | 투자금 복리 계산",
                 description:
                     "초기 투자금과 추가 투자금을 기준으로 복리 수익과 예상 최종 금액을 계산해보세요.",
                 type: "website",
@@ -99,7 +99,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "overseas-stock-tax-calculator": {
         slug: "overseas-stock-tax-calculator",
         metadata: {
-            title: "해외주식 세금 계산기 | 양도소득세 및 세후 수익 계산",
+            title: "해외주식 세금 계산기 | 양도세 계산",
             description:
                 "해외주식 매매 수익에 대한 양도소득세와 세후 수익을 계산하는 해외주식 세금 계산기입니다. 기본공제 250만원과 세율 22%를 반영해 예상 세금을 확인할 수 있습니다.",
             keywords: [
@@ -110,7 +110,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "미국주식 세금",
             ],
             openGraph: {
-                title: "해외주식 세금 계산기 | 양도소득세 및 세후 수익 계산",
+                title: "해외주식 세금 계산기 | 양도세 계산",
                 description:
                     "해외주식 투자 수익에서 실제로 얼마가 남는지 계산해보세요. 기본공제와 세율을 반영해 예상 양도세와 세후 수익을 확인할 수 있습니다.",
                 type: "website",
@@ -167,7 +167,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "crypto-liquidation-calculator": {
         slug: "crypto-liquidation-calculator",
         metadata: {
-            title: "코인 청산가 계산기 | 레버리지 롱·숏 청산 가격 계산",
+            title: "코인 청산가 계산기 | 롱·숏 청산가",
             description:
                 "비트코인, 이더리움 등 암호화폐 선물 거래에서 레버리지와 진입가를 기준으로 예상 청산 가격을 계산하는 코인 청산가 계산기입니다.",
             keywords: [
@@ -178,7 +178,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "crypto liquidation calculator",
             ],
             openGraph: {
-                title: "코인 청산가 계산기 | 레버리지 롱·숏 청산 가격 계산",
+                title: "코인 청산가 계산기 | 롱·숏 청산가",
                 description:
                     "암호화폐 선물 거래에서 레버리지와 포지션 방향에 따라 예상 청산 가격을 빠르게 계산하세요.",
                 type: "website",
@@ -247,7 +247,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "crypto-profit-calculator": {
         slug: "crypto-profit-calculator",
         metadata: {
-            title: "코인 수익 계산기 | 비트코인·이더리움 수익률 및 순수익 계산",
+            title: "코인 수익 계산기 | 수익률·순수익",
             description:
                 "매수 가격, 매도 가격, 보유 수량, 거래 수수료를 기준으로 코인 실제 수익과 수익률을 계산하는 코인 수익 계산기입니다.",
             keywords: [
@@ -258,7 +258,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "crypto profit calculator",
             ],
             openGraph: {
-                title: "코인 수익 계산기 | 비트코인·이더리움 수익률 및 순수익 계산",
+                title: "코인 수익 계산기 | 수익률·순수익",
                 description:
                     "암호화폐 매수·매도 가격과 수수료를 반영해 실제 순수익과 수익률을 계산하세요.",
                 type: "website",
@@ -327,7 +327,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "crypto-average-calculator": {
         slug: "crypto-average-calculator",
         metadata: {
-            title: "코인 물타기·불타기 계산기 | 비트코인·이더리움 평균 단가 계산",
+            title: "코인 물타기 계산기 | 평균 단가 계산",
             description:
                 "암호화폐 추가 매수 시 평균 매입 단가가 어떻게 달라지는지 계산하는 코인 물타기 계산기입니다. 비트코인, 이더리움 등 코인의 평균 단가를 쉽게 확인할 수 있습니다.",
             keywords: [
@@ -339,7 +339,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "crypto average calculator",
             ],
             openGraph: {
-                title: "코인 물타기·불타기 계산기 | 비트코인·이더리움 평균 단가 계산",
+                title: "코인 물타기 계산기 | 평균 단가 계산",
                 description:
                     "추가 매수 후 코인 평균 단가가 어떻게 바뀌는지 계산해보세요. 물타기 전략 판단에 도움이 됩니다.",
                 type: "website",
@@ -413,7 +413,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "crypto-leverage-profit-calculator": {
         slug: "crypto-leverage-profit-calculator",
         metadata: {
-            title: "코인 레버리지 수익 계산기 | 롱·숏 선물 수익률 및 ROE 계산",
+            title: "코인 레버리지 수익 계산기 | ROE 계산",
             description:
                 "암호화폐 선물 거래에서 진입가, 종료가, 증거금, 레버리지를 기준으로 실제 수익과 ROE를 계산하는 코인 레버리지 수익 계산기입니다.",
             keywords: [
@@ -424,7 +424,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "crypto leverage profit calculator",
             ],
             openGraph: {
-                title: "코인 레버리지 수익 계산기 | 롱·숏 선물 수익률 및 ROE 계산",
+                title: "코인 레버리지 수익 계산기 | ROE 계산",
                 description:
                     "암호화폐 선물 거래에서 레버리지와 포지션 방향을 반영한 실제 수익과 ROE를 계산해보세요.",
                 type: "website",
@@ -490,7 +490,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "crypto-funding-fee-calculator": {
         slug: "crypto-funding-fee-calculator",
         metadata: {
-            title: "펀딩비 계산기 | 코인 선물 Funding Fee 예상 금액 계산",
+            title: "코인 펀딩비 계산기 | 예상 비용 계산",
             description:
                 "암호화폐 선물 거래에서 포지션 규모, 펀딩비율, 적용 횟수를 기준으로 예상 펀딩비를 계산하는 펀딩비 계산기입니다.",
             keywords: [
@@ -501,7 +501,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "선물 펀딩비 계산",
             ],
             openGraph: {
-                title: "펀딩비 계산기 | 코인 선물 Funding Fee 예상 금액 계산",
+                title: "코인 펀딩비 계산기 | 예상 비용 계산",
                 description:
                     "암호화폐 선물 거래에서 예상 펀딩비를 계산하고 롱·숏 포지션별 지급/수령 구조를 확인하세요.",
                 type: "website",
@@ -569,7 +569,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "crypto-entry-calculator": {
         slug: "crypto-entry-calculator",
         metadata: {
-            title: "코인 레버리지 진입 계산기 | 손절폭 기준 배율·주문금액 계산",
+            title: "코인 진입 계산기 | 배율·주문금액 계산",
             description:
                 "진입가, 손절가, 투자 원금, 리스크 비율을 기준으로 손절폭, 이론 배율, 주문 명목가치, 익절가를 계산하는 코인 레버리지 진입 계산기입니다.",
             keywords: [
@@ -580,7 +580,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "주문 명목가치 계산기",
             ],
             openGraph: {
-                title: "코인 레버리지 진입 계산기 | 손절폭 기준 배율·주문금액 계산",
+                title: "코인 진입 계산기 | 배율·주문금액 계산",
                 description:
                     "손절폭을 기준으로 이론 배율, 주문 명목가치, 익절가를 빠르게 계산하세요.",
                 type: "website",
@@ -651,7 +651,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "us-exchange-profit-calculator": {
         slug: "us-exchange-profit-calculator",
         metadata: {
-            title: "미국주식 환율 반영 수익 계산기 | 원화 기준 실제 수익 계산",
+            title: "미국주식 환율 수익 계산기 | 원화 손익",
             description:
                 "매수·매도 가격, 환율, 수량, 수수료를 기준으로 미국주식의 달러 기준 손익과 원화 기준 실제 수익을 계산하는 환율 반영 수익 계산기입니다.",
             keywords: [
@@ -662,7 +662,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "us stock exchange profit calculator",
             ],
             openGraph: {
-                title: "미국주식 환율 반영 수익 계산기 | 원화 기준 실제 수익 계산",
+                title: "미국주식 환율 수익 계산기 | 원화 손익",
                 description:
                     "미국주식 매매 시 환율과 수수료를 반영한 원화 기준 실제 수익을 계산해보세요.",
                 type: "website",
@@ -728,7 +728,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "us-dividend-calculator": {
         slug: "us-dividend-calculator",
         metadata: {
-            title: "미국주식 배당 계산기 | 세전·세후 배당금 및 배당수익률 계산",
+            title: "미국주식 배당 계산기 | 세후 배당금",
             description:
                 "보유 수량, 연간 주당 배당금, 평균 매수가, 환율, 원천징수세율을 기준으로 미국주식의 세전·세후 배당금과 배당수익률을 계산하는 계산기입니다.",
             keywords: [
@@ -739,7 +739,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "us dividend calculator",
             ],
             openGraph: {
-                title: "미국주식 배당 계산기 | 세전·세후 배당금 및 배당수익률 계산",
+                title: "미국주식 배당 계산기 | 세후 배당금",
                 description:
                     "미국주식 배당금을 세전·세후 기준으로 계산하고, 원화 기준 실수령 배당금과 배당수익률을 확인하세요.",
                 type: "website",
