@@ -44,6 +44,23 @@ function formatPlaceholder(placeholder?: string) {
   });
 }
 
+const SIMULATION_FIELD_LABELS: Readonly<Record<string, string>> = {
+  seed: "결과 재현 번호",
+  paths: "가상 미래 생성 횟수",
+  months: "계산 기간",
+  initialBalance: "초기 자산",
+  "returns.expectedReturn": "연평균 수익률",
+  "returns.volatility": "수익률이 흔들리는 정도",
+  inflationRate: "물가상승률",
+  "goal.targetAmount": "목표 금액",
+  "goal.targetProbability": "목표 달성 비율",
+};
+
+export function simulationIssueText(issue: { field: string; message: string }) {
+  const label = SIMULATION_FIELD_LABELS[issue.field];
+  return label ? `${label}: ${issue.message}` : issue.message;
+}
+
 /* =========================
    Page Header
 ========================= */

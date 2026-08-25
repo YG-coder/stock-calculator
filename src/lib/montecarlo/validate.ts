@@ -215,8 +215,11 @@ export function validateInput(input: SimulationInput): ValidationIssue[] {
 export function collectWarnings(input: SimulationInput): string[] {
   const warnings: string[] = [
     "수익률은 배당을 재투자한 총수익 기준입니다. 세금과 거래비용은 반영하지 않았습니다.",
-    "성공확률은 입력한 가정에 대한 조건부 확률입니다. 실제 결과를 보장하지 않습니다.",
   ];
+
+  if (input.goal) {
+    warnings.push("성공확률은 입력한 가정에 대한 조건부 확률입니다. 실제 결과를 보장하지 않습니다.");
+  }
 
   if (input.paths < 1_000) {
     warnings.push("경로 수가 1,000 미만이라 백분위가 불안정할 수 있습니다.");

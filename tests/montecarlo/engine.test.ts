@@ -572,10 +572,12 @@ describe("입력 검증", () => {
    8. 경고와 스냅샷
    ============================================================ */
 describe("경고·스냅샷", () => {
-  it("세금·수수료 미반영 고지가 항상 실려 나온다", () => {
+  it("세금·수수료 고지는 항상, 성공확률 고지는 목표 입력에만 실려 나온다", () => {
     const r = runSimulation(baseInput());
     expect(r.meta.warnings.join(" ")).toContain("세금과 거래비용은 반영하지 않았습니다");
-    expect(r.meta.warnings.join(" ")).toContain("조건부 확률");
+    expect(r.meta.warnings.join(" ")).not.toContain("조건부 확률");
+    const goal = runSimulation(baseInput({ goal: { kind: "terminal-target", targetAmount: 1 } }));
+    expect(goal.meta.warnings.join(" ")).toContain("조건부 확률");
   });
 
   it("고정 시드 백분위 스냅샷 (리팩터링 회귀 감지)", () => {

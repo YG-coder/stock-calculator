@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { AdvancedPanel, CalculatorCard, CalculatorLayout, InputEffectNote, InputField, PercentileNote, ResultCard, ResultDetail, ResultHighlight, ResultNote, SelectField } from "@/components/ui/Shared";
+import { AdvancedPanel, CalculatorCard, CalculatorLayout, InputEffectNote, InputField, PercentileNote, ResultCard, ResultDetail, ResultHighlight, ResultNote, SelectField, simulationIssueText } from "@/components/ui/Shared";
 import { useMonteCarlo } from "@/hooks/useMonteCarlo";
 import { buildGoalProbabilityInput, type GoalProbabilityValues } from "@/lib/goal-probability";
 import { probabilityForContribution, requiredForProbability, type RequiredContributions } from "@/lib/montecarlo";
 
 type Fields = Record<"seed" | "paths" | "years" | "initialBalance" | "monthlyAmount" | "expectedReturn" | "volatility" | "inflation" | "targetAmount" | "targetProbability", string> & { reportBasis: "nominal" | "real" };
-const INITIAL: Fields = { seed: "", paths: "", years: "", initialBalance: "", monthlyAmount: "", expectedReturn: "", volatility: "", inflation: "", targetAmount: "", targetProbability: "", reportBasis: "real" };
+const INITIAL: Fields = { seed: "", paths: "10000", years: "", initialBalance: "", monthlyAmount: "", expectedReturn: "", volatility: "", inflation: "", targetAmount: "", targetProbability: "", reportBasis: "real" };
 const won = (v: number) => Number.isFinite(v) ? new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 }).format(Math.ceil(v)) : "-";
 const pct = (v: number) => Number.isFinite(v) ? `${(v * 100).toFixed(1)}%` : "-";
 
@@ -47,20 +47,20 @@ export default function GoalProbabilityCalculator() {
       <SelectField id="goal-basis" label="목표금액 기준" value={fields.reportBasis} onChange={(e) => set("reportBasis", e.target.value as Fields["reportBasis"])}><option value="real">현재 가치(실질)</option><option value="nominal">미래 금액(명목)</option></SelectField>
       <div className="flex flex-wrap gap-3"><button type="button" onClick={start} disabled={status === "running"} className="min-h-11 rounded-2xl bg-slate-900 px-5 py-3 font-semibold text-white disabled:opacity-50">달성 가능성 계산</button><button type="button" onClick={cancel} disabled={status !== "running"} className="min-h-11 rounded-2xl border border-slate-300 px-5 py-3 font-semibold text-slate-700 disabled:opacity-40">취소</button></div>
       {status === "running" ? <div className="h-2 overflow-hidden rounded bg-slate-200"><div className="h-full bg-slate-900" style={{ width: `${progressPct}%` }} /></div> : null}
-      {error ? <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error.issues?.map((i) => <p key={`${i.field}-${i.message}`}>{i.field}: {i.message}</p>) ?? error.message}</div> : null}
+      {error ? <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error.issues?.map((i) => <p key={`${i.field}-${i.message}`}>{simulationIssueText(i)}</p>) ?? error.message}</div> : null}
     
       <AdvancedPanel>
-        <div className="grid gap-4 sm:grid-cols-2"><InputField id="goal-paths" label="가상 미래를 몇 번 만들지 (경로 수)" type="number" value={fields.paths} onChange={(e) => set("paths", e.target.value)} unit="개" placeholder="예: 10000" hint="서로 다른 미래를 몇 개 만들어볼지 정합니다." help="이 계산기는 미래를 하나만 예측하지 않고 서로 다른 미래를 수천~수만 개 만들어 결과가 어떻게 퍼지는지를 봅니다. 숫자를 늘리면 결과가 더 안정적이지만 계산이 오래 걸립니다." /><InputField id="goal-seed" label="같은 결과를 다시 만드는 번호 (시드)" type="number" value={fields.seed} onChange={(e) => set("seed", e.target.value)} placeholder="예: 20260824" grouping={false} hint="같은 번호를 넣으면 언제 계산해도 똑같은 결과가 나옵니다." help="결과를 캡처해두거나 남에게 보여줄 때 이 번호가 같으면 상대도 똑같은 화면을 볼 수 있습니다. 신경 쓰지 않아도 되는 값입니다." /></div>
+        <div className="grid gap-4 sm:grid-cols-2"><InputField id="goal-paths" label="가상 미래를 몇 번 만들지 (경로 수)" type="number" value={fields.paths} onChange={(e) => set("paths", e.target.value)} unit="개" placeholder="예: 10000" hint="서로 다른 미래를 몇 개 만들어볼지 정합니다." help="이 계산기는 미래를 하나만 예측하지 않고 서로 다른 미래를 수천~수만 개 만들어 결과가 어떻게 퍼지는지를 봅니다. 숫자를 늘리면 결과가 더 안정적이지만 계산이 오래 걸립니다." /><InputField id="goal-seed" label="결과 재현 번호" type="number" value={fields.seed} onChange={(e) => set("seed", e.target.value)} placeholder="예: 20260824" grouping={false} hint="같은 번호를 넣으면 언제 계산해도 똑같은 결과가 나옵니다." help="결과를 캡처해두거나 남에게 보여줄 때 이 번호가 같으면 상대도 똑같은 화면을 볼 수 있습니다. 신경 쓰지 않아도 되는 값입니다." /></div>
       </AdvancedPanel>
       <InputEffectNote />
       </CalculatorCard>
 
     {result?.goal ? <>
-      <CalculatorCard title="목표달성확률 결과" description={`${result.meta.pathsRun.toLocaleString("ko-KR")}개 시나리오 · ${result.meta.months / 12}년 · 시드 ${result.meta.seed}`}>
+      <CalculatorCard title="목표달성확률 결과" description={`${result.meta.pathsRun.toLocaleString("ko-KR")}개 시나리오 · ${result.meta.months / 12}년 · 결과 재현 번호 ${result.meta.seed}`}>
         <ResultHighlight label="현재 월 투자금의 목표 달성 시나리오 비율" value={pct(result.goal.successProbability)} />
         {required !== undefined ? <div className="grid gap-4 sm:grid-cols-2"><ResultHighlight label={`${(result.input.goal?.targetProbability ?? 0) * 100}% 시나리오 목표에 필요한 월 투자금`} value={won(required)} unit="원" tone="positive" /><ResultHighlight label="현재 대비 월 조정액" value={won(required - executedMonthly)} unit="원" tone={required > executedMonthly ? "negative" : "positive"} /></div> : null}
         <div className="grid gap-4 sm:grid-cols-2"><ResultDetail label="목표 금액" value={won(result.input.goal?.targetAmount ?? 0)} unit="원" /><ResultDetail label="중간 결과 (최종 자산 중앙값)" value={won(result.terminal.p50)} unit="원" /><ResultDetail label="역산 방식" value={inversion?.method === "linear-exact" ? "선형 정확 역산" : "미지원"} /><ResultDetail label="표시 기준" value={result.input.reportBasis === "real" ? "현재 가치" : "미래 금액"} /></div>
-        <ResultNote><PercentileNote /><p>“80% 시나리오”는 미래 성공을 80% 보장한다는 뜻이 아니라, 입력한 가정과 시드로 만든 경로 중 목표를 넘은 비율입니다.</p></ResultNote>
+        <ResultNote><PercentileNote /><p>“80% 시나리오”는 미래 성공을 80% 보장한다는 뜻이 아니라, 입력한 가정과 결과 재현 번호로 만든 경로 중 목표를 넘은 비율입니다.</p></ResultNote>
       </CalculatorCard>
       {sensitivity.length ? <CalculatorCard className="min-w-0" title="목표 시나리오 비율별 필요 월 투자금" description="같은 시뮬레이션 경로를 재사용하므로 표의 값은 추가 시뮬레이션 없이 계산됩니다."><div className="overflow-x-auto"><table className="w-full border-collapse text-sm"><thead><tr className="border-b border-slate-200 text-slate-500"><th scope="col" className="px-2 py-2 text-left">목표 비율</th><th scope="col" className="px-2 py-2 text-right">필요 월 투자금</th><th scope="col" className="px-2 py-2 text-right">해당 금액 달성 비율</th></tr></thead><tbody>{sensitivity.map((row) => {
           const inv = result.goal?.inversion; if (!inv?.sortedRequired || row.amount === null) return null;

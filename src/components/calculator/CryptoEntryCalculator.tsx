@@ -131,7 +131,7 @@ export default function CryptoEntryCalculator() {
         <CalculatorLayout>
             <CalculatorCard
                 title="코인 100배 진입 계산기"
-                description="진입가, 손절가, 시드, 리스크 비율, 손익비를 입력하면 손절폭 기준 이론 배율, 주문 금액, 익절가를 계산할 수 있습니다."
+                description="진입가, 손절가, 투자 원금, 리스크 비율, 손익비를 입력하면 손절폭 기준 이론 배율, 주문 금액, 익절가를 계산할 수 있습니다."
             >
                 <CurrencyToggle value={currency} onChange={setCurrency} />
 
@@ -159,7 +159,7 @@ export default function CryptoEntryCalculator() {
                 <div className="grid gap-4 sm:grid-cols-2">
                     <InputField
                         id="seed"
-                        label="시드"
+                        label="투자 원금"
                         type="number"
                         placeholder={currency === "KRW" ? "예: 1000000" : "예: 100"}
                         unit={moneyUnit}
@@ -195,7 +195,7 @@ export default function CryptoEntryCalculator() {
 
             <ResultCard
                 title="100배 진입 계산 결과"
-                emptyMessage="진입가, 손절가, 시드, 리스크 비율을 입력하면 결과가 계산됩니다."
+                emptyMessage="진입가, 손절가, 투자 원금, 리스크 비율을 입력하면 결과가 계산됩니다."
                 isValid={result.valid}
             >
                 <ResultHighlight
@@ -229,7 +229,7 @@ export default function CryptoEntryCalculator() {
                 </div>
 
                 <p className="mt-4 text-xs leading-relaxed text-slate-500">
-                    이론 배율은 손절폭(%)으로 100을 나눈 값으로, 손절 시 시드 대비 손실이 입력한 리스크
+                    이론 배율은 손절폭(%)으로 100을 나눈 값으로, 손절 시 투자 원금 대비 손실이 입력한 리스크
                     비율과 같아지는 최대 배율입니다. 거래소가 지원하는 최대 배율을 넘을 수 있고 수수료·
                     슬리피지가 반영되지 않으므로, 실제 진입은 이보다 낮은 배율을 사용하세요.
                 </p>
@@ -283,20 +283,20 @@ export default function CryptoEntryCalculator() {
                 <CalculatorCard
                     className="min-w-0"
                     title="연속 익절 / 연속 손절 시뮬레이션"
-                    description={`매 회차 시드의 ${formatNumber(result.risk, 2)}%를 리스크로 잡고 손익비 1:${formatNumber(result.rr, 2)}로 거래했을 때, 10회 연속 익절한 경우와 10회 연속 손절한 경우의 시드 변화입니다.`}
+                    description={`매 회차 투자 원금의 ${formatNumber(result.risk, 2)}%를 리스크로 잡고 손익비 1:${formatNumber(result.rr, 2)}로 거래했을 때, 10회 연속 익절한 경우와 10회 연속 손절한 경우의 원금 변화입니다.`}
                 >
                     <div className="-mx-2 overflow-x-auto">
                         <table className="w-full min-w-[300px] border-collapse text-sm">
                             <thead>
                                 <tr className="border-b border-slate-200 text-left text-slate-500">
                                     <th className="px-2 py-2 font-medium">회차</th>
-                                    <th className="px-2 py-2 text-right font-medium">연속 익절 시 시드</th>
-                                    <th className="px-2 py-2 text-right font-medium">연속 손절 시 시드</th>
+                                    <th className="px-2 py-2 text-right font-medium">연속 익절 시 원금</th>
+                                    <th className="px-2 py-2 text-right font-medium">연속 손절 시 원금</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr className="border-b border-slate-100 text-slate-500">
-                                    <td className="px-2 py-2">첫 시드</td>
+                                    <td className="px-2 py-2">첫 투자 원금</td>
                                     <td className="px-2 py-2 text-right tabular-nums">
                                         {formatFixed(result.seedValue)}
                                     </td>
@@ -322,7 +322,7 @@ export default function CryptoEntryCalculator() {
                         </table>
                     </div>
                     <p className="text-xs leading-relaxed text-slate-500">
-                        매 회차 불어난(혹은 줄어든) 시드를 전액 재투자한다고 가정한 복리 계산이며, 수수료와
+                        매 회차 불어난(혹은 줄어든) 투자 원금을 전액 재투자한다고 가정한 복리 계산이며, 수수료와
                         펀딩비는 반영되지 않았습니다. 실제 매매는 연승과 연패가 섞이므로 참고용 수치로만
                         보세요.
                     </p>

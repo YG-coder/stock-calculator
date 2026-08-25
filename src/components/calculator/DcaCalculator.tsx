@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { AdvancedPanel, CalculatorCard, CalculatorLayout, InputField, PercentileNote, ResultCard, ResultDetail, ResultHighlight, ResultNote, SelectField } from "@/components/ui/Shared";
+import { AdvancedPanel, CalculatorCard, CalculatorLayout, InputField, PercentileNote, ResultCard, ResultDetail, ResultHighlight, ResultNote, SelectField, simulationIssueText } from "@/components/ui/Shared";
 import { useMonteCarlo } from "@/hooks/useMonteCarlo";
 import { buildDcaInput, contributionsFromInput, type DcaFormValues } from "@/lib/dca";
 import type { PercentileBand } from "@/lib/montecarlo/types";
@@ -14,7 +14,7 @@ type Fields = Record<"seed" | "paths" | "years" | "initialBalance" | "monthlyAmo
 
 const INITIAL: Fields = {
   seed: "",
-  paths: "",
+  paths: "10000",
   years: "",
   initialBalance: "",
   monthlyAmount: "",
@@ -122,7 +122,7 @@ export default function DcaCalculator() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <InputField id="dca-return" label="1년에 평균 얼마나 불어난다고 볼까요?" type="number" value={fields.expectedReturn} onChange={(e) => set("expectedReturn", e.target.value)} unit="%" placeholder="예: 7" hint="장기간의 연평균 복리 수익률 가정입니다." help="전문 용어로 CAGR이라고 합니다. 예를 들어 7을 넣으면 긴 기간에 걸쳐 1년에 평균 7%씩 복리로 불어난다고 가정합니다. 매년 정확히 7%가 난다는 뜻은 아닙니다.\n\n값을 높이면 계산 결과도 커집니다. 미래 수익률은 알 수 없으므로 여러 값으로 비교해 보세요." />
-          <InputField id="dca-volatility" label="해마다 얼마나 크게 오르내린다고 볼까요?" type="number" value={fields.volatility} onChange={(e) => set("volatility", e.target.value)} unit="%" placeholder="예: 15" hint="숫자가 클수록 해마다 수익률이 더 크게 흔들립니다." help="전문 용어로 변동성이라고 합니다. 0을 넣으면 매년 같은 수익률로 계산되어 일반 복리 계산기와 비슷해집니다.\n\n값을 높이면 좋은 경우와 좋지 않은 경우의 차이가 커집니다. 예상 손실의 한도를 뜻하지는 않습니다." />
+          <InputField id="dca-volatility" label="수익률이 흔들리는 정도 (변동성)" type="number" value={fields.volatility} onChange={(e) => set("volatility", e.target.value)} unit="%" placeholder="예: 15" hint="숫자가 클수록 해마다 수익률이 더 크게 흔들립니다." help="0을 넣으면 매년 같은 수익률로 계산되어 일반 복리 계산기와 비슷해집니다.\n\n값을 높이면 좋은 경우와 좋지 않은 경우의 차이가 커집니다. 예상 손실의 한도를 뜻하지는 않습니다." />
           <InputField id="dca-inflation" label="물가가 1년에 얼마나 오른다고 볼까요?" type="number" value={fields.inflation} onChange={(e) => set("inflation", e.target.value)} unit="%" placeholder="예: 2" hint="미래 금액을 오늘의 돈 가치로 바꿀 때 사용합니다." help="물가가 오르면 같은 금액으로 살 수 있는 것이 줄어듭니다. 현재 가치로 결과를 볼 때 이 값을 반영합니다.\n\n한국은행의 물가안정목표 2%는 계산 예시로 사용할 수 있지만 실제 물가는 시기마다 달라집니다." />
         </div>
 
@@ -135,7 +135,7 @@ export default function DcaCalculator() {
           <label className="flex min-h-11 items-center gap-3 text-sm font-semibold text-slate-700"><input type="checkbox" checked={fields.inflationIndexed} onChange={(e) => set("inflationIndexed", e.target.checked)} /> 매년 투자 금액을 물가상승률만큼 늘리기</label>
           <div className="grid gap-4 sm:grid-cols-2">
             <InputField id="dca-paths" label="가상 미래를 몇 번 만들지 (경로 수)" type="number" value={fields.paths} onChange={(e) => set("paths", e.target.value)} unit="개" placeholder="예: 10000" hint="서로 다른 미래를 몇 개 만들어볼지 정합니다." help="이 계산기는 미래를 하나만 예측하지 않고 서로 다른 미래를 수천~수만 개 만들어 결과가 어떻게 퍼지는지를 봅니다. 숫자를 늘리면 결과가 더 안정적이지만 계산이 오래 걸립니다." />
-            <InputField id="dca-seed" label="같은 결과를 다시 만드는 번호 (시드)" type="number" value={fields.seed} onChange={(e) => set("seed", e.target.value)} placeholder="예: 20260824" grouping={false} hint="같은 번호를 넣으면 언제 계산해도 똑같은 결과가 나옵니다." help="결과를 캡처해두거나 남에게 보여줄 때 이 번호가 같으면 상대도 똑같은 화면을 볼 수 있습니다. 신경 쓰지 않아도 되는 값입니다." />
+            <InputField id="dca-seed" label="결과 재현 번호" type="number" value={fields.seed} onChange={(e) => set("seed", e.target.value)} placeholder="예: 20260824" grouping={false} hint="같은 번호를 넣으면 언제 계산해도 똑같은 결과가 나옵니다." help="결과를 캡처해두거나 남에게 보여줄 때 이 번호가 같으면 상대도 똑같은 화면을 볼 수 있습니다. 신경 쓰지 않아도 되는 값입니다." />
           </div>
         </AdvancedPanel>
 
@@ -145,7 +145,7 @@ export default function DcaCalculator() {
           <button type="button" onClick={cancel} disabled={status !== "running"} className="min-h-11 rounded-2xl border border-slate-300 px-5 py-3 font-semibold text-slate-700 disabled:opacity-40">취소</button>
         </div>
         {status === "running" ? <div className="h-2 overflow-hidden rounded bg-slate-200"><div className="h-full bg-slate-900 transition-all" style={{ width: `${progressPct}%` }} /></div> : null}
-        {error ? <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error.issues?.map((issue) => <p key={`${issue.field}-${issue.message}`}>{issue.field}: {issue.message}</p>) ?? error.message}</div> : null}
+        {error ? <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error.issues?.map((issue) => <p key={`${issue.field}-${issue.message}`}>{simulationIssueText(issue)}</p>) ?? error.message}</div> : null}
       </CalculatorCard>
 
       {result ? <>
@@ -161,7 +161,7 @@ export default function DcaCalculator() {
             <ResultDetail label={result.input.reportBasis === "real" ? "투자한 돈의 현재 가치 합계" : "투자한 돈의 합계"} value={won(principal)} unit="원" />
             <ResultDetail label="금액을 보는 기준" value={result.input.reportBasis === "real" ? "오늘의 돈 가치" : "미래에 표시될 금액"} />
           </div>
-          <ResultNote><p>같은 결과를 다시 보려면 고급 설정의 시드에 <strong>{result.meta.seed}</strong>를 입력하세요.</p><PercentileNote /></ResultNote>
+          <ResultNote><p>같은 결과를 다시 보려면 고급 설정의 결과 재현 번호에 <strong>{result.meta.seed}</strong>를 입력하세요.</p><PercentileNote /></ResultNote>
         </CalculatorCard>
         <CalculatorCard className="min-w-0" title="기간별 자산 분포" description="진한 선은 중앙값, 음영은 각 시점의 시뮬레이션 분포 범위입니다."><FanChart bands={result.bands} /></CalculatorCard>
         <CalculatorCard title="가정과 주의사항">
