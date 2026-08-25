@@ -232,6 +232,10 @@ type InputFieldProps = {
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   disabled?: boolean;
   grouping?: boolean;
+  /** 입력칸 아래 항상 보이는 한 줄 설명. */
+  hint?: string;
+  /** "자세히"를 눌렀을 때 펼쳐지는 설명. 예시와 값이 결과에 미치는 영향. */
+  help?: string;
 };
 
 export function InputField({
@@ -249,6 +253,8 @@ export function InputField({
   inputMode,
   disabled = false,
   grouping = true,
+  hint,
+  help,
 }: InputFieldProps) {
   const isNumeric =
     type === "number" ||
@@ -313,7 +319,121 @@ export function InputField({
           </span>
         ) : null}
       </div>
+
+      {hint ? <p className="text-sm leading-relaxed text-slate-500">{hint}</p> : null}
+      {help ? <FieldHelp>{help}</FieldHelp> : null}
     </div>
+  );
+}
+
+/** 입력칸에 딸린 접이식 상세 설명. 기본은 접힘. */
+export function FieldHelp({ children }: { children: React.ReactNode }) {
+  return (
+    <details className="group">
+      <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-1 text-sm font-medium text-slate-500 underline decoration-dotted underline-offset-4 hover:text-slate-700">
+        <span aria-hidden="true">?</span> 자세히
+      </summary>
+      <div className="mt-2 space-y-2 rounded-2xl bg-slate-50 p-4 text-sm leading-relaxed text-slate-600">
+        {typeof children === "string"
+          ? children.split("\n\n").map((line) => <p key={line}>{line}</p>)
+          : children}
+      </div>
+    </details>
+  );
+}
+
+/* =========================
+   도움말 / 고급 설정 / 결과 안내
+========================= */
+
+export type GettingStartedProps = {
+  /** 무엇을 계산하는 도구인지 */
+  what: string;
+  /** 무엇을 입력해야 하는지 */
+  input: string;
+  /** 결과를 어떻게 읽는지 */
+  read: string;
+  /** 처음 써보는 사람을 위한 입력 예시 */
+  example: string;
+};
+
+/** 계산기 상단의 "처음 사용하시나요?" 접이식 안내. 기본은 접힘. */
+export function GettingStarted({ what, input, read, example }: GettingStartedProps) {
+  return (
+    <details className="rounded-2xl border border-slate-200 bg-white">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 px-4 py-3 text-sm font-semibold text-slate-700 hover:text-slate-900">
+        <span aria-hidden="true">💡</span> 처음 사용하시나요?
+      </summary>
+      <div className="space-y-4 border-t border-slate-100 px-4 py-4 text-sm leading-relaxed text-slate-600">
+        <div>
+          <h3 className="mb-1 font-semibold text-slate-800">무엇을 계산하나요</h3>
+          <p>{what}</p>
+        </div>
+        <div>
+          <h3 className="mb-1 font-semibold text-slate-800">무엇을 입력하나요</h3>
+          <p>{input}</p>
+        </div>
+        <div>
+          <h3 className="mb-1 font-semibold text-slate-800">결과를 어떻게 읽나요</h3>
+          <p>{read}</p>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-3">
+          <h3 className="mb-1 font-semibold text-slate-800">입력 예시</h3>
+          <p>{example}</p>
+          <p className="mt-1 text-xs text-slate-500">
+            도구 사용법을 익히기 위한 예시이며 시장 전망이나 권장 투자안이 아닙니다.
+          </p>
+        </div>
+      </div>
+    </details>
+  );
+}
+
+/** 일반 사용자가 건드릴 필요 없는 입력을 접어두는 영역. */
+export function AdvancedPanel({ children }: { children: React.ReactNode }) {
+  return (
+    <details className="rounded-2xl border border-slate-200">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 px-4 py-3 text-sm font-medium text-slate-600 hover:text-slate-800">
+        <span aria-hidden="true">⚙</span> 고급 설정
+      </summary>
+      <div className="space-y-4 border-t border-slate-100 px-4 py-4">{children}</div>
+    </details>
+  );
+}
+
+/** 결과 카드 아래 작은 글씨 안내. */
+export function ResultNote({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="space-y-2 border-t border-slate-100 pt-4 text-xs leading-relaxed text-slate-500">
+      {children}
+    </div>
+  );
+}
+
+/** 입력값을 올리면 결과가 어떻게 달라지는지 — 시뮬레이션 계산기 공통. */
+export function InputEffectNote() {
+  return (
+    <p className="text-sm leading-relaxed text-slate-500">
+      수익률을 높이면 예상 결과가 전체적으로 커집니다. 변동성을 높이면 결과의 폭이 넓어져
+      좋은 쪽은 더 커지고 나쁜 쪽은 더 나빠지며, 목표를 넘지 못할 가능성도 함께 커집니다.
+      기간을 늘리면 복리 효과와 불확실성이 동시에 커집니다.
+    </p>
+  );
+}
+
+/** 백분위 결과 해석 고지 — 시뮬레이션 계산기 공통. */
+export function PercentileNote() {
+  return (
+    <>
+      <p>
+        <strong>보수적인 경우</strong>는 만들어본 미래 중 결과가 하위 10% 부근이었던 상황입니다.
+        손실이 이보다 크지 않다는 뜻이 아니며 최저 금액을 보장하지 않습니다.
+      </p>
+      <p>
+        이 결과는 입력한 가정에 따른 계산이며 실제 투자 결과를 예측하거나 보장하지 않습니다.
+        세금과 거래비용은 반영하지 않았습니다.
+      </p>
+    </>
   );
 }
 
