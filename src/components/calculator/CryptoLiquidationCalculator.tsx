@@ -54,7 +54,11 @@ export default function CryptoLiquidationCalculator() {
             };
         }
 
-        const effectiveMmr = marginType === "cross" ? Math.max(0, mmr - 0.001) : mmr;
+        // 교차/격리 차이는 유지증거금률이 아니라 "청산에 동원되는 증거금"에서 나온다.
+        // 교차 마진은 계좌 잔고 전체가 증거금이 되어 청산가가 더 멀어지지만, 그 값은
+        // 계좌 잔고를 알아야 계산할 수 있다. 근거 없이 유지증거금률을 깎지 않고
+        // 격리 기준으로 계산한 뒤, 교차는 안내 문구로 차이를 알린다.
+        const effectiveMmr = mmr;
 
         let liquidationPrice = 0;
         let bankruptcyPrice = 0;
@@ -84,7 +88,7 @@ export default function CryptoLiquidationCalculator() {
             lossPercent,
             warning,
         };
-    }, [entryPrice, leverage, marginType, positionType, maintenanceMarginRate]);
+    }, [entryPrice, leverage, positionType, maintenanceMarginRate]);
 
     return (
         <CalculatorLayout>
@@ -142,6 +146,14 @@ export default function CryptoLiquidationCalculator() {
                     </label>
                 </div>
 
+                {marginType === "cross" ? (
+                    <p className="text-sm leading-relaxed text-slate-500">
+                        교차 마진은 계좌의 다른 잔고까지 증거금으로 사용하므로 실제 청산 가격이 아래
+                        결과보다 더 멀어집니다. 정확한 값은 계좌 잔고와 다른 포지션에 따라 달라지므로,
+                        아래 결과는 <strong>격리 마진 기준의 보수적인 청산 가격</strong>으로 보시기 바랍니다.
+                    </p>
+                ) : null}
+
                 <InputField
                     id="maintenanceMarginRate"
                     label="유지 증거금률"
@@ -151,6 +163,12 @@ export default function CryptoLiquidationCalculator() {
                     value={maintenanceMarginRate}
                     onChange={(e) => setMaintenanceMarginRate(e.target.value)}
                 />
+
+                <p className="text-sm leading-relaxed text-slate-500">
+                    최대 레버리지와 유지 증거금률은 거래소·상품·종목·포지션 규모(위험한도 구간)에 따라
+                    달라집니다. 이 계산기는 고정값을 제공하지 않으므로, 거래 전 해당 상품의 최신
+                    위험한도 표에서 값을 확인해 직접 입력하세요.
+                </p>
 
                 <p className="text-sm leading-relaxed text-slate-500">
                     선택한 통화 단위에 맞춰 직접 입력하세요. KRW/USDT 토글은 환율 변환 기능이 아니라
