@@ -2,6 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { CALCULATOR_HELP_BY_PATH } from "@/lib/calculatorHelp";
 
 /* =========================
    number helpers
@@ -85,7 +87,15 @@ export function CalculatorLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="grid grid-cols-[minmax(0,1fr)] gap-6">{children}</div>;
+  const pathname = usePathname();
+  const help = CALCULATOR_HELP_BY_PATH[pathname];
+
+  return (
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
+      {help ? <GettingStarted {...help} /> : null}
+      {children}
+    </div>
+  );
 }
 
 export function CalculatorCard({

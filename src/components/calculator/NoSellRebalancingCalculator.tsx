@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CalculatorCard, CalculatorLayout, GettingStarted, InputField, ResultCard, ResultDetail, ResultHighlight, ResultNote } from "@/components/ui/Shared";
+import { CalculatorCard, CalculatorLayout, InputField, ResultCard, ResultDetail, ResultHighlight, ResultNote } from "@/components/ui/Shared";
 import { allocateWithoutSelling, type RebalancingAsset, totalWeightDeviation } from "@/lib/noSellRebalancing";
 
 type AssetInput = { name: string; currentValue: string; targetWeight: string };
@@ -26,12 +26,6 @@ export default function NoSellRebalancingCalculator() {
   const afterDeviation = result ? totalWeightDeviation(result) : 0;
 
   return <CalculatorLayout>
-      <GettingStarted
-        what="갖고 있는 것을 팔지 않고 새로 넣는 돈만으로 목표 비중에 가까워지려면 어디에 얼마를 사야 하는지 계산합니다. 매도에 따르는 세금과 비용을 피하고 싶을 때 씁니다."
-        input="자산별 현재 평가금액과 목표 비중, 그리고 이번에 새로 넣을 투자금입니다. 목표 비중의 합은 100%가 되어야 합니다."
-        read="자산별 추천 매수액과 매수 후 비중이 나옵니다. 새 투자금만으로는 목표 비중에 한 번에 도달하지 못할 수 있습니다. 비중이 이미 넘친 자산을 팔지 않기 때문이며, 여러 번 반복하면 점점 가까워집니다."
-        example="국내주식 5,000만 원(목표 50%) · 해외주식 3,000만 원(30%) · 채권 2,000만 원(20%), 새 투자금 1,000만 원"
-      />
     <CalculatorCard title="보유 자산과 목표 비중" description="매도하지 않고 새 투자금만 배분합니다. 목표 비중의 합은 100%여야 합니다.">
       <div className="space-y-5">{assets.map((asset, index) => <div key={index} className="grid gap-3 border-b border-slate-100 pb-5 last:border-0 sm:grid-cols-3">
         <InputField id={`asset-name-${index}`} label="자산명" value={asset.name} onChange={(event) => update(index, "name", event.target.value)} placeholder={index === 0 ? "예: 국내주식" : index === 1 ? "예: 해외주식" : "예: 채권·현금"} />

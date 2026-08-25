@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CalculatorCard, CalculatorLayout, GettingStarted, InputField, ResultCard, ResultDetail, ResultHighlight } from "@/components/ui/Shared";
+import { CalculatorCard, CalculatorLayout, InputField, ResultCard, ResultDetail, ResultHighlight } from "@/components/ui/Shared";
 import { calculatePortfolio, type PortfolioAsset } from "@/lib/portfolio";
 
 type AssetInput = { name: string; weight: string; expectedReturn: string; volatility: string };
@@ -22,12 +22,6 @@ export default function PortfolioCalculator() {
   const updateCorrelation = (index: number, value: string) => setCorrelations((items) => items.map((item, itemIndex) => itemIndex === index ? value : item));
 
   return <CalculatorLayout>
-      <GettingStarted
-        what="여러 자산에 나눠 담았을 때 전체 기대수익률과 위험이 얼마인지 계산합니다. 자산이 서로 다르게 움직이면 위험이 줄어드는 분산효과가 얼마나 되는지 보여줍니다."
-        input="자산별 비중과 기대수익률, 변동성, 그리고 자산끼리 얼마나 같이 움직이는지를 나타내는 상관계수입니다. 비중의 합은 100%가 되어야 합니다."
-        read="포트폴리오 변동성이 자산별 변동성을 단순히 비중대로 더한 값보다 작다면 그 차이가 분산효과입니다. 상관계수가 낮을수록 이 효과가 커집니다."
-        example="주식 60% (수익률 7 · 변동성 15) · 채권 30% (3 · 5) · 현금 10% (2 · 1), 상관계수 0.2 / 0 / 0.1"
-      />
     <CalculatorCard title="자산별 가정" description="직접 입력한 기대수익률·변동성·상관계수로 계산합니다. 기본값은 예시일 뿐 시장 전망이나 추천값이 아닙니다.">
       {assets.map((asset, index) => <div key={index} className="grid gap-3 border-b border-slate-100 pb-5 last:border-0 sm:grid-cols-2 lg:grid-cols-4">
         <InputField id={`portfolio-name-${index}`} label="자산명" value={asset.name} onChange={(event) => updateAsset(index, "name", event.target.value)} placeholder={index === 0 ? "예: 주식" : index === 1 ? "예: 채권" : "예: 현금"} />

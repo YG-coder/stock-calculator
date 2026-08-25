@@ -96,7 +96,7 @@ export default function DcaCalculator() {
   return (
     <CalculatorLayout>
       <section className="rounded-3xl border border-blue-100 bg-blue-50 p-5 md:p-6">
-        <p className="text-sm font-semibold text-blue-900">처음 사용해도 괜찮습니다</p>
+        <p className="text-sm font-semibold text-blue-900">처음 사용하시나요?</p>
         <h2 className="mt-1 text-xl font-bold text-slate-900">세 단계만 입력하면 예상 금액의 범위를 볼 수 있어요.</h2>
         <ol className="mt-4 grid gap-3 text-sm leading-relaxed text-slate-700 sm:grid-cols-3">
           <li className="rounded-2xl bg-white p-4"><strong className="block text-slate-900">1. 투자 계획</strong>지금 가진 돈, 매달 넣을 돈, 투자 기간을 적습니다.</li>

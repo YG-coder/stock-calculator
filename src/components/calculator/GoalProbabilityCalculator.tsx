@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { AdvancedPanel, CalculatorCard, CalculatorLayout, GettingStarted, InputEffectNote, InputField, PercentileNote, ResultCard, ResultDetail, ResultHighlight, ResultNote, SelectField } from "@/components/ui/Shared";
+import { AdvancedPanel, CalculatorCard, CalculatorLayout, InputEffectNote, InputField, PercentileNote, ResultCard, ResultDetail, ResultHighlight, ResultNote, SelectField } from "@/components/ui/Shared";
 import { useMonteCarlo } from "@/hooks/useMonteCarlo";
 import { buildGoalProbabilityInput, type GoalProbabilityValues } from "@/lib/goal-probability";
 import { probabilityForContribution, requiredForProbability, type RequiredContributions } from "@/lib/montecarlo";
@@ -31,12 +31,6 @@ export default function GoalProbabilityCalculator() {
   }, [inversion, result]);
 
   return <CalculatorLayout>
-      <GettingStarted
-        what="20년 뒤 5억 원처럼 목표가 있을 때, 지금 방식대로 하면 그 목표를 넘는 경우가 얼마나 되는지 계산합니다. 반대로 목표를 맞추려면 매달 얼마를 넣어야 하는지도 알려줍니다."
-        input="목표 금액과 기간, 지금 넣고 있는 월 투자금입니다. 목표 비율은 이 정도는 되게 하고 싶다는 기준으로, 보통 80% 정도를 씁니다."
-        read="목표 달성 시나리오 비율은 만들어본 미래 중 목표를 넘은 비율입니다. 80%가 나왔다고 실제로 80% 확률로 성공한다는 뜻이 아니라 입력한 가정에서 그랬다는 뜻입니다. 가정을 바꾸면 숫자도 바뀝니다."
-        example="목표 5억 원 · 20년 · 현재 월 50만 원 · 수익률 7 · 변동성 15 · 목표 비율 80%"
-      />
     <CalculatorCard title="목표와 투자 조건" description="목표금액과 기간, 현재 월 투자금을 입력하면 달성 시나리오 비율과 원하는 목표 확률에 필요한 최소 월 투자금을 계산합니다.">
       <div className="grid gap-4 sm:grid-cols-2">
         <InputField id="goal-target" label="목표 금액" type="number" value={fields.targetAmount} onChange={(e) => set("targetAmount", e.target.value)} unit="원" placeholder="예: 500000000" />

@@ -21,10 +21,10 @@ export default function SorrSimulationCalculator() {
 
   return <CalculatorLayout>
       <GettingStarted
-        what="은퇴 후 돈을 꺼내 쓸 때는 똑같은 평균 수익률이라도 손실이 언제 오느냐에 따라 결과가 크게 달라집니다. 초반에 하락하면 줄어든 자산에서 계속 꺼내 쓰게 되어 회복할 몫이 적어지기 때문입니다. 그 위험을 확률로 계산합니다."
-        input="은퇴 시작 자산과 지금 기준 월 생활비, 그리고 수익률 가정입니다. 생활비는 물가에 맞춰 매년 올라가는 것으로 계산합니다."
-        read="기간 종료까지 자산이 소진되지 않은 경로의 비율이 핵심 숫자입니다. 아래쪽 비교 도구에서는 같은 수익률 목록을 원래 순서와 거꾸로 적용해 결과가 얼마나 갈리는지 볼 수 있습니다."
-        example="은퇴 자산 10억 원 · 월 생활비 300만 원 · 30년 · 수익률 7 · 변동성 15"
+        what="은퇴 초반의 하락장이 정기적으로 생활비를 꺼내 쓰는 자산에 얼마나 큰 영향을 주는지 계산합니다."
+        input="은퇴 시작 자산, 매달 생활비, 사용할 기간과 수익률이 오르내리는 정도를 입력하세요."
+        read="자산이 끝까지 남은 경우의 비율과 소진 시점을 확인하세요. 같은 평균수익률도 발생 순서에 따라 결과가 달라질 수 있습니다."
+        example="은퇴 자산 5억 원 · 월 생활비 200만 원 · 30년 · 연평균 수익률 7% · 흔들림 정도 15%"
       />
     <CalculatorCard title="월 인출 생존확률 조건" description="월초 생활비 인출과 월별 수익률 경로를 확률 시뮬레이션으로 계산합니다. 아래 정순·역순 비교와 별개의 분석입니다.">
       <div className="grid gap-4 sm:grid-cols-2"><InputField id="sorr-mc-assets" label="은퇴 시작 자산" type="number" value={fields.initialAssets} onChange={(event) => set("initialAssets", event.target.value)} unit="원" placeholder="예: 1000000000" /><InputField id="sorr-mc-withdrawal" label="현재 기준 월 생활비" type="number" value={fields.monthlyWithdrawal} onChange={(event) => set("monthlyWithdrawal", event.target.value)} unit="원" placeholder="예: 3000000" /><InputField id="sorr-mc-years" label="인출 기간" type="number" value={fields.years} onChange={(event) => set("years", event.target.value)} unit="년" placeholder="예: 30" /><InputField id="sorr-mc-return" label="연평균 수익률 (CAGR)" type="number" value={fields.expectedReturn} onChange={(event) => set("expectedReturn", event.target.value)} unit="%" placeholder="예: 7" hint="이 투자가 1년에 평균 몇 %씩 불어난다고 가정할지 정합니다." help="예를 들어 7을 넣으면 ‘매년 7%씩 복리로 불어난다고 치고’ 계산합니다. 매년 정확히 7%가 난다는 뜻이 아니라 긴 기간의 평균이 7%라는 가정입니다.\n\n이 값을 올리면 예상 결과가 전체적으로 커집니다. 실제 수익률은 알 수 없으므로 값을 바꿔가며 결과가 얼마나 달라지는지 보는 용도로 쓰는 편이 낫습니다." /><InputField id="sorr-mc-volatility" label="수익률이 흔들리는 정도 (변동성)" type="number" value={fields.volatility} onChange={(event) => set("volatility", event.target.value)} unit="%" placeholder="예: 15" hint="수익률이 해마다 얼마나 출렁이는지 정합니다. 이 값이 이 계산기의 핵심입니다." help="0을 넣으면 매년 똑같은 수익률이 나서 일반 복리 계산기와 결과가 같아집니다. 15를 넣으면 어떤 해는 크게 오르고 어떤 해는 떨어지는 상황을 만들어 계산합니다. 그래서 결과가 하나의 숫자가 아니라 범위로 나옵니다.\n\n이 값을 올리면 결과의 폭이 넓어집니다. 좋은 쪽 결과도 커지지만 나쁜 쪽은 더 나빠지고 목표를 넘지 못할 가능성도 함께 커집니다." /><InputField id="sorr-mc-inflation" label="연 물가상승률" type="number" value={fields.inflation} onChange={(event) => set("inflation", event.target.value)} unit="%" placeholder="예: 2" hint="물가가 매년 얼마나 오른다고 볼지 정합니다." help="20년 뒤의 1억 원은 지금의 1억 원과 가치가 다릅니다. 이 값을 넣으면 결과를 지금 돈으로 치면 얼마인지로 바꿔 보여줍니다.\n\n한국은행의 중기 물가안정목표는 연 2%입니다. 실제 상승률은 시기에 따라 이보다 높을 수 있으니 값을 올려서도 확인해 보세요. 이 값을 올리면 물가를 반영한 결과가 작아집니다." /></div>
