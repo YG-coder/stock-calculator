@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CalculatorCard, CalculatorLayout, InputField, ResultCard, ResultDetail, ResultHighlight } from "@/components/ui/Shared";
+import { CalculatorCard, CalculatorLayout, GettingStarted, InputField, ResultCard, ResultDetail, ResultHighlight, ResultNote } from "@/components/ui/Shared";
 import { allocateWithoutSelling, type RebalancingAsset, totalWeightDeviation } from "@/lib/noSellRebalancing";
 
 type AssetInput = { name: string; currentValue: string; targetWeight: string };
@@ -26,6 +26,12 @@ export default function NoSellRebalancingCalculator() {
   const afterDeviation = result ? totalWeightDeviation(result) : 0;
 
   return <CalculatorLayout>
+      <GettingStarted
+        what="갖고 있는 것을 팔지 않고 새로 넣는 돈만으로 목표 비중에 가까워지려면 어디에 얼마를 사야 하는지 계산합니다. 매도에 따르는 세금과 비용을 피하고 싶을 때 씁니다."
+        input="자산별 현재 평가금액과 목표 비중, 그리고 이번에 새로 넣을 투자금입니다. 목표 비중의 합은 100%가 되어야 합니다."
+        read="자산별 추천 매수액과 매수 후 비중이 나옵니다. 새 투자금만으로는 목표 비중에 한 번에 도달하지 못할 수 있습니다. 비중이 이미 넘친 자산을 팔지 않기 때문이며, 여러 번 반복하면 점점 가까워집니다."
+        example="국내주식 5,000만 원(목표 50%) · 해외주식 3,000만 원(30%) · 채권 2,000만 원(20%), 새 투자금 1,000만 원"
+      />
     <CalculatorCard title="보유 자산과 목표 비중" description="매도하지 않고 새 투자금만 배분합니다. 목표 비중의 합은 100%여야 합니다.">
       <div className="space-y-5">{assets.map((asset, index) => <div key={index} className="grid gap-3 border-b border-slate-100 pb-5 last:border-0 sm:grid-cols-3">
         <InputField id={`asset-name-${index}`} label="자산명" value={asset.name} onChange={(event) => update(index, "name", event.target.value)} placeholder={index === 0 ? "예: 국내주식" : index === 1 ? "예: 해외주식" : "예: 채권·현금"} />
@@ -39,7 +45,7 @@ export default function NoSellRebalancingCalculator() {
       <CalculatorCard title="추천 매수 배분"><div className="grid gap-4 sm:grid-cols-2"><ResultHighlight label="새 투자금" value={won(Number(contribution))} unit="원" /><ResultHighlight label="비중 편차 감소" value={((beforeDeviation - afterDeviation) * 100).toFixed(2)} unit="%p" tone="positive" /></div>
         <div className="overflow-x-auto"><table className="w-full min-w-[520px] text-sm"><thead><tr className="border-b text-slate-500"><th className="p-2 text-left" scope="col">자산</th><th className="p-2 text-right" scope="col">추천 매수</th><th className="p-2 text-right" scope="col">매수 후 금액</th><th className="p-2 text-right" scope="col">목표 / 매수 후</th></tr></thead><tbody>{result.map((row) => <tr key={row.name} className="border-b border-slate-100"><th className="p-2 text-left font-medium" scope="row">{row.name}</th><td className="p-2 text-right font-semibold text-red-600 tabular-nums">+{won(row.buyAmount)}</td><td className="p-2 text-right tabular-nums">{won(row.finalValue)}</td><td className="p-2 text-right tabular-nums">{(row.targetWeight * 100).toFixed(1)}% / {(row.finalWeight * 100).toFixed(1)}%</td></tr>)}</tbody></table></div>
         <p className="text-xs leading-relaxed text-slate-500">목표보다 부족한 자산의 부족액에 비례해 우선 배분합니다. 투자금이 충분해 부족분을 모두 채우고 남으면 목표 비중대로 배분합니다.</p>
-      </CalculatorCard>
+      <ResultNote><p>새 투자금만으로는 목표 비중에 한 번에 도달하지 못할 수 있습니다. 비중이 이미 넘친 자산을 팔지 않기 때문이며, 여러 번에 걸쳐 반복하면 점점 가까워집니다.</p><p>세금과 거래비용은 반영하지 않았습니다.</p></ResultNote></CalculatorCard>
       <CalculatorCard title="주의사항"><p className="text-sm leading-relaxed text-slate-600">세금·수수료·최소 주문금액·주식 수량 단위는 반영하지 않습니다. 실제 주문 전 거래 가능 단위에 맞게 금액을 조정하세요.</p></CalculatorCard>
     </> : <ResultCard title="추천 매수 배분" isValid={false} emptyMessage="보유 자산과 목표 비중을 입력하면 결과가 표시됩니다." />}
   </CalculatorLayout>;

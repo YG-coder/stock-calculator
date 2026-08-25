@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CalculatorCard, CalculatorLayout, InputField, ResultCard, ResultDetail, ResultHighlight } from "@/components/ui/Shared";
+import { CalculatorCard, CalculatorLayout, GettingStarted, InputField, ResultCard, ResultDetail, ResultHighlight } from "@/components/ui/Shared";
 import { calculatePortfolio, type PortfolioAsset } from "@/lib/portfolio";
 
 type AssetInput = { name: string; weight: string; expectedReturn: string; volatility: string };
@@ -22,6 +22,12 @@ export default function PortfolioCalculator() {
   const updateCorrelation = (index: number, value: string) => setCorrelations((items) => items.map((item, itemIndex) => itemIndex === index ? value : item));
 
   return <CalculatorLayout>
+      <GettingStarted
+        what="여러 자산에 나눠 담았을 때 전체 기대수익률과 위험이 얼마인지 계산합니다. 자산이 서로 다르게 움직이면 위험이 줄어드는 분산효과가 얼마나 되는지 보여줍니다."
+        input="자산별 비중과 기대수익률, 변동성, 그리고 자산끼리 얼마나 같이 움직이는지를 나타내는 상관계수입니다. 비중의 합은 100%가 되어야 합니다."
+        read="포트폴리오 변동성이 자산별 변동성을 단순히 비중대로 더한 값보다 작다면 그 차이가 분산효과입니다. 상관계수가 낮을수록 이 효과가 커집니다."
+        example="주식 60% (수익률 7 · 변동성 15) · 채권 30% (3 · 5) · 현금 10% (2 · 1), 상관계수 0.2 / 0 / 0.1"
+      />
     <CalculatorCard title="자산별 가정" description="직접 입력한 기대수익률·변동성·상관계수로 계산합니다. 기본값은 예시일 뿐 시장 전망이나 추천값이 아닙니다.">
       {assets.map((asset, index) => <div key={index} className="grid gap-3 border-b border-slate-100 pb-5 last:border-0 sm:grid-cols-2 lg:grid-cols-4">
         <InputField id={`portfolio-name-${index}`} label="자산명" value={asset.name} onChange={(event) => updateAsset(index, "name", event.target.value)} placeholder={index === 0 ? "예: 주식" : index === 1 ? "예: 채권" : "예: 현금"} />
@@ -29,7 +35,7 @@ export default function PortfolioCalculator() {
         <InputField id={`portfolio-return-${index}`} label="연 기대수익률" type="number" value={asset.expectedReturn} onChange={(event) => updateAsset(index, "expectedReturn", event.target.value)} unit="%" placeholder={`예: ${[8, 3, 2][index]}`} />
         <InputField id={`portfolio-volatility-${index}`} label="연 변동성" type="number" value={asset.volatility} onChange={(event) => updateAsset(index, "volatility", event.target.value)} unit="%" placeholder={`예: ${[20, 8, 1][index]}`} />
       </div>)}
-      <div className="grid gap-4 sm:grid-cols-3"><InputField id="correlation-01" label={`${assets[0].name}–${assets[1].name} 상관계수`} type="number" value={correlations[0]} onChange={(event) => updateCorrelation(0, event.target.value)} placeholder="예: 0.2" /><InputField id="correlation-02" label={`${assets[0].name}–${assets[2].name} 상관계수`} type="number" value={correlations[1]} onChange={(event) => updateCorrelation(1, event.target.value)} placeholder="예: 0" /><InputField id="correlation-12" label={`${assets[1].name}–${assets[2].name} 상관계수`} type="number" value={correlations[2]} onChange={(event) => updateCorrelation(2, event.target.value)} placeholder="예: 0.1" /></div>
+      <div className="grid gap-4 sm:grid-cols-3"><InputField id="correlation-01" label={`${assets[0].name}–${assets[1].name} 상관계수`} type="number" value={correlations[0]} onChange={(event) => updateCorrelation(0, event.target.value)} placeholder="예: 0.2" hint="두 자산이 같이 움직이는 정도입니다. 낮을수록 분산효과가 커집니다." help="1이면 항상 같은 방향, 0이면 서로 무관, -1이면 반대 방향으로 움직인다는 뜻입니다. 이 값이 낮을수록 전체 변동성이 줄어듭니다.\n\n정확한 값은 자산별 과거 데이터로 추정해야 합니다. 화면의 예시는 계산 방식을 보여주기 위한 값이며 권장값이 아닙니다." /><InputField id="correlation-02" label={`${assets[0].name}–${assets[2].name} 상관계수`} type="number" value={correlations[1]} onChange={(event) => updateCorrelation(1, event.target.value)} placeholder="예: 0" /><InputField id="correlation-12" label={`${assets[1].name}–${assets[2].name} 상관계수`} type="number" value={correlations[2]} onChange={(event) => updateCorrelation(2, event.target.value)} placeholder="예: 0.1" /></div>
       {hasInput && !calculated.result ? <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{calculated.error}</div> : null}
     </CalculatorCard>
     {calculated.result ? <><CalculatorCard title="포트폴리오 분석 결과"><div className="grid gap-4 sm:grid-cols-2"><ResultHighlight label="연 기대수익률" value={(calculated.result.expectedReturn * 100).toFixed(2)} unit="%" tone="positive" /><ResultHighlight label="연 변동성" value={(calculated.result.volatility * 100).toFixed(2)} unit="%" /></div><ResultDetail label="상관관계를 무시한 가중 변동성" value={((calculated.result.volatility + calculated.result.diversificationBenefit) * 100).toFixed(2)} unit="%" /><ResultDetail label="분산투자 변동성 감소분" value={(calculated.result.diversificationBenefit * 100).toFixed(2)} unit="%p" /><p className="text-xs leading-relaxed text-slate-500">변동성은 공분산 공식 √(wᵀΣw)로 계산합니다. 기대수익률과 변동성은 같은 기간·통화·빈도의 자료로 추정해야 비교가 의미 있습니다.</p></CalculatorCard><CalculatorCard title="주의사항"><p className="text-sm leading-relaxed text-slate-600">과거 자료로 추정한 수익률·변동성·상관관계는 미래에 달라질 수 있습니다. 세금·수수료·환율·리밸런싱 비용은 포함하지 않습니다.</p></CalculatorCard></> : <ResultCard title="포트폴리오 분석 결과" isValid={false} emptyMessage="자산 비중과 가정값을 입력하면 결과가 표시됩니다." />}
