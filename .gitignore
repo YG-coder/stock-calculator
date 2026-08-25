@@ -44,3 +44,7 @@ next-env.d.ts
 
 # 삭제 대기 (수동 삭제 후 이 줄 제거 가능)
 _to_delete/
+
+# 로컬 에이전트 지침 파일
+AGENTS.md
+CLAUDE.md
