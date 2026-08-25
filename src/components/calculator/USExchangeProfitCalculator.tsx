@@ -62,6 +62,8 @@ export default function USExchangeProfitCalculator() {
                 krwProfit: 0,
                 krwProfitRate: 0,
                 exchangeEffectKrw: 0,
+                noFxProfitKrw: 0,
+                totalFeeKrw: 0,
             };
         }
 
@@ -75,8 +77,12 @@ export default function USExchangeProfitCalculator() {
         const krwProfit = totalSellKrw - totalBuyKrw;
         const krwProfitRate = totalBuyKrw > 0 ? (krwProfit / totalBuyKrw) * 100 : 0;
 
+        // 환율 효과는 "매도 시점 원화 가치 - 매수 환율로 환산했을 때의 원화 가치" 차이만이다.
+        // 수수료는 환율과 무관하므로 여기에 섞지 않는다.
+        // (이전 구현은 krwProfit 에서 빼는 방식이라 수수료 전액이 환율 효과로 잡혔다.)
+        const exchangeEffectKrw = totalSellUsd * (sellRate - buyRate);
+        // 수수료를 뺀 순수 매매손익(매수 환율 고정 기준). 표시용 보조 값.
         const noFxProfitKrw = (totalSellUsd - totalBuyUsd) * buyRate;
-        const exchangeEffectKrw = krwProfit - noFxProfitKrw;
 
         return {
             valid: true,
@@ -88,6 +94,8 @@ export default function USExchangeProfitCalculator() {
             krwProfit,
             krwProfitRate,
             exchangeEffectKrw,
+            noFxProfitKrw,
+            totalFeeKrw: buyFee + sellFee,
         };
     }, [
         buyPriceUsd,
@@ -220,13 +228,22 @@ export default function USExchangeProfitCalculator() {
                         unit="%"
                     />
                     <ResultDetail
-                        label="환율 효과"
+                        label="환율 효과 (수수료 제외)"
                         value={`${result.exchangeEffectKrw > 0 ? "+" : ""}${formatNumber(
                             result.exchangeEffectKrw
                         )}`}
                         unit="원"
                     />
+                    <ResultDetail
+                        label="매매 수수료 합계"
+                        value={formatNumber(result.totalFeeKrw)}
+                        unit="원"
+                    />
                 </div>
+                <p className="text-sm leading-relaxed text-slate-500">
+                    환율 효과는 매도 대금에 매도 환율과 매수 환율을 각각 적용했을 때의 원화 차이입니다.
+                    수수료는 환율과 무관하므로 따로 표시합니다. 세금은 반영하지 않았습니다.
+                </p>
             </ResultCard>
         </CalculatorLayout>
     );

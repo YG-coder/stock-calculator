@@ -59,6 +59,7 @@ export default function CryptoLeverageProfitCalculator() {
                 totalFee: 0,
                 netPnl: 0,
                 roe: 0,
+                beyondLiquidation: false,
             };
         }
 
@@ -77,6 +78,10 @@ export default function CryptoLeverageProfitCalculator() {
 
         const netPnl = grossPnl - totalFee;
         const roe = (netPnl / marginValue) * 100;
+        // 불리한 방향 변동폭이 1/레버리지를 넘으면 실제 거래에서는 그 전에 청산된다.
+        // 이 계산기는 청산을 모델링하지 않으므로, 도달 불가능한 구간임을 알린다.
+        const liquidationThreshold = 1 / lev;
+        const beyondLiquidation = priceChangeRate < -liquidationThreshold;
 
         return {
             valid: true,
@@ -86,6 +91,7 @@ export default function CryptoLeverageProfitCalculator() {
             totalFee,
             netPnl,
             roe,
+            beyondLiquidation,
         };
     }, [entryPrice, exitPrice, margin, leverage, positionType, feeRate]);
 
@@ -211,6 +217,17 @@ export default function CryptoLeverageProfitCalculator() {
                         unit="%"
                     />
                 </div>
+                {result.beyondLiquidation ? (
+                    <div
+                        role="alert"
+                        className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900"
+                    >
+                        입력한 종료 가격은 이 레버리지의 청산 가격을 이미 지나친 구간입니다. 실제
+                        거래에서는 그 전에 청산되어 손실이 투입 증거금으로 제한되며, 위 ROE 처럼
+                        −100% 를 넘는 손실이 그대로 발생하지는 않습니다. 청산 가격은 청산가 계산기에서
+                        확인하세요.
+                    </div>
+                ) : null}
             </ResultCard>
         </CalculatorLayout>
     );

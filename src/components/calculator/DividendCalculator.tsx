@@ -48,11 +48,28 @@ export default function DividendCalculator() {
         setTaxRate(e.target.value);
     };
 
+    // 세율을 비워 두면 Number("") === 0 이라 세금 0원으로 계산되어
+    // "세후 배당금 = 세전 배당금"이 정상 결과처럼 보인다.
+    // 미입력과 0% 를 구분해 조용히 통과시키지 않는다.
+    const taxRateEntered = taxRate.trim() !== "";
+
     const result = useMemo(() => {
         const qty = Number(shares);
         const dividend = Number(dividendPerShare);
         const price = Number(buyPrice);
         const tax = Number(taxRate) / 100;
+
+        if (taxRate.trim() === "") {
+            return {
+                valid: false,
+                grossDividend: 0,
+                taxAmount: 0,
+                netDividend: 0,
+                totalInvestment: 0,
+                grossYield: 0,
+                netYield: 0,
+            };
+        }
 
         if (
             !Number.isFinite(qty) ||
@@ -151,15 +168,18 @@ export default function DividendCalculator() {
 
                 <p className="text-sm leading-relaxed text-slate-500">
                     KRW / USD 토글은 환율 자동 변환 기능이 아니라 계산 기준 통화를 선택하는 기능입니다.
-                    국내주식은 원화, 미국주식은 달러 기준으로 입력하면 됩니다. 세율은 국내 15.4%,
-                    미국 15%(현지 원천징수 기준)를 기본값으로 자동 반영하며, 직접 수정하면 그 값을
-                    유지합니다.
+                    국내주식은 원화, 미국주식은 달러 기준으로 입력하면 됩니다. 세율 입력 예시는 국내
+                    15.4%, 미국 15%(현지 원천징수 기준)이며, 실제 적용할 세율을 직접 입력하세요.
                 </p>
             </CalculatorCard>
 
             <ResultCard
                 title="배당 수익 계산 결과"
-                emptyMessage="보유 수량, 배당금, 평균 매수가를 입력하면 결과가 계산됩니다."
+                emptyMessage={
+                    taxRateEntered
+                        ? "보유 수량, 배당금, 평균 매수가를 입력하면 결과가 계산됩니다."
+                        : "보유 수량, 배당금, 평균 매수가와 함께 세율을 입력하면 결과가 계산됩니다. 세율을 비워 두면 세후 금액을 계산할 수 없습니다."
+                }
                 isValid={result.valid}
             >
                 <ResultHighlight
