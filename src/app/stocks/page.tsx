@@ -71,13 +71,12 @@ export default function StocksPage() {
                             href={calc.href}
                             className="group rounded-2xl bg-white p-6 border border-slate-200 hover:shadow-lg hover:-translate-y-1 transition"
                         >
-                            {/* ✅ 공용 배지 포함 */}
                             <div className="flex items-center gap-2 mb-4">
                                 <span className="text-xs bg-slate-100 px-2 py-1 rounded">
                                     {calc.badge}
                                 </span>
 
-                                {calc.isCommon && (
+                                {(calc.groups?.length ?? 0) > 1 && (
                                     <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded border border-blue-200">
                                         공용
                                     </span>

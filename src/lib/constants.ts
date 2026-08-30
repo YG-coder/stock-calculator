@@ -9,7 +9,7 @@ export type CalculatorItem = {
   kind: "calculator" | "hub";
   groups?: ("stocks" | "crypto" | "us-stocks")[];
   featured?: boolean;
-  isCommon?: boolean; // ✅ 공용 여부 추가
+  isCommon?: boolean;
 };
 
 export const CALCULATORS: CalculatorItem[] = [
@@ -22,7 +22,6 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "수익 실현",
     kind: "calculator",
     groups: ["stocks"],
-    isCommon: true, // ✅ 공용
     featured: true,
   },
   {
@@ -33,7 +32,6 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "포지션 조절",
     kind: "calculator",
     groups: ["stocks"],
-    isCommon: true,
     featured: true,
   },
   {
@@ -44,7 +42,6 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "수익 실현",
     kind: "calculator",
     groups: ["stocks"],
-    isCommon: true,
   },
   {
     href: "/stop-loss-calculator",
@@ -54,7 +51,6 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "리스크 관리",
     kind: "calculator",
     groups: ["stocks"],
-    isCommon: true,
     featured: true,
   },
   {
@@ -65,7 +61,6 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "리스크 관리",
     kind: "calculator",
     groups: ["stocks"],
-    isCommon: true,
   },
   {
     href: "/risk-reward-calculator",
@@ -75,7 +70,6 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "전략 검증",
     kind: "calculator",
     groups: ["stocks"],
-    isCommon: true,
   },
   {
     href: "/position-size-calculator",
@@ -85,7 +79,6 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "자금 관리",
     kind: "calculator",
     groups: ["stocks"],
-    isCommon: true,
   },
   {
     href: "/dividend-calculator",
@@ -95,7 +88,6 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "현금 흐름",
     kind: "calculator",
     groups: ["stocks"],
-    isCommon: true,
   },
   {
     href: "/compound-interest-calculator",
@@ -105,7 +97,6 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "장기 투자",
     kind: "calculator",
     groups: ["stocks"],
-    isCommon: true,
     featured: true,
   },
   {
@@ -116,7 +107,6 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "세금 분석",
     kind: "calculator",
     groups: ["stocks"],
-    isCommon: true,
   },
   {
     href: "/dca-calculator",
@@ -126,7 +116,6 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "투자 시뮬레이션",
     kind: "calculator",
     groups: ["stocks"],
-    isCommon: true,
     featured: true,
   },
   {
@@ -137,7 +126,6 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "재무 목표",
     kind: "calculator",
     groups: ["stocks"],
-    isCommon: true,
     featured: true,
   },
   {
@@ -148,12 +136,11 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "은퇴 설계",
     kind: "calculator",
     groups: ["stocks"],
-    isCommon: true,
     featured: true,
   },
-  { href: "/sequence-risk-calculator", label: "순서 위험", title: "수익률 순서 위험 계산기", desc: "같은 평균수익률의 발생 순서에 따른 은퇴 결과 비교", badge: "은퇴 위험", kind: "calculator", groups: ["stocks"], isCommon: true },
-  { href: "/no-sell-rebalancing-calculator", label: "무매도 리밸런싱", title: "무매도 리밸런싱 계산기", desc: "새 투자금만으로 목표 자산배분에 가까워지는 추천 매수액 계산", badge: "자산배분", kind: "calculator", groups: ["stocks"], isCommon: true },
-  { href: "/portfolio-calculator", label: "포트폴리오", title: "포트폴리오 기대수익률·변동성 계산기", desc: "자산 비중과 상관관계를 반영한 기대수익률·위험 계산", badge: "포트폴리오", kind: "calculator", groups: ["stocks"], isCommon: true, featured: true },
+  { href: "/sequence-risk-calculator", label: "순서 위험", title: "수익률 순서 위험 계산기", desc: "같은 평균수익률의 발생 순서에 따른 은퇴 결과 비교", badge: "은퇴 위험", kind: "calculator", groups: ["stocks"] },
+  { href: "/no-sell-rebalancing-calculator", label: "무매도 리밸런싱", title: "무매도 리밸런싱 계산기", desc: "새 투자금만으로 목표 자산배분에 가까워지는 추천 매수액 계산", badge: "자산배분", kind: "calculator", groups: ["stocks"] },
+  { href: "/portfolio-calculator", label: "포트폴리오", title: "포트폴리오 기대수익률·변동성 계산기", desc: "자산 비중과 상관관계를 반영한 기대수익률·위험 계산", badge: "포트폴리오", kind: "calculator", groups: ["stocks"], featured: true },
 
   // ===== 미국 주식 (전용만) =====
   {
