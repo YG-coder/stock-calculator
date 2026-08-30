@@ -76,7 +76,7 @@ export default function StocksPage() {
                                     {calc.badge}
                                 </span>
 
-                                {(calc.groups?.length ?? 0) > 1 && (
+                                {calc.isCommon && (
                                     <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded border border-blue-200">
                                         공용
                                     </span>
