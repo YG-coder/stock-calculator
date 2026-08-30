@@ -102,7 +102,9 @@ export default function HomePage() {
                       <p className="mt-2 text-sm text-slate-600">{item.desc}</p>
                     </div>
 
-                    <span className="text-xs">{item.badge}</span>
+                    <span className="shrink-0 whitespace-nowrap text-xs text-slate-600">
+                      {item.badge}
+                    </span>
                   </div>
 
                   <div className="mt-4 text-sm font-semibold">
