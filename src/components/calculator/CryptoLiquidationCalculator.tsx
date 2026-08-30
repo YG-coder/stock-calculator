@@ -148,9 +148,10 @@ export default function CryptoLiquidationCalculator() {
 
                 {marginType === "cross" ? (
                     <p className="text-sm leading-relaxed text-slate-500">
-                        교차 마진은 계좌의 다른 잔고까지 증거금으로 사용하므로 실제 청산 가격이 아래
-                        결과보다 더 멀어집니다. 정확한 값은 계좌 잔고와 다른 포지션에 따라 달라지므로,
-                        아래 결과는 <strong>격리 마진 기준의 보수적인 청산 가격</strong>으로 보시기 바랍니다.
+                        교차 마진은 계좌의 가용 잔고와 다른 포지션의 손익까지 함께 반영하므로 실제
+                        청산 가격이 아래 결과보다 멀어지거나 가까워질 수 있습니다. 아래 결과는
+                        <strong> 격리 마진 기준의 단순 근사값</strong>이며, 교차 마진의 최종 판단에는
+                        거래소 주문 화면의 예상 청산가와 계정 유지증거금률을 확인하세요.
                     </p>
                 ) : null}
 
@@ -182,7 +183,7 @@ export default function CryptoLiquidationCalculator() {
                 isValid={result.valid}
             >
                 <ResultHighlight
-                    label="예상 청산 가격"
+                    label="격리마진 근사 청산가"
                     value={formatNumber(result.liquidationPrice)}
                     unit={priceUnit}
                     tone="negative"
@@ -206,6 +207,12 @@ export default function CryptoLiquidationCalculator() {
                         {result.warning}
                     </div>
                 ) : null}
+
+                <p className="text-sm leading-relaxed text-slate-500">
+                    실제 청산은 거래소의 마크 가격을 기준으로 판단될 수 있으며, 종료 수수료·펀딩비·추가
+                    증거금·위험한도 등급에 따라 결과가 달라집니다. 주문 전 거래소에 표시되는 예상
+                    청산가를 최종 기준으로 확인하세요.
+                </p>
             </ResultCard>
         </CalculatorLayout>
     );
