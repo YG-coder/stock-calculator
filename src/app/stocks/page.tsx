@@ -64,6 +64,12 @@ export default function StocksPage() {
 
             {/* 계산기 리스트 */}
             <div className="mx-auto max-w-5xl px-6 py-16">
+                <p className="mb-4 text-xs leading-relaxed text-slate-500">
+                    <span className="mr-1 inline-flex rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 font-semibold text-blue-600">
+                        공용
+                    </span>
+                    표시는 KRW·USD를 모두 지원해 국내주식과 미국주식에 함께 사용할 수 있다는 뜻입니다.
+                </p>
                 <section className="grid gap-6 sm:grid-cols-2 mb-16">
                     {calculators.map((calc) => (
                         <Link
