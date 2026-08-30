@@ -10,12 +10,22 @@ import {
   ResultDetail,
   InputField,
 } from "@/components/ui/Shared";
+import CurrencyToggle from "@/components/calculator/CurrencyToggle";
+
+type Currency = "KRW" | "USD";
 
 export default function PositionSizeCalculator() {
+  const [currency, setCurrency] = useState<Currency>("KRW");
   const [totalCapital, setTotalCapital] = useState("");
   const [riskPercent, setRiskPercent] = useState("");
   const [entryPrice, setEntryPrice] = useState("");
   const [stopLossPrice, setStopLossPrice] = useState("");
+  const moneyUnit = currency === "KRW" ? "원" : "USD";
+  const moneyDigits = currency === "KRW" ? 0 : 2;
+  const formatMoney = (value: number) =>
+    Number.isFinite(value)
+      ? new Intl.NumberFormat("ko-KR", { maximumFractionDigits: moneyDigits }).format(value)
+      : "-";
 
   const result = useMemo(() => {
     const capital = parsePositive(totalCapital);
@@ -70,12 +80,17 @@ export default function PositionSizeCalculator() {
           title="1. 자금 및 리스크 정보"
           description="총 자본금과 1회 매매 허용 리스크를 입력하세요."
         >
+          <CurrencyToggle
+            value={currency}
+            onChange={setCurrency}
+            options={["KRW", "USD"] as const}
+          />
           <InputField
             id="totalCapital"
             label="총 투자 자본금"
             type="number"
-            placeholder="예: 10000000"
-            unit="원"
+            placeholder={currency === "KRW" ? "예: 10000000" : "예: 10000"}
+            unit={moneyUnit}
             value={totalCapital}
             onChange={(e) => setTotalCapital(e.target.value)}
           />
@@ -98,8 +113,8 @@ export default function PositionSizeCalculator() {
             id="entryPrice"
             label="진입 가격"
             type="number"
-            placeholder="예: 50000"
-            unit="원"
+            placeholder={currency === "KRW" ? "예: 50000" : "예: 50"}
+            unit={moneyUnit}
             value={entryPrice}
             onChange={(e) => setEntryPrice(e.target.value)}
           />
@@ -107,8 +122,8 @@ export default function PositionSizeCalculator() {
             id="stopLossPrice"
             label="손절 라인"
             type="number"
-            placeholder="예: 48000"
-            unit="원"
+            placeholder={currency === "KRW" ? "예: 48000" : "예: 48"}
+            unit={moneyUnit}
             value={stopLossPrice}
             onChange={(e) => setStopLossPrice(e.target.value)}
           />
@@ -122,8 +137,8 @@ export default function PositionSizeCalculator() {
       >
         <ResultHighlight
           label="권장 매수 금액 (포지션 크기)"
-          value={formatNumber(result.positionSize)}
-          unit="원"
+          value={formatMoney(result.positionSize)}
+          unit={moneyUnit}
           tone="positive"
         />
         <div className="grid gap-4 sm:grid-cols-2">
@@ -144,7 +159,7 @@ export default function PositionSizeCalculator() {
             className="rounded-xl border border-amber-200 bg-amber-50 p-5 shadow-sm mt-2"
           >
             <p className="text-sm font-medium text-amber-900 leading-relaxed">
-              허용 리스크 금액({formatNumber(result.maxLoss)}원)이 1주당 손실보다 작아
+              허용 리스크 금액({formatMoney(result.maxLoss)} {moneyUnit})이 1주당 손실보다 작아
               이 조건에서는 매수할 수 있는 수량이 없습니다. 손절 폭을 좁히거나 허용 리스크를
               높여야 합니다.
             </p>
@@ -159,7 +174,7 @@ export default function PositionSizeCalculator() {
             </p>
             <p className="mt-2 text-sm text-amber-900 leading-relaxed">
               리스크 한도만 보면 {formatNumber(result.recommendQty)}주이지만, 자본금{" "}
-              {formatNumber(result.capital)}원으로 실제 매수 가능한 최대 수량은{" "}
+              {formatMoney(result.capital)} {moneyUnit}로 실제 매수 가능한 최대 수량은{" "}
               <strong>{formatNumber(result.affordableQty)}주</strong>입니다. 미수·신용을
               쓰지 않는다면 손절 폭을 넓히거나 허용 리스크를 낮춰 다시 계산하세요.
             </p>
@@ -169,7 +184,7 @@ export default function PositionSizeCalculator() {
             <p className="text-sm font-medium text-slate-700 leading-relaxed">
               손절가 도달 시 계좌 총 손실액은 최대{" "}
               <strong className="text-blue-600">
-                -{formatNumber(result.actualLoss)}원 ({result.actualLossRate.toFixed(2)}%)
+                -{formatMoney(result.actualLoss)} {moneyUnit} ({result.actualLossRate.toFixed(2)}%)
               </strong>
               으로 제한됩니다.
             </p>
