@@ -125,7 +125,6 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "투자 시뮬레이션",
     kind: "calculator",
     groups: ["stocks"],
-    isCommon: true,
     featured: true,
   },
   {
@@ -136,7 +135,6 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "재무 목표",
     kind: "calculator",
     groups: ["stocks"],
-    isCommon: true,
     featured: true,
   },
   {
@@ -147,12 +145,11 @@ export const CALCULATORS: CalculatorItem[] = [
     badge: "은퇴 설계",
     kind: "calculator",
     groups: ["stocks"],
-    isCommon: true,
     featured: true,
   },
-  { href: "/sequence-risk-calculator", label: "순서 위험", title: "수익률 순서 위험 계산기", desc: "같은 평균수익률의 발생 순서에 따른 은퇴 결과 비교", badge: "은퇴 위험", kind: "calculator", groups: ["stocks"], isCommon: true },
-  { href: "/no-sell-rebalancing-calculator", label: "무매도 리밸런싱", title: "무매도 리밸런싱 계산기", desc: "새 투자금만으로 목표 자산배분에 가까워지는 추천 매수액 계산", badge: "자산배분", kind: "calculator", groups: ["stocks"], isCommon: true },
-  { href: "/portfolio-calculator", label: "포트폴리오", title: "포트폴리오 기대수익률·변동성 계산기", desc: "자산 비중과 상관관계를 반영한 기대수익률·위험 계산", badge: "포트폴리오", kind: "calculator", groups: ["stocks"], isCommon: true, featured: true },
+  { href: "/sequence-risk-calculator", label: "순서 위험", title: "수익률 순서 위험 계산기", desc: "같은 평균수익률의 발생 순서에 따른 은퇴 결과 비교", badge: "은퇴 위험", kind: "calculator", groups: ["stocks"] },
+  { href: "/no-sell-rebalancing-calculator", label: "무매도 리밸런싱", title: "무매도 리밸런싱 계산기", desc: "새 투자금만으로 목표 자산배분에 가까워지는 추천 매수액 계산", badge: "자산배분", kind: "calculator", groups: ["stocks"] },
+  { href: "/portfolio-calculator", label: "포트폴리오", title: "포트폴리오 기대수익률·변동성 계산기", desc: "자산 비중과 상관관계를 반영한 기대수익률·위험 계산", badge: "포트폴리오", kind: "calculator", groups: ["stocks"], featured: true },
 
   // ===== 미국 주식 (전용만) =====
   {
