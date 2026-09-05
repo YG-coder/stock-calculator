@@ -120,7 +120,7 @@ export default function HomePage() {
               return (
                 <article key={group.title} className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                   <h3 className="text-lg font-black leading-snug">{group.title}</h3>
-                  <p className="mt-2 grow text-sm leading-6 text-slate-600">{group.description}</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600 md:min-h-12">{group.description}</p>
                   <Link href={primary.href} className="mt-5 inline-flex w-fit items-center rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-slate-700">
                     {primary.label} 계산부터 시작 →
                   </Link>
