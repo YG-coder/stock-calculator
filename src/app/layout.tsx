@@ -6,10 +6,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
-import { HEADER_CALCULATORS, POLICY_ROUTES } from "@/lib/constants";
+import { POLICY_ROUTES } from "@/lib/constants";
 import "./globals.css";
 
 import JsonLd from "@/components/seo/JsonLd";
+import SiteHeader from "@/components/layout/SiteHeader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -102,29 +103,7 @@ export default function RootLayout({
       {/* 🔥 JSON-LD 위치 (여기가 맞다) */}
       <JsonLd />
 
-      {/* 헤더 */}
-      <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-3 px-4 py-4 md:px-6">
-          <Link
-              href="/"
-              className="whitespace-nowrap text-2xl font-extrabold tracking-tight text-slate-900 hover:text-slate-700 transition"
-          >
-            주식계산기.kr
-          </Link>
-
-          <nav className="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm font-semibold text-slate-600 max-[1100px]:w-full max-[1100px]:justify-center">
-            {HEADER_CALCULATORS.map((item) => (
-                <Link
-                    key={item.href}
-                    href={item.href}
-                    className="whitespace-nowrap hover:text-slate-900 transition-colors"
-                >
-                  {item.label}
-                </Link>
-            ))}
-          </nav>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* 본문 */}
       <div className="flex-grow">{children}</div>
