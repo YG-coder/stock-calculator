@@ -1,9 +1,17 @@
-# MonteCarloEngine v1 — 구현 기록과 모형 문서
+# MonteCarloEngine — 모형과 구현 문서
 
-- **작성일**: 2026-08-24
-- **상태**: 1단계(엔진) 구현 완료. UI 는 개발 전용 검증 화면만. 커밋 전.
-- **선행 문서**: `2026-08-21-montecarlo-engine-contract.md`, `2026-08-22-montecarlo-implementation-plan.md`, `2026-08-22-portfolio-assumptions-design.md`, `2026-08-22-types-contract-final.md`
-- **엔진 버전**: `1.0.0` (`ENGINE_VERSION`)
+- **문서 성격**: **현재 기준 문서.** 코드가 바뀌면 이 문서를 갱신한다.
+- **최종 갱신**: 2026-09-16 (main `3f3f4c5` 기준)
+- **엔진 버전**: `1.0.1` — `ENGINE_VERSION` (`src/lib/montecarlo/types.ts`)
+- **적용 범위**: 공개 계산기 4종이 이 엔진을 쓴다 — `/dca-calculator`, `/goal-probability-calculator`, `/fire-calculator`, `/sequence-risk-calculator`. `/dev/montecarlo` 는 개발 전용 검증 화면이다.
+- **선행 설계 문서(과거 기록)**: `2026-08-21-montecarlo-engine-contract.md`, `2026-08-22-montecarlo-implementation-plan.md`, `2026-08-22-portfolio-assumptions-design.md`, `2026-08-22-types-contract-final.md`
+
+> **문서 이력** — 이 문서는 2026-08-24 작성된 `2026-08-24-montecarlo-engine-v1.md`
+> (엔진 v1 구현 기록)에서 출발했다. 2026-09-16 에 실제 코드와 대조해 현재 기준 문서로
+> 바꾸고 파일 이름에서 날짜를 뺐다. 작성 당시의 원문은 Git 이력에 남아 있다.
+> 이때 고친 것은 엔진 버전(1.0.0 → 1.0.1), 적용 범위(개발 화면만 → 공개 계산기 4종),
+> 파일 목록, 다단계 현금흐름(`phases`), 테스트 결과, 구현 현황이다.
+> 모형 가정·수식·설계 근거는 코드와 일치해 그대로 두었다.
 
 > 이 문서는 **모형이 무엇을 가정하는지**를 적는다. 시뮬레이션 결과는 입력한 가정에 대한
 > 조건부 분포이지 미래에 대한 예측이나 보장이 아니다. 실제 시장은 이 모형이 담지 않는
@@ -31,8 +39,16 @@ src/workers/montecarlo.worker.ts   메시지·배치 스케줄링. 계산 로직
 src/hooks/useMonteCarlo.ts         디바운스·상태·정리. 수식을 모름
 src/components/dev/MonteCarloLab.tsx  개발 전용 검증 화면
 src/app/dev/montecarlo/page.tsx       프로덕션 빌드에서 404
+
+엔진을 쓰는 공개 화면
+src/lib/dca.ts  goal-probability.ts  fire.ts  sorr.ts   화면 입력 → SimulationInput 변환
+src/components/calculator/DcaCalculator.tsx            팬 차트 포함(인라인 SVG)
+src/components/calculator/GoalProbabilityCalculator.tsx
+src/components/calculator/FireCalculator.tsx
+src/components/calculator/SorrSimulationCalculator.tsx
+
 scripts/gen-sigma-table.mjs        캘리브레이션 테이블 생성기
-tests/montecarlo/*.test.ts         106개 테스트
+tests/montecarlo/*.test.ts         8파일 110테스트
 ```
 
 이 경계의 실질적 이득은 **테스트가 Worker·React 없이 돌아간다**는 점이다.
@@ -52,6 +68,7 @@ tests/montecarlo/*.test.ts         106개 테스트
 | `cashFlow.inflationIndexed` | — | 매년 물가만큼 증액 | 배수 `(1+π)^floor(m/12)` |
 | `cashFlow.fromMonth` / `toMonth` | 개월 | 적용 구간 | **반열림 `[from, to)`** |
 | `cashFlow.overrides` | 원 | 월별 일시금 | 해당 월 `monthlyAmount` 에 **더해진다**(치환 아님) |
+| `cashFlow.phases` | — | 비중첩 다단계 현금흐름 | FIRE·SoRR 용. 있으면 `monthlyAmount`·`fromMonth`/`toMonth` 대신 이 목록을 쓰고, `monthlyAmount` 는 0 이어야 한다. 구간이 겹치면 거부 |
 | `returns.expectedReturn` | 실수 | 연 **CAGR**(기하평균, 명목, 총수익) | 산술평균이 아니다 |
 | `returns.volatility` | 실수 | 연 변동성, **단순수익률 기준** | 0 ~ 0.45 |
 | `returns.shock` | — | 충격 분포 | 기본 `{student-t, df 6}`. v1 은 df 6 고정 |
@@ -242,8 +259,8 @@ W_T(c) = A_j + c·B_j
 ```
 
 `A`, `B` 는 시뮬레이션 **한 번의 패스에서 함께 누적**된다. 이후 목표 금액·목표 확률·납입액을
-아무리 바꿔도 재시뮬레이션이 필요 없다 — 목표달성확률 화면의 슬라이더 3개가 실시간으로
-움직일 수 있는 이유다.
+아무리 바꿔도 재시뮬레이션이 필요 없다. 현재 목표달성확률 화면은 이 성질을 50/70/80/90%
+민감도 표에 쓰고 있다(설계 단계에서 논의된 실시간 슬라이더는 아직 구현하지 않았다 — §13).
 
 ```
 c_j = (W* − A_j) / B_j          (B_j > 0)
@@ -256,7 +273,9 @@ c*  = c_j 의 p 분위수            ← p 분위수이지 1−p 가 아니다
 
 **선형성이 깨지는 조건** — 잔액이 0 에 클램프되거나 경로 의존 규칙이 들어가면 성립하지 않는다.
 엔진이 클램프를 감지하면 `affine` 을 **아예 만들지 않고** 경고를 남긴다. 호출부는 `affine` 의
-존재 여부만 보고 선형 역산과 이분 탐색을 가른다 — 판단 로직이 UI 에 흩어지지 않는다.
+존재 여부만 보고 분기한다 — 판단 로직이 UI 에 흩어지지 않는다. 다만 **이분 탐색 폴백은 아직
+구현돼 있지 않다.** `affine` 이 없으면 역산 결과를 내지 않는다(`InversionResult.method` 의
+`"bisection"` 은 타입 예약값이다).
 
 **부동소수 경계 주의**: `c*` 는 경계 경로의 종말자산이 목표와 정확히 같아지는 값이므로,
 `A + c*·B` 가 마지막 비트에서 목표를 근소하게 밑돌아 재시뮬 성공확률이 1경로(1/N)만큼
@@ -311,6 +330,9 @@ Worker 의 이벤트 루프가 멈춰 있어, 메인 스레드가 보낸 `cancel
 
 ## 11. 성능 측정
 
+> **측정 시점: 2026-08-24.** 아래 수치는 그때 한 번 잰 값이고 이후 다시 재지 않았다.
+> 현재 코드의 성능을 주장하는 숫자가 아니다. 다시 재려면 `tests/montecarlo/perf.test.ts` 를 돌린다.
+
 측정 환경: Intel Xeon @ 2.10GHz (2 vCPU, 클라우드 컨테이너), Node 22, `vitest run`.
 **일반 데스크톱보다 느린 환경**이므로 실사용 브라우저에서는 더 빠를 것으로 본다.
 
@@ -344,18 +366,27 @@ Worker 의 이벤트 루프가 멈춰 있어, 메인 스레드가 보낸 `cancel
 
 ## 12. 테스트 결과
 
-`npm run test` — **7파일 106테스트 전부 통과.**
+**2026-09-16 실행: 16파일 145테스트 전부 통과** (그중 몬테카를로 8파일 110테스트).
 
-| 파일 | 다루는 것 |
-|---|---|
-| `rng.test.ts` (11) | 시드 재현성, 균등·정규 적률, **분산 보정**, 절단 상한, df ≤ 2 거부, 홀수 df |
-| `returns.test.ts` (12) | 드리프트 = CAGR, 캘리브레이션 값, 로그정규식과의 구분, CAGR 소거, 테이블 역보간, 범위 거부 |
-| `engine.test.ts` (41) | 재현성, **복리 회귀**, 해석적 대조, 캘리브레이션 종단 검증, 수렴, 실질 환산, 구간·일시금, 경계값, 소진, 입력 검증, 스냅샷 |
-| `affine.test.ts` (17) | 아핀 항등식, 납입액 불변성, 클램프 감지, **역산 양방향(p=0.9/0.8/0.5/0.1)**, 실질 목표 환산, 분위수 인덱스 |
-| `stats.test.ts` (8) | 백분위 정의, 경계, 빈 분포 NaN |
-| `correlation.test.ts` (14) | 대칭·대각·범위·PSD·Cholesky·비중 |
-| `worker-client.test.ts` (4) | 폴백 모드, 경로 수 상한, 진행률, 오류 전달 |
-| `perf.test.ts` (2) | 성능 측정(CI 실패시키지 않음), 절단 비율 정합성 |
+> 실행 조건 — `vitest 4.1.11`, Node 22, Linux. 저장소의 `tests/`·`src/lib/` 를 별도 작업
+> 환경에 복사해 `vitest run` 으로 돌린 결과다. 저장소의 `node_modules` 는 macOS 용 네이티브
+> 바이너리라 이 환경에서 그대로 실행되지 않아 같은 버전의 vitest 를 새로 설치해 돌렸다.
+> **`npm run lint`·`npm run typecheck`·`npm run build` 는 이번에 실행하지 않았다.**
+
+| 파일 | 개수 | 다루는 것 |
+|---|---|---|
+| `montecarlo/rng.test.ts` | 11 | 시드 재현성, 균등·정규 적률, **분산 보정**, 절단 상한, df ≤ 2 거부, 홀수 df |
+| `montecarlo/returns.test.ts` | 12 | 드리프트 = CAGR, 캘리브레이션 값, 로그정규식과의 구분, CAGR 소거, 테이블 역보간, 범위 거부 |
+| `montecarlo/engine.test.ts` | 45 | 재현성, **복리 회귀**, 해석적 대조, 캘리브레이션 종단 검증, 수렴, 실질 환산, 구간·일시금, 경계값, 소진, 입력 검증, 스냅샷 |
+| `montecarlo/affine.test.ts` | 17 | 아핀 항등식, 납입액 불변성, 클램프 감지, **역산 양방향(p=0.9/0.8/0.5/0.1)**, 실질 목표 환산, 분위수 인덱스 |
+| `montecarlo/stats.test.ts` | 7 | 백분위 정의, 경계, 빈 분포 NaN |
+| `montecarlo/correlation.test.ts` | 12 | 대칭·대각·범위·PSD·Cholesky·비중 |
+| `montecarlo/worker-client.test.ts` | 4 | 폴백 모드, 경로 수 상한, 진행률, 오류 전달 |
+| `montecarlo/perf.test.ts` | 2 | 성능 측정(CI 실패시키지 않음), 절단 비율 정합성 |
+| 엔진 밖 계산 모듈 | 35 | `backtest` 4, `dca` 5, `fire` 3, `goal-probability` 3, `noSellRebalancing` 4, `portfolio` 3, `sorr` 6, `stockTransactionTax` 7 |
+
+아래 12-1 ~ 12-3 은 **테스트가 무엇을 확인하는지**에 대한 설명이다. 수치 자체는 2026-08-24
+작성 당시 기록이며, 같은 테스트가 지금도 통과한다는 것이 위 실행으로 확인된 부분이다.
 
 ### 12-1. 기존 복리 계산기 회귀 — **원 단위 일치**
 
@@ -408,28 +439,56 @@ NaN·Infinity, 잘못된 구간·일시금 월, 소진 이후 처리 — 전부 
 
 ---
 
-## 13. 이후 단계가 이 엔진을 쓰는 방식
+## 13. 구현 현황 — 구현된 것과 계획으로 남은 것
 
-| 단계 | 엔진 사용 방식 | 추가로 필요한 것 |
+원래 계획은 엔진(1단계) 위에 8단계를 쌓는 것이었다. 2026-09-16 기준 실제 상태는 아래와 같다.
+**계획 문서의 단계 번호와 화면 이름이 실제 구현과 다른 곳이 있어 함께 적는다.**
+
+### 이 엔진을 쓰는 공개 계산기 (구현됨)
+
+| 화면 | 경로 | 엔진 사용 방식 |
 |---|---|---|
-| **2. DCA** | `cashFlow.monthlyAmount > 0`, `goal` 없음 | 적립 UI, 팬 차트(인라인 SVG) |
-| **3. 목표달성확률** | `goal.kind = "terminal-target"` + `affine` | 슬라이더 3개. `sortedRequired` 만으로 양방향 조회 — 재시뮬 없음 |
-| 4. FIRE | 적립 구간 + 인출 구간을 `fromMonth`/`toMonth` 로 이어 붙임 | 클램프 발생 시 `affine` 미생성 확인, 이분 탐색 폴백 |
-| 5. SoRR | `monthlyAmount < 0`, `goal.kind = "never-depleted"` | `depletion.byYear` 히스토그램, `never-depleted` 구현 |
-| 6. 무매도 리밸런싱 | 다자산 `ReturnSpec` 확장 | `correlation.ts` 를 엔진에 연결, 프리셋 공분산 출처 |
-| 7. 포트폴리오 | 자산별 가중치 | 입력 UI |
-| 8. `/lab` 백테스트 | `ReturnSpec.kind = "bootstrap"` | 데이터셋 라이선스 확인 선행 |
+| 적립식 투자 시뮬레이션 | `/dca-calculator` | `cashFlow.monthlyAmount > 0`, `goal` 없음. 팬 차트는 인라인 SVG (`DcaCalculator.tsx` 내부 `FanChart`) |
+| 투자 목표달성확률 | `/goal-probability-calculator` | `goal.kind = "terminal-target"` + `affine`. `sortedRequired` 로 재시뮬 없이 확률↔납입액 조회 |
+| FIRE 은퇴 시뮬레이션 | `/fire-calculator` | `cashFlow.phases` 2구간(적립 → 인출). 성공률 = `1 − depletion.rate` |
+| 수익률 순서 위험 | `/sequence-risk-calculator` | `monthlyAmount < 0`, `timing: "start"`, `inflationIndexed: true`. 생존율 = `1 − depletion.rate`. 같은 페이지의 정순·역순 비교 도구(`SorrCalculator`)는 엔진을 쓰지 않는 결정론 계산이다 |
 
-**타입 계약은 이후 단계에서 바뀌지 않는다.** `never-depleted` / `income-target`,
-`depletion`, `InversionResult.method: "bisection"` 은 이미 타입에 예약돼 있다.
+입력 변환은 각각 `src/lib/dca.ts`, `goal-probability.ts`, `fire.ts`, `sorr.ts` 에 있다.
+화면은 `SimulationInput` 을 직접 조립하지 않는다.
 
-### 2단계 착수 전 결정할 것
+### 엔진을 쓰지 않는 계산기 (오해하기 쉬운 부분)
 
-1. **프리셋 수치의 1차 출처** — 확보 전까지 `PORTFOLIO_PRESETS` 는 빈 배열이고 "직접 입력"만 제공한다
-2. **팬 차트 백분위 표시 범위** — 결과 객체는 p5~p95 를 모두 갖지만 화면 기본은 10/25/50/75/90
-3. **모바일 경로 수** — 화면 폭 기준으로 5,000 으로 낮출지
-4. `/dca-calculator` 라우트를 `constants.ts` · `calculatorPages.ts` 에 등록하는 시점
-   (등록하는 순간 sitemap·허브·전체 목록에 자동으로 들어간다)
+| 화면 | 경로 | 실제 구현 |
+|---|---|---|
+| 무매도 리밸런싱 | `/no-sell-rebalancing-calculator` | `src/lib/noSellRebalancing.ts` 결정론 계산. 계획에 있던 다자산 `ReturnSpec` 확장이 아니다 |
+| 포트폴리오 기대수익률·변동성 | `/portfolio-calculator` | `src/lib/portfolio.ts` 결정론 계산 |
+| 사용자 자료 백테스트 | `/lab` | `src/lib/backtest.ts` — 사용자가 붙여넣은 월별 수익률의 롤링 구간 비교. 계획에 있던 `ReturnSpec.kind = "bootstrap"` 이 아니며, 엔진의 bootstrap 은 여전히 미구현(입력하면 거부)이다 |
+
+### 타입에만 예약돼 있고 아직 구현되지 않은 것
+
+| 항목 | 상태 |
+|---|---|
+| `goal.kind = "never-depleted"` / `"income-target"` | 타입에만 존재. `validate.ts` 가 `terminal-target` 외에는 거부한다. FIRE·SoRR 은 `depletion.rate` 로 대신 계산한다 |
+| `InversionResult.method = "bisection"` | 타입에만 존재. 현재 역산 경로는 `linear-exact` 뿐이다 |
+| `ReturnSpec.kind = "bootstrap"` | `createReturnGenerator` 가 예외를 던진다 |
+| 다자산 `ReturnSpec` · `correlation.ts` 엔진 연결 | `correlation.ts` 는 순수 유틸로만 존재하고 엔진 경로에서 호출되지 않는다 |
+| `phases` + 목표 역산 조합 | 다단계 현금흐름에서는 `affine` 을 만들지 않으며, `targetProbability` 를 함께 주면 입력 오류로 거부한다 |
+
+### 설계 문서에 있었으나 구현되지 않은 화면 기능
+
+아래는 설계 단계에서 논의된 항목이다. **현재 코드에 없다.**
+
+| 기능 | 설계 문서 | 현재 코드 |
+|---|---|---|
+| 자산배분 프리셋 선택 | `2026-08-22-portfolio-assumptions-design.md` | `PORTFOLIO_PRESETS` 는 빈 배열. 1차 출처 미확정으로 화면은 "직접 입력"만 제공 |
+| 실시간 슬라이더(목표달성확률 3개) | `2026-08-22-montecarlo-implementation-plan.md` §7 | 슬라이더 없음. 대신 50/70/80/90% 민감도 표를 `sortedRequired` 로 재시뮬 없이 계산해 보여준다 |
+| 시나리오 `localStorage` 저장·불러오기 | `2026-08-22-types-contract-final.md` | 코드에 `localStorage` 사용처가 없다 |
+| URL 에 가정만 실어 공유 | `2026-08-22-types-contract-final.md` | `useSearchParams`·`URLSearchParams` 사용처가 없다. 금액을 URL 에 싣지 않는다는 원칙은 여전히 유효하다 |
+| 모바일에서 경로 수 자동 축소 | `2026-08-24` 시점 미결정 항목 | 화면 폭에 따른 자동 조정 없음. 경로 수는 고급 입력에서 사용자가 지정한다(기본 10,000) |
+
+**타입 계약은 이후 단계에서 깨지지 않았다.** 08-24 이후 추가된 것은 다단계 현금흐름
+(`CashFlowPhase` / `CashFlowSpec.phases`)뿐이고, 선택 필드라 기존 호출부에 영향이 없다.
+이 변경으로 `ENGINE_VERSION` 이 `1.0.1` 이 되었다.
 
 ---
 

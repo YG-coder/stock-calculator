@@ -1,5 +1,9 @@
 # 코인 100배 진입 계산기 ↔ MJ 엑셀 대조 및 보완 (2026-08-21)
 
+> **[과거 기록 · 2026-08-21]** `/crypto/entry` 계산기와 외부 엑셀의 대조 검증 기록입니다. 그 시점의 코드와 대조한 결과입니다.
+> 본문은 당시 기록을 보존하기 위해 사실관계를 고쳐 쓰지 않았습니다. 이후 확인된 차이는 본문 안에 **정정** 표시로만 덧붙였습니다.
+> 현재 기준 설명은 [`../README.md`](../README.md) 와 [`montecarlo-engine.md`](montecarlo-engine.md) 에 있습니다.
+
 대상: `/crypto/entry` → `src/components/calculator/CryptoEntryCalculator.tsx`
 원본: `MJ 진입 타점 계산기마스터 클래스.xlsx` (Sheet1)
 

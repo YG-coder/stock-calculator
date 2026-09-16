@@ -1,5 +1,9 @@
 # 타입 계약 최종본 — `types.ts` 그대로 옮겨 쓰는 버전
 
+> **[과거 기록 · 2026-08-22]** 구현 착수 시점의 **타입 확정본**입니다. **타입의 단일 소스는 이 문서가 아니라 `src/lib/montecarlo/types.ts` 입니다.** 그 뒤 코드에서 달라진 부분은 문서 끝의 "현재 코드와의 차이" 절에 정리했습니다.
+> 본문은 당시 기록을 보존하기 위해 사실관계를 고쳐 쓰지 않았습니다. 이후 확인된 차이는 본문 안에 **정정** 표시로만 덧붙였습니다.
+> 현재 기준 설명은 [`../README.md`](../README.md) 와 [`montecarlo-engine.md`](montecarlo-engine.md) 에 있습니다.
+
 - **작성일**: 2026-08-22
 - **상태**: 설계 확정. 코드 0줄.
 - **역할**: 지금까지 3개 문서에 흩어져 있던 타입을 **하나로 합치고 이름을 고정**한다. 구현은 이 블록을 `src/lib/montecarlo/types.ts`에 옮기는 것으로 시작한다.
@@ -344,3 +348,31 @@ URL에는 **금액 계열 필드를 절대 싣지 않는다.** `initialBalance`,
 5. `worker-client.ts` → `useMonteCarlo.ts`
 
 **남은 결정은 프리셋 수치 출처 하나다.** 확보 전까지는 "직접 입력"만으로 진행할 수 있으므로 v1 착수를 막지 않는다.
+
+---
+
+## 현재 코드와의 차이 (2026-09-16 확인)
+
+위 타입 블록은 2026-08-22 구현 착수 시점의 확정본입니다. 실제 계약은
+`src/lib/montecarlo/types.ts` 가 가지고 있으며, 그 파일과 위 블록을 기계적으로 대조한 결과
+**차이는 아래 6가지뿐입니다. 기존 필드가 바뀌거나 사라진 것은 없고 전부 추가입니다.**
+
+| # | 차이 | 현재 코드 |
+|---|---|---|
+| 1 | `ENGINE_VERSION` | `"1.0.0"` → **`"1.0.1"`** |
+| 2 | **다단계 현금흐름** | `CashFlowSpec.phases?: CashFlowPhase[]` 와 `CashFlowPhase` 인터페이스 추가. FIRE·SoRR 이 적립 구간과 인출 구간을 이어 붙이는 데 쓴다. 구간은 서로 겹칠 수 없고, `phases` 를 쓰면 `monthlyAmount` 는 0 이어야 한다 |
+| 3 | `RunMeta.months` | 추가. 결과만 보고도 기간을 알 수 있게 |
+| 4 | `RunMeta.warnings: string[]` | 추가. 결과와 함께 화면에 노출할 경고(예: 세금·수수료 미반영, 소진으로 선형 역산 불가) |
+| 5 | `ValidationIssue` | 추가. 입력 거부 사유를 필드 단위로 구조화. `WorkerResponse` 의 `error` 에 `issues?: ValidationIssue[]` 가 함께 실린다 |
+| 6 | `ProgressFn` / `RunOptions` | 추가. 엔진이 Worker 를 모른 채 진행률·취소를 다루기 위한 시그니처 |
+
+`phases` 를 쓰면 엔진이 아핀 계수(`affine`)를 만들지 않습니다. 따라서 다단계 현금흐름과
+목표 역산(`goal.targetProbability`)을 함께 주면 입력 오류로 거부합니다.
+
+### 이 문서의 설계 중 아직 구현되지 않은 것
+
+- **시나리오 `localStorage` 저장·불러오기** — 코드에 `localStorage` 사용처가 없습니다.
+- **URL 에 가정만 실어 공유** — `useSearchParams` / `URLSearchParams` 사용처가 없습니다.
+  다만 "금액 계열 필드를 URL 에 싣지 않는다"는 원칙은 구현 시 그대로 적용할 기준입니다.
+- **물가 기본값 2.0%** 는 구현돼 있습니다 (`src/lib/montecarlo/presets.ts` 의 `DEFAULT_INFLATION`,
+  `asOf: "2026-08-22"`). 이 기준일과 출처는 1차 출처로 재확인하지 않았으므로 그대로 두었습니다.

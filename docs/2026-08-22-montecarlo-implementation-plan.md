@@ -1,5 +1,9 @@
 # MonteCarlo 구현 계획 — 파일 구조와 모듈 책임
 
+> **[과거 기록 · 2026-08-22]** 엔진 **구현 계획**입니다(작성 당시 코드 0줄). 실제 구현과 다른 부분이 있어 해당 위치에 정정을 달았습니다. 현재 구조·구현 현황은 `montecarlo-engine.md` 를 보세요.
+> 본문은 당시 기록을 보존하기 위해 사실관계를 고쳐 쓰지 않았습니다. 이후 확인된 차이는 본문 안에 **정정** 표시로만 덧붙였습니다.
+> 현재 기준 설명은 [`../README.md`](../README.md) 와 [`montecarlo-engine.md`](montecarlo-engine.md) 에 있습니다.
+
 - **작성일**: 2026-08-22
 - **상태**: 설계 확정. **코드 0줄.** 이 문서를 보면서 그대로 구현하는 것이 목표.
 - **선행 문서**: `2026-08-21-montecarlo-engine-contract.md` (입출력 계약), `2026-08-21-track-plan.md` (트랙 분리)
@@ -11,6 +15,21 @@
 | 충격 분포 | Student's t, `df = 6`, 분산 보정 `sqrt((ν−2)/ν)`. 정규는 옵션 | 08-21 |
 | 드리프트 | CAGR 기준 `μ_m = ln(1+CAGR)/12` | 08-21 |
 | 변동성 입력 | **단순수익률 기준**. 내부에서 `σ_log = sqrt(ln(1+σ²/(1+CAGR)²))` 변환 | 08-22 |
+
+> **정정 (2026-09-16)** — 위 표의 "변동성 입력" 행은 **이 문서 본문(§2)과 실제 코드 어느 쪽과도
+> 맞지 않습니다.** 같은 문서 §2 가 로그정규 폐형식 `σ_log = sqrt(ln(1+σ²/(1+CAGR)²))` 을
+> **쓰지 않기로** 결론 내리고 캘리브레이션 테이블 역보간으로 바꿨는데, 요약표만 갱신되지
+> 않은 채 남았습니다. 구현된 변환은 다음과 같습니다.
+>
+> ```
+> μ_m = ln(1 + CAGR) / 12
+> σ_m = invertSigmaTable( σ / (1 + CAGR) )   ← df 6 · |z| ≤ 8 고정 테이블의 단조 역보간
+> ```
+>
+> 코드: `src/lib/montecarlo/returns.ts` 의 `toMonthlyParams`,
+> 테이블: `src/lib/montecarlo/sigma-table.ts` (생성기 `scripts/gen-sigma-table.mjs`).
+> 자세한 근거는 이 문서 §2 와 `montecarlo-engine.md` §4 를 보세요.
+
 | 절단 | `\|z\| > 8` 재추출, 재정규화 없음. 표본 σ 오차 −0.32% 허용 | 08-21 |
 | 목표 역산 | 선형 정확해. `c_j = (W*−A_j)/B_j` 의 **p 분위수** | 08-21 |
 | 실행 환경 | 브라우저 Web Worker | 08-21 |
@@ -52,6 +71,13 @@ src/app/goal-probability-calculator/page.tsx
 tests/montecarlo/
   rng.test.ts  returns.test.ts  engine.test.ts  affine.test.ts
 ```
+
+> **정정 (2026-09-16)** — 위 파일 구조는 계획안이고 실제 구현과 이름·위치가 다릅니다.
+> `DcaSimulator.tsx` → `DcaCalculator.tsx`, `src/components/chart/FanChart.tsx` ·
+> `DistributionBar.tsx` → 별도 디렉터리 없이 `DcaCalculator.tsx` 안의 인라인 SVG.
+> `montecarlo/` 아래에는 계획에 없던 `sigma-table.ts`, `validate.ts`, `correlation.ts`,
+> `presets.ts`, `worker-client.ts` 가 있고, FIRE·SoRR 화면과 `src/lib/{dca,goal-probability,
+> fire,sorr}.ts` 가 뒤에 추가됐습니다. 현재 구조는 `montecarlo-engine.md` §1 을 보세요.
 
 **기존 관례를 따르는 부분** — 페이지는 `withPageMetadata(config.metadata, "/경로")`로 메타데이터를 붙이고(어제 고친 배선), `CalculatorJsonLd`를 렌더하며, 설정은 `lib/calculatorPages.ts`에 추가한다. `constants.ts`의 `CALCULATORS`에도 등록해야 허브·전체 목록·사이트맵에 자동으로 들어간다.
 
@@ -236,6 +262,12 @@ export function createRunner(input: SimulationInput): SimulationRunner;
 | 1 | **결정론 축소** | `volatility = 0`에서 폐형식 연금식과 원 단위 일치 (조건은 아래 고정) | 드리프트 정의 오류 |
 | 2 | 분산 보정 | df 6, 10,000경로 표본 σ가 `σ_m`과 오차 2% 이내 | `sqrt((ν−2)/ν)` 누락 (+22.5%로 즉시 실패) |
 | 3 | 변환 지점 | `toMonthlyParams(0.07, 0.15)` → `σ_log ≈ 0.1395` | 단순↔로그 기준 혼동 |
+
+> **정정 (2026-09-16)** — 3번의 `0.1395` 는 위에서 쓰지 않기로 한 로그정규 폐형식의 값입니다.
+> 캘리브레이션 기준값은 `toMonthlyParams(0.07, 0.15).sigmaM ≈ 0.039978`(연환산 약 `0.13849`)
+> 이고, 실제 테스트(`tests/montecarlo/returns.test.ts`)는 이 값을 기준으로 작성돼 있습니다.
+> 두 값의 비 `1.0073` 은 이 문서 §2 가 적어 둔 "로그정규식 사용 시 +0.76%" 오차와 일치합니다.
+
 | 4 | 해석적 대조 | 중앙값이 `P0·exp(μ_log·T)`와 오차 1% 이내 | 루프 순서·복리 오류 |
 | 5 | 시드 재현 | 같은 시드 두 번 = 완전 동일 | RNG 상태 누수 |
 | 6 | **역산 양방향** | `p = 0.9`와 `p = 0.1` 모두 검증 | **분위수 방향 반전** |
