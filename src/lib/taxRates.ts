@@ -88,3 +88,74 @@ export const FINANCIAL_INCOME_THRESHOLD = {
     asOf: TAX_REVIEWED_AT,
     sources: [TAX_SOURCES.nts],
 } as const;
+
+/* ============================================================
+   기준 데이터 레지스트리와 변경 감지
+   ------------------------------------------------------------
+   인컴랩 아키텍처 §3 Reference Foundation:
+     Reference 는 SSOT 이고, Knowledge 문서는 Reference 가 바뀌면
+     "검토 트리거"를 받는다. Reference 변경이 곧 문서 자동 수정은 아니다.
+
+   그래서 이 파일은 값을 제공하는 동시에, 값이 바뀌었는지 판별할 수 있는
+   지문(fingerprint)을 제공한다. 가이드는 자신이 참조한 기준과 그때의 지문을
+   기록해 두고, 지문이 달라지면 자동으로 재검토 대상(Pending Review)이 된다.
+
+   지문이 바뀌어도 검수 상태가 자동으로 Verified 로 올라가는 일은 없다.
+   내려가는 방향(Verified → Pending Review)으로만 동작한다.
+   ============================================================ */
+
+/** 가이드가 참조할 수 있는 기준 데이터 목록. */
+export const TAX_BASIS = {
+    overseasStockTax: OVERSEAS_STOCK_TAX,
+    domesticDividendTax: DOMESTIC_DIVIDEND_TAX,
+    usDividendWithholding: US_DIVIDEND_WITHHOLDING,
+    financialIncomeThreshold: FINANCIAL_INCOME_THRESHOLD,
+} as const;
+
+export type TaxBasisKey = keyof typeof TAX_BASIS;
+
+/**
+ * 지문에 포함할 필드.
+ * 숫자·표기·적용시점처럼 "내용이 달라지면 문서를 다시 봐야 하는" 값만 넣는다.
+ * sources 배열이나 설명 문구(note) 변경은 재검토 트리거로 보지 않는다.
+ */
+const BASIS_FINGERPRINT_FIELDS = [
+    "rate",
+    "ratePercent",
+    "rateDisplay",
+    "rateBreakdown",
+    "basicDeduction",
+    "basicDeductionDisplay",
+    "filingPeriod",
+    "amount",
+    "amountDisplay",
+    "asOf",
+] as const;
+
+/** FNV-1a 32bit. 암호용이 아니라 변경 감지용이다. */
+function fnv1a(input: string): string {
+    let hash = 0x811c9dc5;
+    for (let i = 0; i < input.length; i++) {
+        hash ^= input.charCodeAt(i);
+        hash = Math.imul(hash, 0x01000193) >>> 0;
+    }
+    return hash.toString(16).padStart(8, "0");
+}
+
+/** 기준 데이터의 현재 지문. 값이 하나라도 바뀌면 달라진다. */
+export function taxBasisFingerprint(key: TaxBasisKey): string {
+    const basis = TAX_BASIS[key] as Record<string, unknown>;
+    const payload = BASIS_FINGERPRINT_FIELDS.filter((f) => f in basis)
+        .map((f) => `${f}=${String(basis[f])}`)
+        .join("|");
+    return fnv1a(`${key}:${payload}`);
+}
+
+/** 전 기준의 현재 지문. 디버깅·검사 출력용. */
+export function allTaxBasisFingerprints(): Record<TaxBasisKey, string> {
+    const out = {} as Record<TaxBasisKey, string>;
+    for (const key of Object.keys(TAX_BASIS) as TaxBasisKey[]) {
+        out[key] = taxBasisFingerprint(key);
+    }
+    return out;
+}

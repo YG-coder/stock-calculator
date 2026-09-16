@@ -1,7 +1,11 @@
 "use client";
 
 import { useMemo, useState, type ChangeEvent } from "react";
-import { DOMESTIC_DIVIDEND_TAX, US_DIVIDEND_WITHHOLDING } from "@/lib/taxRates";
+import {
+    DOMESTIC_DIVIDEND_TAX,
+    FINANCIAL_INCOME_THRESHOLD,
+    US_DIVIDEND_WITHHOLDING,
+} from "@/lib/taxRates";
 import {
     CalculatorLayout,
     CalculatorCard,
@@ -14,9 +18,8 @@ import CurrencyToggle from "@/components/calculator/CurrencyToggle";
 
 type Currency = "KRW" | "USD";
 
-// 국내 배당소득세(15.4%, 소득세 14% + 지방소득세 1.4%)와 달리
-// 미국 배당은 한미 조세조약에 따른 현지 원천징수세율(15%)을 기본값으로 사용합니다.
-// (사이트 내 "미국주식 배당 계산기" 안내 기준과 동일)
+// 세율 기본값·안내 문구는 모두 taxRates.ts 를 단일 소스로 삼는다.
+// 국내 배당은 원천징수세율, 미국 배당은 한미 조세조약에 따른 현지 원천징수세율을 쓴다.
 const DEFAULT_TAX_RATE: Record<Currency, string> = {
     KRW: String(DOMESTIC_DIVIDEND_TAX.ratePercent),
     USD: String(US_DIVIDEND_WITHHOLDING.ratePercent),
@@ -168,8 +171,9 @@ export default function DividendCalculator() {
 
                 <p className="text-sm leading-relaxed text-slate-500">
                     KRW / USD 토글은 환율 자동 변환 기능이 아니라 계산 기준 통화를 선택하는 기능입니다.
-                    국내주식은 원화, 미국주식은 달러 기준으로 입력하면 됩니다. 세율 입력 예시는 국내
-                    15.4%, 미국 15%(현지 원천징수 기준)이며, 실제 적용할 세율을 직접 입력하세요.
+                    국내주식은 원화, 미국주식은 달러 기준으로 입력하면 됩니다. 세율 입력 예시는 국내{" "}
+                    {DOMESTIC_DIVIDEND_TAX.rateDisplay}, 미국 {US_DIVIDEND_WITHHOLDING.rateDisplay}(현지
+                    원천징수 기준)이며, 실제 적용할 세율을 직접 입력하세요.
                 </p>
             </CalculatorCard>
 
@@ -218,8 +222,8 @@ export default function DividendCalculator() {
                 </div>
 
                 <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                    연간 이자·배당 금융소득 합계가 2,000만원을 초과하면 금융소득종합과세 대상이 될 수
-                    있으며 실제 세금은 달라질 수 있습니다.
+                    연간 이자·배당 금융소득 합계가 {FINANCIAL_INCOME_THRESHOLD.amountDisplay}을 초과하면
+                    금융소득종합과세 대상이 될 수 있으며 실제 세금은 달라질 수 있습니다.
                 </div>
             </ResultCard>
         </CalculatorLayout>

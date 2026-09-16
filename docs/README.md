@@ -24,7 +24,13 @@
 | 입력 허용 범위 | `src/lib/montecarlo/validate.ts` (`LIMITS`) |
 | 연 → 월 변환 | `src/lib/montecarlo/returns.ts` (`toMonthlyParams`) |
 | 공개 계산기 목록·라우트 | `src/lib/constants.ts` (`CALCULATORS`) |
-| 세율·기준일 | `src/lib/taxRates.ts` |
+| 세율·공제액·기준일 (단일 소스) | `src/lib/taxRates.ts` |
+| 가이드 검수 상태·출처 확인 기록 | `src/data/guidePages.ts` 의 `review`, 타입은 `src/lib/contentReview.ts` |
+| 발행·색인 검사 규칙 | `src/lib/contentGate.ts` |
+
+가이드 검수 3단계와 색인 금지 운영 방법은 저장소 [`../README.md`](../README.md) 의
+"콘텐츠 검수와 색인" 절에 있습니다. 공통 기준 원본(`Incomelab-Architecture.md`)은
+이 저장소에 복사하지 않습니다.
 
 ---
 

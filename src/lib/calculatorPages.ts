@@ -1,3 +1,4 @@
+import { OVERSEAS_STOCK_TAX, US_DIVIDEND_WITHHOLDING } from "@/lib/taxRates";
 import type { Metadata } from "next";
 
 export type RelatedLink = {
@@ -101,7 +102,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
         metadata: {
             title: "해외주식 세금 계산기 | 양도세 계산",
             description:
-                "해외주식 매매 수익에 대한 양도소득세와 세후 수익을 계산하는 해외주식 세금 계산기입니다. 기본공제 250만원과 세율 22%를 반영해 예상 세금을 확인할 수 있습니다.",
+                `해외주식 매매 수익에 대한 양도소득세와 세후 수익을 계산하는 해외주식 세금 계산기입니다. 기본공제 ${OVERSEAS_STOCK_TAX.basicDeductionDisplay}과 세율 ${OVERSEAS_STOCK_TAX.rateDisplay}를 반영해 예상 세금을 확인할 수 있습니다.`,
             keywords: [
                 "해외주식 세금 계산기",
                 "해외주식 양도세 계산기",
@@ -124,16 +125,16 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
         articleIntro:
             "해외주식 매매 시 발생하는 양도차익에 대해 예상 세금과 실제 세후 수익을 계산하는 도구입니다.",
         articleBody:
-            "해외주식은 국내주식과 달리 양도소득세 계산이 중요합니다. 기본공제 250만원을 반영한 뒤 과세 대상 수익에 22% 세율을 적용하면 실제로 얼마가 남는지 확인할 수 있습니다.",
+            `해외주식은 국내주식과 달리 양도소득세 계산이 중요합니다. 기본공제 ${OVERSEAS_STOCK_TAX.basicDeductionDisplay}을 반영한 뒤 과세 대상 수익에 ${OVERSEAS_STOCK_TAX.rateDisplay} 세율을 적용하면 실제로 얼마가 남는지 확인할 수 있습니다.`,
         formulaTitle: "해외주식 세금 계산 기본 개념",
-        formula: "과세 대상 수익 = 총 수익 - 기본공제 / 세금 = 과세 대상 수익 × 22%",
+        formula: `과세 대상 수익 = 총 수익 - 기본공제 / 세금 = 과세 대상 수익 × ${OVERSEAS_STOCK_TAX.rateDisplay}`,
         formulaDescription:
-            "해외주식은 연간 기본공제 250만원을 초과한 수익에 대해 일반적으로 22% 세율을 적용해 예상 세금을 계산합니다.",
+            `해외주식은 연간 기본공제 ${OVERSEAS_STOCK_TAX.basicDeductionDisplay}을 초과한 수익에 대해 일반적으로 ${OVERSEAS_STOCK_TAX.rateDisplay} 세율을 적용해 예상 세금을 계산합니다.`,
         faqs: [
             {
                 question: "해외주식 양도소득세는 얼마인가요?",
                 answer:
-                    "일반적으로 기본공제 250만원을 초과한 양도차익에 대해 22% 세율을 적용해 계산합니다.",
+                    `일반적으로 기본공제 ${OVERSEAS_STOCK_TAX.basicDeductionDisplay}을 초과한 양도차익에 대해 ${OVERSEAS_STOCK_TAX.rateDisplay} 세율을 적용해 계산합니다.`,
             },
             {
                 question: "환차익도 과세 대상인가요?",
@@ -771,7 +772,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
             "미국주식 배당은 보통 원천징수세가 차감되므로, 세전 배당금보다 실제 실수령 배당금이 더 적을 수 있습니다.",
         exampleTitle: "미국주식 배당 계산 예시",
         exampleBody:
-            "예를 들어 연간 주당 배당금이 2달러인 미국주식을 100주 보유하고 있다면 세전 배당금은 연 200달러입니다. 원천징수세율이 15%라면 세후 배당금은 170달러가 됩니다. 여기에 환율 1,350원을 적용하면 연간 세후 배당금은 약 229,500원 수준으로 계산할 수 있습니다.",
+            `예를 들어 연간 주당 배당금이 2달러인 미국주식을 100주 보유하고 있다면 세전 배당금은 연 200달러입니다. 원천징수세율이 ${US_DIVIDEND_WITHHOLDING.rateDisplay}라면 세후 배당금은 ${200 * (1 - US_DIVIDEND_WITHHOLDING.rate)}달러가 됩니다. 여기에 환율 1,350원을 적용하면 연간 세후 배당금은 약 ${new Intl.NumberFormat("ko-KR").format(200 * (1 - US_DIVIDEND_WITHHOLDING.rate) * 1350)}원 수준으로 계산할 수 있습니다.`,
         faqs: [
             {
                 question: "세전 배당금과 세후 배당금은 왜 다른가요?",

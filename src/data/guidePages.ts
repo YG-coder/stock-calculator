@@ -17,15 +17,45 @@
  *  - 각 글은 Disclaimer로 마무리
  */
 
+import {
+    DOMESTIC_DIVIDEND_TAX,
+    FINANCIAL_INCOME_THRESHOLD,
+    OVERSEAS_STOCK_TAX,
+} from "@/lib/taxRates";
+import {
+    effectiveReviewStatus,
+    isIndexableStatus,
+    type ReviewRecord,
+} from "@/lib/contentReview";
+
 export type GuideCluster =
     | "투자 기초"
     | "리스크 관리"
     | "세금"
     | "계산기 활용";
 
+/**
+ * 근거가 확정되지 않아 **공개하지 않는** 부분의 표시.
+ *
+ * 문서 전체를 Provisional 로 내려 색인에서 빼는 대신, 근거가 확정되지 않은 부분만
+ * 발행에서 제외한다. 남는 본문은 근거가 기록된 주장만 담게 되므로 공개를 유지할 수 있다.
+ * "확인 전 정보"라는 문구를 붙여 그대로 공개하는 방식은 쓰지 않는다.
+ */
+export type ProvisionalMark = {
+    /** 왜 공개하지 않는지. 검토 기록과 화면에 그대로 노출된다 */
+    reason: string;
+};
+
 export type GuideSection = {
     heading: string;
     paragraphs: string[];
+    provisional?: ProvisionalMark;
+};
+
+export type GuideFaq = {
+    question: string;
+    answer: string;
+    provisional?: ProvisionalMark;
 };
 
 export type GuideRelatedCalculator = {
@@ -47,12 +77,36 @@ export type GuidePageConfig = {
     /** 헤더 아래 도입 문단 */
     intro: string;
     sections: GuideSection[];
-    faqs?: { question: string; answer: string }[];
+    faqs?: GuideFaq[];
     /** 가이드 → 계산기 (CTA) */
     relatedCalculators?: GuideRelatedCalculator[];
     /** 가이드 ↔ 같은 클러스터 가이드 (slug 배열) */
     relatedGuides?: string[];
-    /** 최종 작성 완료 여부 — false면 목록/사이트맵에서 제외 가능 */
+    /**
+     * SOP-001 상단 요약. "지금 무엇을 해야 하는가"를 먼저 제시한다.
+     * 모든 글에 필요하지는 않다 — 행동이 따르는 문서에만 채운다.
+     */
+    actionSummary?: {
+        conclusion: string;
+        doNow: string[];
+        /** 조건·기준 표 */
+        conditions?: { label: string; value: string }[];
+    };
+    /**
+     * Decision Handoff. 계산이나 판단 뒤에 이어지는 실제 행동.
+     * 맥락이 있을 때만 연결한다 — 계산기를 붙이려고 문제를 만들지 않는다 (아키텍처 §8).
+     */
+    nextSteps?: {
+        heading: string;
+        items: string[];
+        note?: string;
+    };
+    /**
+     * 검수 상태·근거 기록. 발행 여부와 별개 축이다.
+     * @see src/lib/contentReview.ts
+     */
+    review: ReviewRecord;
+    /** 최종 작성 완료 여부 — false면 라우트 자체가 404 */
     published: boolean;
 };
 
@@ -62,6 +116,10 @@ export const GUIDE_CLUSTERS: { name: GuideCluster; desc: string }[] = [
     { name: "세금", desc: "투자 수익에 붙는 세금의 기초 이해" },
     { name: "계산기 활용", desc: "각 계산기를 실제로 어떻게 쓰는지" },
 ];
+
+/** 이번 검토에서 실제로 대조한 법제처 생활법령 페이지 */
+const EASYLAW_URL =
+    "https://easylaw.go.kr/CSP/CnpClsMain.laf?popMenu=ov&csmSeq=1701&ccfNo=2&cciNo=3&cnpClsNo=1";
 
 export const guidePages: Record<string, GuidePageConfig> = {
     /* =========================================================
@@ -139,6 +197,14 @@ export const guidePages: Record<string, GuidePageConfig> = {
             },
         ],
         relatedGuides: ["compound-investing"],
+        review: {
+            status: "Pending Review",
+            statusReason:
+                "2026-09-16 검수 체계를 도입하면서 상태를 부여했다. 이번 적용 범위(해외주식 양도세·배당소득세)에 포함되지 않아 근거를 재검토하지 않았으므로 Verified 로 올리지 않는다. 기존 공개 상태는 그대로 유지한다.",
+            updatedAt: "2026-09-16",
+            sourceChecks: [],
+            unverifiedScope: ["문서 전체 — 이번 검토 범위 밖"],
+        },
         published: true,
     },
 
@@ -201,6 +267,14 @@ export const guidePages: Record<string, GuidePageConfig> = {
             },
         ],
         relatedGuides: ["average-price-meaning"],
+        review: {
+            status: "Pending Review",
+            statusReason:
+                "2026-09-16 검수 체계를 도입하면서 상태를 부여했다. 이번 적용 범위(해외주식 양도세·배당소득세)에 포함되지 않아 근거를 재검토하지 않았으므로 Verified 로 올리지 않는다. 기존 공개 상태는 그대로 유지한다.",
+            updatedAt: "2026-09-16",
+            sourceChecks: [],
+            unverifiedScope: ["문서 전체 — 이번 검토 범위 밖"],
+        },
         published: true,
     },
 
@@ -266,6 +340,14 @@ export const guidePages: Record<string, GuidePageConfig> = {
             },
         ],
         relatedGuides: ["when-not-to-average-down"],
+        review: {
+            status: "Pending Review",
+            statusReason:
+                "2026-09-16 검수 체계를 도입하면서 상태를 부여했다. 이번 적용 범위(해외주식 양도세·배당소득세)에 포함되지 않아 근거를 재검토하지 않았으므로 Verified 로 올리지 않는다. 기존 공개 상태는 그대로 유지한다.",
+            updatedAt: "2026-09-16",
+            sourceChecks: [],
+            unverifiedScope: ["문서 전체 — 이번 검토 범위 밖"],
+        },
         published: true,
     },
 
@@ -324,6 +406,14 @@ export const guidePages: Record<string, GuidePageConfig> = {
             },
         ],
         relatedGuides: ["stop-loss-ratio"],
+        review: {
+            status: "Pending Review",
+            statusReason:
+                "2026-09-16 검수 체계를 도입하면서 상태를 부여했다. 이번 적용 범위(해외주식 양도세·배당소득세)에 포함되지 않아 근거를 재검토하지 않았으므로 Verified 로 올리지 않는다. 기존 공개 상태는 그대로 유지한다.",
+            updatedAt: "2026-09-16",
+            sourceChecks: [],
+            unverifiedScope: ["문서 전체 — 이번 검토 범위 밖"],
+        },
         published: true,
     },
 
@@ -346,7 +436,7 @@ export const guidePages: Record<string, GuidePageConfig> = {
                 heading: "해외주식 양도세의 큰 틀",
                 paragraphs: [
                     "국내주식은 대부분의 일반 투자자에게는 양도세가 부과되지 않지만, 해외주식은 일반 투자자라도 매매 차익이 일정 기준을 넘으면 양도소득세 신고·납부 대상이 됩니다. 즉 국내주식과 해외주식은 과세 방식 자체가 다릅니다.",
-                    "현재 기준으로는 1년간(1월 1일~12월 31일) 실현한 해외주식 양도차익을 합산해, 연 250만 원의 기본공제를 넘는 부분에 세금이 부과됩니다. 초과분에 적용되는 세율은 지방소득세를 포함해 22% 수준입니다. 다만 이 수치는 제도 변경 가능성이 있으므로 신고 시점의 최신 기준을 확인하는 것이 안전합니다.",
+                    `현재 기준으로는 1년간(1월 1일~12월 31일) 실현한 해외주식 양도차익을 합산해, 연 ${OVERSEAS_STOCK_TAX.basicDeductionDisplay}의 기본공제를 넘는 부분에 세금이 부과됩니다. 초과분에 적용되는 세율은 ${OVERSEAS_STOCK_TAX.rateDisplay}(${OVERSEAS_STOCK_TAX.rateBreakdown})입니다. 이 수치는 사이트 전체가 같은 기준 데이터를 참조하며, 제도 변경 가능성이 있으므로 신고 시점의 최신 기준을 확인하는 것이 안전합니다.`,
                 ],
             },
             {
@@ -366,7 +456,7 @@ export const guidePages: Record<string, GuidePageConfig> = {
         ],
         faqs: [
             {
-                question: "이익이 250만 원을 넘지 않으면 신고 안 해도 되나요?",
+                question: `이익이 ${OVERSEAS_STOCK_TAX.basicDeductionDisplay}을 넘지 않으면 신고 안 해도 되나요?`,
                 answer:
                     "기본공제 범위 안이라 납부할 세액이 없는 경우라도, 신고 의무 여부는 상황에 따라 다를 수 있습니다. 안전하게는 본인의 거래 내역을 기준으로 홈택스 안내나 증권사 자료를 확인하는 것이 좋습니다. 이 글은 일반적인 구조 안내이며 개별 신고 판단을 대신하지 않습니다.",
             },
@@ -389,6 +479,59 @@ export const guidePages: Record<string, GuidePageConfig> = {
             },
         ],
         relatedGuides: ["dividend-tax-basic"],
+        actionSummary: {
+            conclusion:
+                "한 해 동안 해외주식을 팔아 남은 이익이 기본공제를 넘으면, 그 이듬해 5월에 직접 신고·납부해야 합니다. 증권사가 대신 떼어 주지 않습니다.",
+            doNow: [
+                "올해 매도한 해외주식이 있는지 확인합니다. 팔지 않았다면 이번 해에는 신고 대상이 아닙니다.",
+                "거래한 증권사를 모두 적습니다. 여러 곳을 썼다면 전부 합산해야 합니다.",
+                "각 증권사에서 '해외주식 양도소득 내역'을 내려받아 연간 순손익을 확인합니다.",
+                "순이익이 기본공제를 넘으면 계산기로 예상 세액을 확인하고, 신고 준비물을 챙깁니다.",
+            ],
+            conditions: [
+                { label: "누가", value: "해외주식을 매도해 연간 순이익이 발생한 거주자" },
+                { label: "언제", value: "양도한 다음 해 5월 (확정신고)" },
+                { label: "어디에", value: "홈택스 또는 관할 세무서" },
+                { label: "합산 단위", value: "그 해 전체 해외주식 손익을 모두 합산 (증권사별로 나누지 않음)" },
+                { label: "신고 대상 아님", value: "그 해에 해외주식을 한 주도 팔지 않은 경우" },
+            ],
+        },
+        nextSteps: {
+            heading: "계산했다면, 신고 준비는 이렇게",
+            items: [
+                "증권사별 해외주식 양도소득 내역서를 모두 확보합니다 (증권사 HTS·MTS 또는 고객센터).",
+                "같은 해 여러 증권사 거래가 있으면 합산한 뒤 기본공제를 한 번만 적용합니다.",
+                "매매 수수료 등 필요경비를 확인합니다. 이 계산기는 필요경비를 반영하지 않습니다.",
+                "홈택스 양도소득세 확정신고 메뉴에서 신고서를 작성합니다. 증권사 신고 대행 서비스를 제공하는 경우 이를 이용할 수도 있습니다.",
+                "신고 후 납부까지 마쳤는지, 지방소득세가 별도로 처리되는지 확인합니다.",
+            ],
+            note:
+                "신고 기한과 화면 경로는 국세청·홈택스 안내를 따릅니다. 이 목록은 준비물 체크용이며 신고 대행이나 세무 자문이 아닙니다.",
+        },
+        review: {
+            status: "Pending Review",
+            statusReason:
+                "2026-09-16 에 해외주식 양도 과세 여부·국세 세율·확정신고 기한을 법제처 자료의 해외주식 문답으로 직접 대조했다. 기본공제의 국외자산 적용 근거와 지방소득세 가산분·환율 기준은 재확인하지 못해 문서 전체 검토로 볼 수 없으므로 Verified 로 올리지 않는다. 근거가 확정되지 않은 주장은 없으므로 Provisional 도 아니다.",
+            updatedAt: "2026-09-16",
+            sourceChecks: [
+                {
+                    label: "법제처 찾기쉬운 생활법령정보",
+                    url: EASYLAW_URL,
+                    document:
+                        "주식투자자 > 주식거래에 따른 세금 납부하기 > 양도소득세·증권거래세 및 배당소득세 (해외주식 매매 문답)",
+                    checkedAt: "2026-09-16",
+                    scope:
+                        "해외주식 문답에서 (1) 해외 증권시장 상장주식 등은 대주주 여부와 무관하게 양도소득세 대상이라는 서술, (2) 국세 세율이 중소기업 주식 10% · 그 밖의 주식 20% 라는 서술, (3) 예정신고가 아니라 다음 해 5월 1일~31일 확정신고라는 서술을 확인했다. 이 페이지의 기본공제 연 250만 원 표기는 국내주식 양도소득 설명에 있고 국외자산에도 적용되는지는 명시하지 않는다. 지방소득세 가산분은 이 자료에 없다.",
+                },
+            ],
+            unverifiedScope: [
+                "지방소득세 2% 가산으로 합계 22%가 된다는 부분 — 지방세법 근거를 확인하지 못했습니다. 화면에 쓰는 22% 는 2026-08-21 기준 데이터를 그대로 유지한 값입니다.",
+                "기본공제 연 250만 원이 해외주식에도 적용된다는 부분 — 2026-09-16 에 국외자산 기준으로 재확인하지 못했습니다. 근거가 없다는 뜻이 아니라 이번에 확인하지 못했다는 뜻이며, 기존 2026-08-21 기준을 유지했습니다.",
+                "원화 환산에 결제일 기준환율을 적용한다는 부분 — 공식 근거를 확인하지 못했습니다.",
+                "필요경비 인정 범위와 국내주식 과세대상 손익과의 통산 — 이번 검토 범위 밖입니다.",
+            ],
+            basis: [{ key: "overseasStockTax", fingerprint: "9d401529" }],
+        },
         published: true,
     },
 
@@ -407,15 +550,15 @@ export const guidePages: Record<string, GuidePageConfig> = {
             {
                 heading: "배당소득세의 기본: 원천징수",
                 paragraphs: [
-                    "배당금은 보통 지급 시점에 일정 세율로 먼저 떼인 뒤(원천징수) 입금됩니다. 즉 기업이 발표한 명목 배당금과 계좌에 실제로 들어오는 금액은 다를 수 있습니다. 현재 일반적인 원천징수 세율은 지방소득세를 포함해 15.4%(소득세 14% + 지방소득세 1.4%) 수준입니다.",
+                    `배당금은 보통 지급 시점에 일정 세율로 먼저 떼인 뒤(원천징수) 입금됩니다. 즉 기업이 발표한 명목 배당금과 계좌에 실제로 들어오는 금액은 다를 수 있습니다. 현재 일반적인 원천징수 세율은 ${DOMESTIC_DIVIDEND_TAX.rateDisplay}(${DOMESTIC_DIVIDEND_TAX.rateBreakdown})입니다.`,
                     "연간 금융소득(이자소득과 배당소득의 합)이 일정 기준 이하라면 이 원천징수만으로 세금 정산이 끝나, 따로 종합소득세 신고를 하지 않아도 되는 경우가 많습니다. 대부분의 개인 투자자는 이 범위에 해당합니다.",
                 ],
             },
             {
                 heading: "금융소득이 커지면 달라지는 부분",
                 paragraphs: [
-                    "이자와 배당을 합한 연간 금융소득이 2,000만 원을 넘으면, 초과분은 다른 종합소득과 합산해 누진세율로 과세하는 '금융소득종합과세' 대상이 될 수 있습니다. 이 경우 다음 해 5월에 종합소득세를 신고해야 할 수 있습니다.",
-                    "다만 종합과세가 항상 세금을 크게 늘리는 것은 아닙니다. 본인의 다른 소득 규모에 따라 추가 세부담이 크지 않을 수도 있습니다. 또한 2026년부터 요건을 갖춘 고배당기업 배당소득을 종합소득 과세표준에 합산하지 않는 분리과세 특례가 시행되는 등 제도가 변화하고 있어, 본인에게 어떤 기준이 적용되는지는 최신 자료로 확인할 필요가 있습니다.",
+                    `이자와 배당을 합한 연간 금융소득이 ${FINANCIAL_INCOME_THRESHOLD.amountDisplay}을 넘으면, 초과분은 다른 종합소득과 합산해 누진세율로 과세하는 '금융소득종합과세' 대상이 될 수 있습니다. 이 경우 다음 해 5월에 종합소득세를 신고해야 할 수 있습니다.`,
+                    "다만 종합과세가 항상 세금을 크게 늘리는 것은 아닙니다. 본인의 다른 소득 규모에 따라 추가 세부담이 크지 않을 수도 있습니다. 또한 고배당기업 주식의 배당소득에 대한 과세특례(조세특례제한법 제104조의27)가 2025년 12월 23일 개정되어 2026년 1월 1일 시행됐습니다. 다만 적용 세율 구간과 대상 기업 요건은 이 문서에서 공식 근거로 확인하지 못해 아래 검토 기록에 남겨 두었습니다. 본인에게 어떤 기준이 적용되는지는 국세청 안내와 해당 기업 공시로 확인하세요.",
                 ],
             },
             {
@@ -426,6 +569,10 @@ export const guidePages: Record<string, GuidePageConfig> = {
                     "대상은 직전 사업연도(2024사업연도) 대비 배당이 줄지 않은 상장법인 중 배당성향이 40% 이상이거나, 배당성향이 25% 이상이면서 전년보다 배당금액을 10% 이상 늘린 기업입니다. 따라서 배당을 주는 기업이라고 해서 모두 해당하지는 않으며, 보유 종목이 요건을 충족하는지는 해당 기업의 공시로 확인해야 합니다.",
                     "이 특례는 요건을 충족한 국내 고배당 상장법인의 주식을 직접 보유해 받은 배당소득을 대상으로 합니다. ETF·펀드·리츠 등의 분배금과 해외주식 배당에는 적용되지 않습니다. 실제 적용 여부는 해당 기업의 고배당기업 공시와 최신 국세청 안내를 확인하세요.",
                 ],
+                provisional: {
+                    reason:
+                        "세율 구간(14·20·25·30%), 배당성향 요건, 한시 적용 종료 연도, 적용 자산 범위를 2026-09-16 검토에서 공식 자료로 확인하지 못했습니다. 근거가 확정되기 전까지 공개하지 않습니다. (특례의 존재와 시행일은 금융위원회 자료로 확인했고, 본문 다른 절에 남아 있습니다.)",
+                },
             },
             {
                 heading: "해외주식 배당은 조금 다르다",
@@ -450,6 +597,10 @@ export const guidePages: Record<string, GuidePageConfig> = {
                 question: "세율이 최근에 바뀐다고 하던데요?",
                 answer:
                     "2026년부터 요건을 충족한 고배당기업의 배당소득은 종합소득 과세표준에 합산하지 않고 분리과세됩니다. 국세 기준 14%·20%·25%·30% 네 구간이고 지방소득세가 별도로 붙으며, 2028년까지 한시 운영됩니다. 국내 상장법인 주식을 직접 보유해 받은 배당이 대상이라 ETF·펀드·리츠 분배금과 해외주식 배당에는 적용되지 않습니다. 보유 종목이 요건을 충족하는지는 해당 기업의 공시와 국세청 안내로 확인하세요.",
+                provisional: {
+                    reason:
+                        "본문의 고배당기업 분리과세 절과 같은 수치를 반복합니다. 해당 수치의 근거를 확인하지 못해 함께 공개를 보류합니다.",
+                },
             },
         ],
         relatedCalculators: [
@@ -465,6 +616,69 @@ export const guidePages: Record<string, GuidePageConfig> = {
             },
         ],
         relatedGuides: ["us-stock-tax-basic"],
+        actionSummary: {
+            conclusion:
+                "국내 배당은 지급될 때 세금이 먼저 떼이고 입금됩니다. 대부분의 투자자는 이것으로 끝나고, 연간 금융소득이 기준을 넘는 경우에만 다음 해 5월에 추가 신고가 생깁니다.",
+            doNow: [
+                "올해 받은 이자·배당을 모두 더해 연간 금융소득 합계를 확인합니다.",
+                "합계가 종합과세 기준 아래면 별도 신고 없이 원천징수로 정산이 끝나는 경우가 많습니다.",
+                "기준을 넘으면 다음 해 5월 종합소득세 신고 대상인지 확인합니다.",
+                "해외주식 배당이 있으면 현지 원천징수와 국내 정산이 다르므로 따로 확인합니다.",
+            ],
+            conditions: [
+                { label: "국내 배당", value: "지급 시 원천징수 (세율은 아래 계산 기준 참조)" },
+                { label: "미국 배당", value: "미국에서 먼저 원천징수된 뒤 지급" },
+                { label: "추가 신고", value: "연간 금융소득이 종합과세 기준을 넘는 경우" },
+                { label: "확인 자료", value: "증권사 배당 내역, 국세청 금융소득 조회" },
+            ],
+        },
+        nextSteps: {
+            heading: "종합과세 대상인지 확인하려면",
+            items: [
+                "증권사·은행에서 연간 이자·배당 내역을 모두 모읍니다.",
+                "원천징수된 세액이 얼마인지 함께 확인합니다.",
+                "합계가 기준을 넘으면 다음 해 5월 종합소득세 신고 대상 여부를 홈택스에서 확인합니다.",
+                "해외주식 배당이 있으면 외국납부세액공제 적용 여부를 함께 확인합니다.",
+            ],
+            note:
+                "종합과세 해당 여부와 실제 세액은 본인의 다른 소득에 따라 달라집니다. 이 목록은 확인 순서이며 세무 자문이 아닙니다.",
+        },
+        review: {
+            status: "Pending Review",
+            statusReason:
+                "2026-09-16 에 국내 배당 원천징수 국세 세율과 고배당기업 과세특례의 근거 조문·시행일을 공식 자료로 대조했다. 지방소득세 가산분·종합과세 기준금액·조세조약 세율은 재확인하지 못했고, 특례의 세율 구간·요건은 근거를 확인하지 못해 해당 본문과 FAQ 를 공개에서 보류했다. 남은 본문은 근거가 기록된 주장만 담고 있어 문서 전체를 색인에서 빼지 않는다.",
+            updatedAt: "2026-09-16",
+            sourceChecks: [
+                {
+                    label: "법제처 찾기쉬운 생활법령정보",
+                    url: EASYLAW_URL,
+                    document:
+                        "주식투자자 > 주식거래에 따른 세금 납부하기 > 양도소득세·증권거래세 및 배당소득세",
+                    checkedAt: "2026-09-16",
+                    scope:
+                        "「소득세법」 제129조제1항제2호나목을 인용한 배당소득 원천징수세율 14%(국세) 표기만 확인했다. 지방소득세 부가분과 금융소득종합과세 기준금액은 이 자료에 없다.",
+                },
+                {
+                    label: "금융위원회",
+                    url: "https://www.fsc.go.kr/no010101/86322",
+                    document: "배당소득 과세특례 대상기업의 기업가치 제고계획 공시의무 도입",
+                    checkedAt: "2026-09-16",
+                    scope:
+                        "고배당기업 배당소득 과세특례의 근거가 「조세특례제한법」 제104조의27 이고, 2025년 12월 23일 개정되어 2026년 1월 1일 시행된다는 서술과 특례요건 공시의무 도입을 확인했다. 적용 세율 구간·배당성향 요건·한시 종료 연도는 이 자료에 없다.",
+                },
+            ],
+            unverifiedScope: [
+                "지방소득세 1.4% 가산으로 합계 15.4%가 된다는 부분 — 이번에 재확인하지 못했습니다. 화면에 쓰는 15.4% 는 2026-08-21 기준 데이터를 그대로 유지한 값입니다.",
+                "금융소득종합과세 기준금액 2,000만 원 — 이번에 재확인하지 못했습니다. 기존 기준을 유지했습니다.",
+                "미국 배당 현지 원천징수 15%(한미 조세조약) — 조약 원문을 확인하지 못했습니다.",
+                "고배당기업 과세특례의 세율 구간·배당성향 요건·한시 종료 연도·적용 자산 범위 — 근거를 확인하지 못했습니다. 이 부분은 문구로 표시만 하지 않고 본문 1개 절과 FAQ 1개를 공개에서 보류했습니다.",
+            ],
+            basis: [
+                { key: "domesticDividendTax", fingerprint: "ca3901a5" },
+                { key: "usDividendWithholding", fingerprint: "d778678c" },
+                { key: "financialIncomeThreshold", fingerprint: "c78e1055" },
+            ],
+        },
         published: true,
     },
 
@@ -530,23 +744,74 @@ export const guidePages: Record<string, GuidePageConfig> = {
             },
         ],
         relatedGuides: ["average-price-meaning"],
+        review: {
+            status: "Pending Review",
+            statusReason:
+                "2026-09-16 검수 체계를 도입하면서 상태를 부여했다. 이번 적용 범위(해외주식 양도세·배당소득세)에 포함되지 않아 근거를 재검토하지 않았으므로 Verified 로 올리지 않는다. 기존 공개 상태는 그대로 유지한다.",
+            updatedAt: "2026-09-16",
+            sourceChecks: [],
+            unverifiedScope: ["문서 전체 — 이번 검토 범위 밖"],
+        },
         published: true,
     },
 };
 
-/** 발행된 가이드만 (목록/사이트맵용) */
+/** 실제로 공개되는 본문 절. 근거 미확정으로 보류한 절은 제외한다. */
+export function visibleSections(guide: GuidePageConfig): GuideSection[] {
+    return guide.sections.filter((s) => !s.provisional);
+}
+
+/** 실제로 공개되는 FAQ. */
+export function visibleFaqs(guide: GuidePageConfig): GuideFaq[] {
+    return (guide.faqs ?? []).filter((f) => !f.provisional);
+}
+
+export type WithheldItem = { kind: "본문" | "FAQ"; label: string; reason: string };
+
+/** 근거 미확정으로 공개를 보류한 항목 목록. 화면과 검사에서 함께 쓴다. */
+export function withheldItems(guide: GuidePageConfig): WithheldItem[] {
+    return [
+        ...guide.sections
+            .filter((s) => s.provisional)
+            .map((s) => ({
+                kind: "본문" as const,
+                label: s.heading,
+                reason: s.provisional!.reason,
+            })),
+        ...(guide.faqs ?? [])
+            .filter((f) => f.provisional)
+            .map((f) => ({
+                kind: "FAQ" as const,
+                label: f.question,
+                reason: f.provisional!.reason,
+            })),
+    ];
+}
+
+/** 발행된 가이드 (라우트가 존재하는 글). 색인 여부와는 별개다. */
 export function getPublishedGuides(): GuidePageConfig[] {
     return Object.values(guidePages).filter((g) => g.published);
 }
 
-/** 클러스터별로 묶은 가이드 (발행 여부와 무관하게 전체) */
+/**
+ * 프로덕션에서 색인 대상이 되는 가이드.
+ * 발행됐고, 실제 검수 상태가 Provisional 이 아닌 것만.
+ * 사이트맵·허브 목록·가이드 간 링크는 모두 이 함수를 기준으로 한다.
+ */
+export function getIndexableGuides(): GuidePageConfig[] {
+    return getPublishedGuides().filter((g) =>
+        isIndexableStatus(effectiveReviewStatus(g.review))
+    );
+}
+
+/** 클러스터별로 묶은 가이드. 기본은 색인 대상만. */
 export function getGuidesByCluster(
-    onlyPublished = true
+    onlyIndexable = true
 ): Record<GuideCluster, GuidePageConfig[]> {
     const result = {} as Record<GuideCluster, GuidePageConfig[]>;
     for (const { name } of GUIDE_CLUSTERS) result[name] = [];
-    for (const g of Object.values(guidePages)) {
-        if (onlyPublished && !g.published) continue;
+    const list = onlyIndexable ? getIndexableGuides() : Object.values(guidePages);
+    for (const g of list) {
         result[g.cluster].push(g);
     }
     return result;
