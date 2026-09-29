@@ -1,22 +1,59 @@
 import Link from "next/link";
-import { buildMetadata } from "@/lib/metadata";
+import type { Metadata } from "next";
+import { BASE_URL, OG_IMAGE } from "@/lib/metadata";
 import { CALCULATORS } from "@/lib/constants";
-import { guidePages } from "@/data/guidePages";
+import { getIndexableGuides } from "@/data/guidePages";
 
-export const metadata = buildMetadata({
-  title: "주식계산기 | 무료 투자 계산기",
-  description:
-    "주식 수익률, 평단가, 손절가, 목표가, 배당과 복리를 투자 상황에 맞춰 계산하고 국내주식·미국주식·코인 계산기를 한 곳에서 확인하세요.",
-  path: "/",
-  keywords: [
-    "주식계산기",
-    "주식 수익률 계산기",
-    "평단가 계산기",
-    "손절가 계산기",
-    "목표가 계산기",
-    "배당 계산기",
-  ],
-});
+const HOME_URL = new URL("/", BASE_URL).href;
+const HOME_TITLE = "주식 계산기 | 수익률·평단가·손절가 무료 계산";
+const HOME_HEADING = "주식 계산기 — 수익률·평단가·손절가를 한곳에서";
+const HOME_DESCRIPTION =
+  "주식 계산기로 수익률, 평단가, 손절가, 목표가, 배당과 복리를 무료로 계산하세요. 국내주식·미국주식·코인 중 필요한 도구를 고르고, 계산별 비용 반영 범위와 주의사항을 확인할 수 있습니다.";
+const HOME_INTRO =
+  "주식 계산기는 매수가·현재가·수량 등 입력값으로 손익과 투자 조건을 계산하는 도구입니다. 이 사이트에서는 수익률·평단가·손절가·목표가·배당·복리를 무료로 계산할 수 있습니다. 보유 손익을 확인하려면 수익률 계산기로, 추가 매수를 비교하려면 평단가 계산기로 시작하세요.";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
+  title: { absolute: HOME_TITLE },
+  description: HOME_DESCRIPTION,
+  alternates: { canonical: HOME_URL },
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    locale: "ko_KR",
+    siteName: "주식계산기.kr",
+    url: HOME_URL,
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+    images: [{
+      url: new URL(OG_IMAGE, BASE_URL).href,
+      width: 1200,
+      height: 630,
+      alt: "주식계산기.kr",
+    }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+    images: [new URL(OG_IMAGE, BASE_URL).href],
+  },
+};
+
+const HOME_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": `${HOME_URL}#webpage`,
+  url: HOME_URL,
+  name: HOME_HEADING,
+  description: HOME_INTRO,
+  inLanguage: "ko-KR",
+  isPartOf: {
+    "@type": "WebSite",
+    name: "주식계산기",
+    url: HOME_URL,
+  },
+};
 
 const calculatorByHref = new Map(
   CALCULATORS.filter((item) => item.kind === "calculator").map((item) => [item.href, item])
@@ -43,24 +80,23 @@ const PURPOSE_GROUPS = [
   },
 ] as const;
 
-const INVESTMENT_FLOW = [
-  { step: "1", title: "평단가 확인", description: "여러 번 매수했다면 실제 평균 매입 단가부터 계산합니다.", href: "/average-price-calculator" },
-  { step: "2", title: "현재 손익 확인", description: "평단가와 현재가를 기준으로 수익금과 수익률을 확인합니다.", href: "/profit-calculator" },
-  { step: "3", title: "매도 목표 설정", description: "원하는 목표 수익률에 도달하는 가격을 계산합니다.", href: "/target-price-calculator" },
-  { step: "4", title: "손실 범위 제한", description: "감당할 수 있는 손실률과 손절 가격을 미리 정합니다.", href: "/stop-loss-calculator" },
-] as const;
-
 const MARKET_HUBS = [
   { href: "/stocks", label: "국내주식", title: "국내주식 계산기", description: "수익률·평단가·손절가·배당·증권거래세" },
   { href: "/us-stocks", label: "미국주식", title: "미국주식 계산기", description: "환율 반영 수익·해외주식 세금·세후 배당" },
   { href: "/crypto", label: "코인", title: "코인 계산기", description: "레버리지 진입·청산가·수익률·펀딩비" },
 ] as const;
 
+const indexableGuideBySlug = new Map(
+  getIndexableGuides().map((guide) => [guide.slug, guide])
+);
 const HOME_GUIDES = [
-  guidePages["average-price-meaning"],
-  guidePages["stop-loss-ratio"],
-  guidePages["compound-investing"],
-].filter(Boolean);
+  "average-price-meaning",
+  "stop-loss-ratio",
+  "compound-investing",
+].flatMap((slug) => {
+  const guide = indexableGuideBySlug.get(slug);
+  return guide ? [guide] : [];
+});
 
 const HOME_FAQ = [
   {
@@ -86,16 +122,20 @@ function getCalculator(href: string) {
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-slate-50 pb-20 text-slate-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(HOME_SCHEMA).replace(/</g, "\\u003c"),
+        }}
+      />
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
-          <p className="text-sm font-semibold text-slate-500">무료 투자 계산기</p>
-          <h1 className="mt-3 max-w-3xl text-3xl font-black leading-tight tracking-tight sm:text-4xl md:text-5xl">
-            투자 결정을 내리기 전에
-            <br className="hidden sm:block" /> 숫자부터 확인하세요
+          <p className="text-sm font-semibold text-slate-500">무료 투자 계산 도구</p>
+          <h1 className="mt-3 max-w-4xl break-keep text-3xl font-black leading-tight tracking-tight sm:text-4xl md:text-5xl">
+            {HOME_HEADING}
           </h1>
           <p className="mt-5 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-            평단가와 현재 손익부터 목표가·손절가·포지션 크기까지, 투자 과정에 필요한
-            계산을 상황별로 찾을 수 있습니다. 회원가입 없이 바로 계산해 보세요.
+            {HOME_INTRO}
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link href="#start" className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-700">
@@ -141,27 +181,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-y border-slate-200 bg-white py-12 sm:py-14">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <h2 className="text-2xl font-black tracking-tight">투자 전후 계산 흐름</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            보유 가격을 확인한 뒤 수익과 위험 기준을 순서대로 정리해 보세요.
-          </p>
-          <ol className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {INVESTMENT_FLOW.map((item) => (
-              <li key={item.step} className="rounded-2xl border border-slate-200 p-5">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm font-black text-white">{item.step}</span>
-                  <h3 className="font-black">{item.title}</h3>
-                </div>
-                <p className="mt-3 text-sm leading-6 text-slate-600">{item.description}</p>
-                <Link href={item.href} className="mt-4 inline-block text-sm font-bold text-slate-800 hover:underline">계산기 열기 →</Link>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
       <section className="py-12 sm:py-14">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
           <div className="flex items-end justify-between gap-4">
@@ -184,11 +203,47 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section id="calculation-basis" aria-labelledby="calculation-basis-title" className="border-y border-slate-200 bg-white py-12 sm:py-14">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <h2 id="calculation-basis-title" className="text-2xl font-black tracking-tight">계산 예시와 반영 범위</h2>
+          <div className="mt-7 grid gap-6 md:grid-cols-2">
+            <article className="min-w-0 rounded-2xl border border-slate-200 p-5">
+              <h3 className="text-lg font-bold">수익률 계산 예시</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-700">
+                매수가 10,000원, 현재가 11,000원, 수량 10주라면 평가손익은 10,000원, 수익률은 10%입니다.
+              </p>
+              <dl className="mt-4 space-y-3 rounded-xl bg-slate-50 p-4 text-sm leading-6">
+                <div><dt className="font-bold">평가손익</dt><dd>(11,000 − 10,000) × 10 = 10,000원</dd></div>
+                <div><dt className="font-bold">수익률</dt><dd>(11,000 − 10,000) ÷ 10,000 × 100 = 10%</dd></div>
+              </dl>
+              <p className="mt-3 text-xs leading-6 text-slate-600">
+                동일 통화로 계산한 가상 예시입니다. 수수료·세금·환율 변동은 반영하지 않았습니다.
+              </p>
+              <Link href="/profit-calculator" className="mt-4 inline-block text-sm font-bold text-slate-800 underline underline-offset-4">내 입력값으로 수익률 계산하기 →</Link>
+            </article>
+            <article className="min-w-0 rounded-2xl border border-slate-200 p-5">
+              <h3 className="text-lg font-bold">세금·수수료와 적용 기준</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-700">
+                계산기마다 세금·수수료·환율의 반영 범위가 다릅니다. 세금이 포함된 결과는 해당 계산기의 ‘계산 기준과 출처’와 연결된 가이드의 검토 상태를 함께 확인하세요.
+              </p>
+              <ul className="mt-4 list-disc space-y-3 pl-5 text-sm leading-6">
+                <li><Link href="/overseas-stock-tax-calculator" className="font-semibold underline underline-offset-4">해외주식 세금 계산 기준</Link></li>
+                <li><Link href="/dividend-calculator" className="font-semibold underline underline-offset-4">배당 계산 기준</Link></li>
+                <li><a href="https://www.nts.go.kr/" className="font-semibold underline underline-offset-4">국세청 공식 홈페이지</a> — 세금 안내 확인</li>
+              </ul>
+              <p className="mt-4 text-xs leading-6 text-slate-600">
+                국세청 링크는 공식 안내를 찾는 시작점입니다. 적용 근거와 확인 범위는 상세 페이지에서 확인하세요. ‘재검토 대상’은 최신 사실 확인이 완료됐다는 뜻이 아닙니다.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
       <section className="border-y border-slate-200 bg-white py-12 sm:py-14">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-black tracking-tight">계산 전에 읽어보세요</h2>
+              <h2 className="text-2xl font-black tracking-tight">계산 결과를 이해하는 가이드</h2>
               <p className="mt-2 text-sm leading-6 text-slate-600">계산 결과를 해석하는 데 필요한 기본 개념을 정리했습니다.</p>
             </div>
             <Link href="/guides" className="shrink-0 text-sm font-bold text-slate-700 hover:underline">가이드 전체 →</Link>

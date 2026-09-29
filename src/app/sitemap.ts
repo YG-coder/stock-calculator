@@ -22,9 +22,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
         ])
     );
 
+    // 실제 콘텐츠 수정일이 관리되기 전에는 빌드 시각을 lastModified로 사용하지 않는다.
     return routes.map((route) => ({
-        url: `${BASE_URL}${route}`,
-        lastModified: new Date(),
+        url: new URL(route || "/", BASE_URL).href,
         changeFrequency: "weekly",
         priority:
             route === ""
