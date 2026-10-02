@@ -19,7 +19,7 @@ export default function PrivacyPage() {
 
         <div className="mx-auto max-w-5xl px-6 py-12 md:px-8">
           <p className="mb-6 text-sm text-slate-500">
-            시행일: 2026년 8월 23일 · 최종 개정일: 2026년 8월 23일
+            시행일: 2026년 8월 23일 · 최종 개정일: 2026년 10월 3일
           </p>
 
           <SectionCard>
@@ -47,61 +47,9 @@ export default function PrivacyPage() {
                 않습니다. 향후 마지막 입력값을 기억하는 편의 기능을 추가하는 경우,
                 해당 정보는 이용자 기기에만 저장되며 서버로 전송되지 않습니다.
               </p>
-              <p className="mt-2">
-                다만 아래 4항의 광고 서비스가 이용자의 브라우저에 쿠키를 설정할 수
-                있습니다.
-              </p>
             </Article>
 
-            <Article title="4. 광고 서비스 이용">
-              <p className="mt-2">
-                본 사이트는 제3자 광고 서비스인 <strong>Google AdSense</strong>를 사용합니다.
-                Google을 포함한 제3자 광고 사업자는 쿠키를 사용하여 이용자가 본 사이트나
-                다른 사이트를 이전에 방문한 기록을 바탕으로 광고를 제공할 수 있습니다.
-              </p>
-              <p className="mt-2">
-                맞춤 광고를 원하지 않으시면 아래에서 설정을 변경하거나 사용을 거부하실 수
-                있습니다.
-              </p>
-              <ul className="mt-3 list-disc space-y-2 pl-5">
-                <li>
-                  <a
-                      href="https://adssettings.google.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-semibold text-slate-800 underline-offset-2 hover:underline"
-                  >
-                    Google 광고 설정
-                  </a>
-                  에서 개인 맞춤 광고를 끄실 수 있습니다.
-                </li>
-                <li>
-                  <a
-                      href="https://policies.google.com/technologies/ads"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-semibold text-slate-800 underline-offset-2 hover:underline"
-                  >
-                    Google 광고 및 쿠키 사용 안내
-                  </a>
-                  에서 데이터 처리 방식을 확인하실 수 있습니다.
-                </li>
-                <li>
-                  <a
-                      href="https://www.aboutads.info"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-semibold text-slate-800 underline-offset-2 hover:underline"
-                  >
-                    www.aboutads.info
-                  </a>
-                  에서 제3자 광고 사업자의 쿠키 사용을 일괄 거부하실 수 있습니다.
-                </li>
-                <li>브라우저 설정에서 쿠키를 차단하거나 삭제하실 수 있습니다.</li>
-              </ul>
-            </Article>
-
-            <Article title="5. 분석 도구">
+            <Article title="4. 분석 도구">
               <p className="mt-2">
                 작성 시점 기준으로 본 사이트는 <strong>별도의 웹 분석 도구를 사용하지
                 않습니다.</strong> 검색엔진 소유 확인을 위한 Google 및 Naver의 확인용
@@ -111,7 +59,7 @@ export default function PrivacyPage() {
               </p>
             </Article>
 
-            <Article title="6. 외부 링크">
+            <Article title="5. 외부 링크">
               <p className="mt-2">
                 본 사이트는 참고용 정보 제공을 위해 외부 사이트 링크를 포함할 수
                 있습니다. 외부 사이트의 개인정보처리방침과 운영 방식은 본 사이트와
@@ -119,7 +67,7 @@ export default function PrivacyPage() {
               </p>
             </Article>
 
-            <Article title="7. 문의">
+            <Article title="6. 문의">
               <p className="mt-2">
                 개인정보 처리와 관련한 문의는 아래 이메일로 접수하실 수 있습니다.
               </p>
