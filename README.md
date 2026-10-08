@@ -3,7 +3,8 @@
 국내주식·미국주식·코인 투자 계산기와 몬테카를로 기반 장기 투자 시뮬레이션을 제공하는 Next.js 웹 서비스입니다.
 
 - 운영 사이트: <https://주식계산기.kr>
-- 이 문서 기준일: 2026-09-16 (main 브랜치 `3f3f4c5` 기준)
+- 기본 문서 기준일: 2026-09-16 (main 브랜치 `3f3f4c5` 기준)
+- 운영 배포·P0/P1 작업 기록 부분 갱신: 2026-10-09 (`2d1b4e2` 운영 반영 확인). 다른 절 전체의 재검토를 뜻하지 않습니다.
 
 ## 목차
 
@@ -182,7 +183,8 @@
 | UI | React 19, Tailwind CSS 4 |
 | 언어 | TypeScript 5 |
 | 테스트 | Vitest 4 (`environment: node`) |
-| 배포 | Cloudflare Workers (`@opennextjs/cloudflare` + `wrangler`) |
+| 운영 배포 | Vercel — GitHub `main` 푸시로 Production 배포 |
+| 저장소에 남아 있는 별도 배포 도구 | Cloudflare Workers (`@opennextjs/cloudflare` + `wrangler`) |
 
 정확한 버전은 `package.json` 을 기준으로 합니다.
 
@@ -222,8 +224,12 @@ npm run dev
 
 ## 배포
 
-Cloudflare Workers 에 OpenNext 어댑터로 배포합니다. 설정은 `wrangler.jsonc`,
-`open-next.config.ts` 에 있습니다.
+2026-10-09에 확인한 운영 배포는 **Vercel**입니다. GitHub `main`에 푸시하면 Production 배포가 시작됩니다.
+P0(`1a7d148`)는 01:41 KST, P1(`2d1b4e2`)는 02:15 KST에 배포 완료 기록과 운영 반영을 확인했습니다.
+커밋·공식 근거·검증 범위와 남은 항목은 [P1 작업 및 배포 기록](docs/2026-10-09-p1-content-review.md)에 있습니다.
+
+아래는 저장소에 남아 있는 **Cloudflare Workers용 별도 스크립트**입니다. 설정은 `wrangler.jsonc`,
+`open-next.config.ts`에 있으며, 이번 Vercel 운영 배포에 사용한 명령이 아닙니다.
 
 | 명령 | 하는 일 |
 |---|---|
@@ -234,8 +240,9 @@ Cloudflare Workers 에 OpenNext 어댑터로 배포합니다. 설정은 `wrangle
 
 `next.config.ts` 에는 `www.주식계산기.kr` → `주식계산기.kr` 영구 리다이렉트가 정의돼 있습니다.
 
-> 이 문서를 갱신하면서 배포 명령을 실행하거나 운영 배포 상태를 확인하지는 않았습니다.
-> 위 표는 `package.json` 의 스크립트 정의를 옮긴 것입니다.
+> 위 Cloudflare 표는 `package.json`의 스크립트 정의입니다. 이번 작업에서 이 명령들을 실행하거나
+> Cloudflare 배포 상태를 확인하지 않았습니다. Vercel 대시보드의 `Ready` 표시는 직접 확인하지 않았고,
+> GitHub의 Vercel Production 성공 기록과 운영 브라우저 확인으로 배포 완료를 판단했습니다.
 
 ---
 
