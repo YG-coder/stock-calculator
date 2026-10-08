@@ -1,7 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { OVERSEAS_STOCK_TAX } from "@/lib/taxRates";
+import {
+    calculateOverseasStockTax,
+    type OverseasStockTaxField,
+} from "@/lib/overseasStockTax";
 import {
     CalculatorLayout,
     CalculatorCard,
@@ -18,63 +21,34 @@ function formatNumber(value: number) {
     }).format(value);
 }
 
+const FIELD_LABELS: Record<OverseasStockTaxField, string> = {
+    buyAmount: "총 매수 금액",
+    sellAmount: "총 매도 금액",
+    deduction: "기본공제",
+};
+
 export default function OverseasStockTaxCalculator() {
     const [buyAmount, setBuyAmount] = useState("");
     const [sellAmount, setSellAmount] = useState("");
     const [deduction, setDeduction] = useState("");
 
-    const result = useMemo(() => {
-        const buy = Number(buyAmount);
-        const sell = Number(sellAmount);
-        const basicDeduction = Number(deduction);
+    const result = useMemo(
+        () => calculateOverseasStockTax({ buyAmount, sellAmount, deduction }),
+        [buyAmount, sellAmount, deduction]
+    );
 
-        if (
-            !Number.isFinite(buy) ||
-            !Number.isFinite(sell) ||
-            !Number.isFinite(basicDeduction) ||
-            buy < 0 ||
-            sell < 0 ||
-            basicDeduction < 0
-        ) {
-            return {
-                valid: false,
-                grossGain: 0,
-                taxableGain: 0,
-                taxAmount: 0,
-                netGain: 0,
-                effectiveRate: 0,
-            };
+    // 일부만 입력한 경우 어떤 값이 비었는지 알린다. 빈칸을 0 으로 계산하지 않는다.
+    const emptyMessage = (() => {
+        const missing = result.missingFields;
+        if (missing.length === 0 || missing.length === 3) {
+            return "값을 입력하면 결과가 자동으로 계산됩니다.";
         }
-
-        if (buy <= 0 && sell <= 0) {
-            return {
-                valid: false,
-                grossGain: 0,
-                taxableGain: 0,
-                taxAmount: 0,
-                netGain: 0,
-                effectiveRate: 0,
-            };
-        }
-
-        const grossGain = sell - buy;
-        const taxableGain = Math.max(0, grossGain - basicDeduction);
-        const taxAmount = taxableGain * OVERSEAS_STOCK_TAX.rate;
-        const netGain = grossGain - taxAmount;
-        // 실효세율 = 세금 ÷ 양도차익(총 손익) × 100. 라벨('실효 세율')과 정의를 일치시킴.
-        // (매도금액을 분모로 쓰면 '매도금액 대비 세부담률'이 되어 라벨과 불일치)
-        // 양도차익이 기본공제 이하이면 세금이 0이므로 실효세율도 0%로 표시됨.
-        const effectiveRate = grossGain > 0 ? (taxAmount / grossGain) * 100 : 0;
-
-        return {
-            valid: true,
-            grossGain,
-            taxableGain,
-            taxAmount,
-            netGain,
-            effectiveRate,
-        };
-    }, [buyAmount, sellAmount, deduction]);
+        const names = missing.map((field) => FIELD_LABELS[field]).join(", ");
+        const deductionHint = missing.includes("deduction")
+            ? " 기본공제를 적용하지 않으려면 0을 입력하세요."
+            : "";
+        return `${names} 항목을 입력해야 세금이 계산됩니다. 빈칸은 0원으로 계산하지 않습니다.${deductionHint}`;
+    })();
 
     const tone =
         result.taxAmount > 0 ? "negative" : result.taxAmount < 0 ? "positive" : "default";
@@ -128,7 +102,7 @@ export default function OverseasStockTaxCalculator() {
 
             <ResultCard
                 title="해외주식 세금 계산 결과"
-                emptyMessage="값을 입력하면 결과가 자동으로 계산됩니다."
+                emptyMessage={emptyMessage}
                 isValid={result.valid}
             >
                 <ResultHighlight

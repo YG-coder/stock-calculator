@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { FINANCIAL_INCOME_THRESHOLD } from "@/lib/taxRates";
+import { calculateUsDividend } from "@/lib/usDividend";
 import {
     CalculatorLayout,
     CalculatorCard,
@@ -26,66 +27,22 @@ export default function USDividendCalculator() {
     const [exchangeRate, setExchangeRate] = useState("");
     const [withholdingTaxRate, setWithholdingTaxRate] = useState("");
 
-    const result = useMemo(() => {
-        const qty = Number(shares);
-        const annualDividend = Number(annualDividendPerShareUsd);
-        const buyPrice = Number(buyPriceUsd);
-        const rate = Number(exchangeRate);
-        const taxRatePercent = Number(withholdingTaxRate);
+    const result = useMemo(
+        () =>
+            calculateUsDividend({
+                shares,
+                annualDividendPerShareUsd,
+                buyPriceUsd,
+                exchangeRate,
+                withholdingTaxRate,
+            }),
+        [shares, annualDividendPerShareUsd, buyPriceUsd, exchangeRate, withholdingTaxRate]
+    );
 
-        if (
-            !Number.isFinite(qty) ||
-            !Number.isFinite(annualDividend) ||
-            !Number.isFinite(buyPrice) ||
-            !Number.isFinite(rate) ||
-            !Number.isFinite(taxRatePercent) ||
-            qty <= 0 ||
-            annualDividend < 0 ||
-            buyPrice <= 0 ||
-            rate <= 0 ||
-            taxRatePercent < 0 ||
-            taxRatePercent >= 100
-        ) {
-            return {
-                valid: false,
-                grossAnnualDividendUsd: 0,
-                netAnnualDividendUsd: 0,
-                grossAnnualDividendKrw: 0,
-                netAnnualDividendKrw: 0,
-                monthlyNetDividendKrw: 0,
-                grossYield: 0,
-                netYield: 0,
-                taxAmountUsd: 0,
-            };
-        }
-
-        const taxRate = taxRatePercent / 100;
-        const grossAnnualDividendUsd = qty * annualDividend;
-        const taxAmountUsd = grossAnnualDividendUsd * taxRate;
-        const netAnnualDividendUsd = grossAnnualDividendUsd - taxAmountUsd;
-
-        const grossAnnualDividendKrw = grossAnnualDividendUsd * rate;
-        const netAnnualDividendKrw = netAnnualDividendUsd * rate;
-        const monthlyNetDividendKrw = netAnnualDividendKrw / 12;
-
-        const totalBuyAmountUsd = qty * buyPrice;
-        const grossYield =
-            totalBuyAmountUsd > 0 ? (grossAnnualDividendUsd / totalBuyAmountUsd) * 100 : 0;
-        const netYield =
-            totalBuyAmountUsd > 0 ? (netAnnualDividendUsd / totalBuyAmountUsd) * 100 : 0;
-
-        return {
-            valid: true,
-            grossAnnualDividendUsd,
-            netAnnualDividendUsd,
-            grossAnnualDividendKrw,
-            netAnnualDividendKrw,
-            monthlyNetDividendKrw,
-            grossYield,
-            netYield,
-            taxAmountUsd,
-        };
-    }, [shares, annualDividendPerShareUsd, buyPriceUsd, exchangeRate, withholdingTaxRate]);
+    // 원천징수세율 빈칸과 0% 를 구분한다. 빈칸이면 세후 금액을 계산하지 않는다.
+    const emptyMessage = result.missingFields.includes("withholdingTaxRate")
+        ? "보유 수량, 배당금, 매수가, 환율과 함께 원천징수세율을 입력하면 결과가 계산됩니다. 원천징수세율을 비워 두면 세후 배당금을 계산할 수 없습니다. 원천징수가 없다면 0을 입력하세요."
+        : "값을 입력하면 결과가 자동으로 계산됩니다.";
 
     return (
         <CalculatorLayout>
@@ -146,7 +103,7 @@ export default function USDividendCalculator() {
 
             <ResultCard
                 title="미국주식 배당 계산 결과"
-                emptyMessage="값을 입력하면 결과가 자동으로 계산됩니다."
+                emptyMessage={emptyMessage}
                 isValid={result.valid}
             >
                 <ResultHighlight

@@ -99,7 +99,7 @@ export const CALCULATOR_HELP_BY_PATH: Readonly<Record<string, CalculatorHelpCopy
   "/crypto/funding-fee": {
     what: "무기한 선물 포지션에서 주고받을 예상 펀딩비를 계산합니다.",
     input: "포지션 규모, 펀딩비율, 지급 횟수와 롱·숏 방향을 입력하세요.",
-    read: "양수 펀딩비의 지급 방향과 실제 지급 주기는 거래소·상품별 최신 정보를 확인하세요.",
+    read: "결과의 양수(+)는 수령, 음수(−)는 지급입니다. 펀딩비율이 양수면 롱 지급·숏 수령, 음수면 반대로 가정하므로 실제 방향과 지급 주기는 거래소·상품별 최신 정보를 확인하세요.",
     example: "포지션 10,000 USDT, 펀딩비율 0.01%, 1회",
   },
   "/crypto/leverage-profit": {

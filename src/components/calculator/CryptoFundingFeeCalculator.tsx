@@ -10,8 +10,15 @@ import {
     InputField,
 } from "@/components/ui/Shared";
 import CurrencyToggle from "@/components/calculator/CurrencyToggle";
+import { calculateFundingFee, type FundingFlow } from "@/lib/fundingFee";
 
 type Currency = "KRW" | "USDT";
+
+const FLOW_LABELS: Record<FundingFlow, string> = {
+    receive: "수령",
+    pay: "지급",
+    none: "지급·수령 없음",
+};
 
 function formatNumber(value: number, maximumFractionDigits = 2) {
     if (!Number.isFinite(value)) return "0";
@@ -31,27 +38,12 @@ export default function CryptoFundingFeeCalculator() {
     const moneyUnit = currency === "KRW" ? "원" : "USDT";
 
     const result = useMemo(() => {
-        const size = Number(positionSize);
-        const rate = Number(fundingRate) / 100;
-        const count = Number(fundingCount);
-
-        if (
-            !Number.isFinite(size) ||
-            !Number.isFinite(rate) ||
-            !Number.isFinite(count) ||
-            size <= 0 ||
-            count <= 0
-        ) {
-            return {
-                valid: false,
-                oneTimeFee: 0,
-                totalFee: 0,
-                directionText: "",
-            };
+        const calc = calculateFundingFee({ positionSize, fundingRate, fundingCount, positionType });
+        if (!calc.valid) {
+            return { ...calc, directionText: "" };
         }
 
-        const oneTimeFee = size * rate;
-        const totalFee = oneTimeFee * count;
+        const rate = Number(fundingRate) / 100;
 
         let directionText = "";
         if (rate > 0) {
@@ -68,16 +60,14 @@ export default function CryptoFundingFeeCalculator() {
             directionText = "펀딩비가 0%이면 지급 또는 수령 금액도 0입니다.";
         }
 
-        return {
-            valid: true,
-            oneTimeFee,
-            totalFee,
-            directionText,
-        };
+        return { ...calc, directionText };
     }, [positionSize, fundingRate, fundingCount, positionType]);
 
+    // 순현금흐름 기준: 양수 = 수령(수익 색), 음수 = 지급(비용 색)
     const tone =
-        result.totalFee > 0 ? "negative" : result.totalFee < 0 ? "positive" : "default";
+        result.netTotal > 0 ? "positive" : result.netTotal < 0 ? "negative" : "default";
+    const flowLabel = FLOW_LABELS[result.flow];
+    const signed = (value: number) => `${value > 0 ? "+" : ""}${formatNumber(value)}`;
 
     return (
         <CalculatorLayout>
@@ -142,8 +132,8 @@ export default function CryptoFundingFeeCalculator() {
                 isValid={result.valid}
             >
                 <ResultHighlight
-                    label="총 예상 펀딩비"
-                    value={formatNumber(result.totalFee)}
+                    label={`총 예상 펀딩비 (${flowLabel})`}
+                    value={signed(result.netTotal)}
                     unit={moneyUnit}
                     tone={tone}
                 />
@@ -151,15 +141,19 @@ export default function CryptoFundingFeeCalculator() {
                 <div className="grid gap-4 sm:grid-cols-2">
                     <ResultDetail
                         label="1회당 펀딩비"
-                        value={formatNumber(result.oneTimeFee)}
+                        value={signed(result.netOneTime)}
                         unit={moneyUnit}
                     />
                     <ResultDetail
                         label="누적 펀딩비"
-                        value={formatNumber(result.totalFee)}
+                        value={signed(result.netTotal)}
                         unit={moneyUnit}
                     />
                 </div>
+
+                <p className="text-sm leading-relaxed text-slate-500">
+                    금액은 내 계좌 기준 순현금흐름입니다. 양수(+)는 수령, 음수(−)는 지급입니다.
+                </p>
 
                 {result.directionText ? (
                     <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-relaxed text-slate-600">

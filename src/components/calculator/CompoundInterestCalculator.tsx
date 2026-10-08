@@ -10,11 +10,13 @@ import {
     InputField,
 } from "@/components/ui/Shared";
 import CurrencyToggle from "@/components/calculator/CurrencyToggle";
+import { calculateCompoundInterest } from "@/lib/compoundInterest";
 
 type Currency = "KRW" | "USD";
 
 function formatNumber(value: number, maximumFractionDigits = 0) {
-    if (!Number.isFinite(value)) return "0";
+    // 유한하지 않은 값을 "0" 으로 보이면 틀린 결과가 정상값처럼 보인다.
+    if (!Number.isFinite(value)) return "-";
     return new Intl.NumberFormat("ko-KR", {
         minimumFractionDigits: 0,
         maximumFractionDigits,
@@ -31,49 +33,10 @@ export default function CompoundInterestCalculator() {
 
     const moneyUnit = currency === "KRW" ? "원" : "USD";
 
-    const result = useMemo(() => {
-        const P = Number(initial);
-        const PMT = Number(monthly);
-        const r = Number(rate) / 100;
-        const t = Number(years);
-
-        if (
-            !Number.isFinite(P) ||
-            !Number.isFinite(PMT) ||
-            !Number.isFinite(r) ||
-            !Number.isFinite(t) ||
-            P < 0 ||
-            PMT < 0 ||
-            r < 0 ||
-            t <= 0
-        ) {
-            return {
-                valid: false,
-                total: 0,
-                principal: 0,
-                profit: 0,
-            };
-        }
-
-        const n = 12;
-        // 수익률 0%일 때는 r/n = 0 나눗셈으로 NaN이 되므로 별도 분기.
-        // 0%에서는 최종 자산 = 초기 원금 + 총 납입액(원금 합계).
-        const total =
-            r === 0
-                ? P + PMT * n * t
-                : P * Math.pow(1 + r / n, n * t) +
-                  PMT * ((Math.pow(1 + r / n, n * t) - 1) / (r / n));
-
-        const principal = P + PMT * n * t;
-        const profit = total - principal;
-
-        return {
-            valid: true,
-            total,
-            principal,
-            profit,
-        };
-    }, [initial, monthly, rate, years]);
+    const result = useMemo(
+        () => calculateCompoundInterest({ initial, monthly, rate, years }),
+        [initial, monthly, rate, years]
+    );
 
     return (
         <CalculatorLayout>
@@ -142,9 +105,16 @@ export default function CompoundInterestCalculator() {
             >
                 <ResultHighlight
                     label="최종 자산"
-                    value={formatNumber(result.total)}
-                    unit={moneyUnit}
+                    value={result.overflow ? "-" : formatNumber(result.total)}
+                    unit={result.overflow ? undefined : moneyUnit}
                 />
+
+                {result.overflow ? (
+                    <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-800">
+                        입력한 수익률과 기간으로는 결과가 계산할 수 있는 숫자 범위를 넘습니다.
+                        수익률이나 투자 기간을 줄여 다시 계산하세요.
+                    </div>
+                ) : null}
 
                 <div className="grid gap-4 sm:grid-cols-2">
                     <ResultDetail
@@ -154,8 +124,8 @@ export default function CompoundInterestCalculator() {
                     />
                     <ResultDetail
                         label="총 수익"
-                        value={formatNumber(result.profit)}
-                        unit={moneyUnit}
+                        value={result.overflow ? "-" : formatNumber(result.profit)}
+                        unit={result.overflow ? undefined : moneyUnit}
                     />
                 </div>
             </ResultCard>
