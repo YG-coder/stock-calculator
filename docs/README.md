@@ -56,6 +56,8 @@
 | [`2026-08-23-adsense-track-report.md`](2026-08-23-adsense-track-report.md) | 애드센스 대비 1차 개선 작업 보고 |
 | [`2026-08-25-backlog-completion.md`](2026-08-25-backlog-completion.md) | SEO·정책·증권거래세 백로그 처리 보고 |
 | [`2026-08-25-help-rollout-verification.md`](2026-08-25-help-rollout-verification.md) | 첫 사용 도움말 적용·검증 보고 |
+| [`2026-09-16-content-review-rollout.md`](2026-09-16-content-review-rollout.md) | 인컴랩 검수 체계 적용 작업 보고 — 공식 근거 확인 범위, 미확인 항목, 실행한 검사 |
+| [`2026-09-29-home-seo-rollout.md`](2026-09-29-home-seo-rollout.md) | 홈 검색 정보·계산 안내 개선 — 변경 내용, 원본 검증, Vercel 배포, 구글 색인 후속 작업 |
 
 > 감사 보고서의 지적 사항 중 상당수는 이후 수정됐습니다. 처리 결과는 애드센스 작업 보고와
 > 백로그 처리 보고에 있습니다. 어떤 항목이 현재 남아 있는지는 문서가 아니라 코드로 확인하세요.
