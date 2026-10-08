@@ -134,13 +134,29 @@ export default function OverseasStockTaxCalculatorPage() {
 
                     <Article title="기본공제와 연간 신고 방법">
                         <p>
-                            해외주식 양도소득세는 매년 5월에 종합소득세 신고 기간에 함께 신고합니다.
+                            해외주식 양도소득세는 양도한 다음 해 5월 1일~31일에 확정신고·납부합니다.
+                            종합소득세와는 별도의 양도소득세 신고입니다. 신고·납부 기한이 토요일·일요일,
+                            공휴일·대체공휴일 또는 노동절에 해당하면 그 다음 날을 기한으로 합니다.
+                            해당 연도의 실제 신고·납부 기한을 확인하세요.
+                        </p>
+                        <p>
                             기본공제 {DEDUCTION}은 1년에 1회 적용되며, 여러 종목에서 발생한 손익을 합산한 뒤
                             공제합니다.
                         </p>
                         <p>
                             손실이 발생한 경우 같은 해 다른 종목의 수익과 합산해 세금을 줄일 수 있습니다.
                             이를 손익 통산이라고 하며, 절세 전략의 핵심입니다.
+                        </p>
+                        <p>
+                            <a href="https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7708&mi=2309"
+                               className="text-blue-600 hover:underline">
+                                국세청 양도소득세 신고·납부기한 확인하기
+                            </a>
+                            {" · "}
+                            <a href="https://www.law.go.kr/법령/국세기본법/제5조"
+                               className="text-blue-600 hover:underline">
+                                국세기본법 제5조 기한의 특례
+                            </a>
                         </p>
                     </Article>
                 </SectionCard>

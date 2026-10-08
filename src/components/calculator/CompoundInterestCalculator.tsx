@@ -93,6 +93,11 @@ export default function CompoundInterestCalculator() {
                 </div>
 
                 <p className="text-sm leading-relaxed text-slate-500">
+                    월복리와 매월 말 납입 기준입니다. 연 수익률을 12로 나누어 월 수익률로 적용하므로,
+                    1년에 한 번 복리를 적용한 결과와 다를 수 있습니다.
+                </p>
+
+                <p className="text-sm leading-relaxed text-slate-500">
                     KRW / USD 토글은 환율 자동 변환 기능이 아니라 계산 기준 통화를 선택하는 기능입니다.
                     국내주식은 원화, 미국주식은 달러 기준으로 입력하면 됩니다.
                 </p>
