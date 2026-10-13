@@ -7,14 +7,15 @@
  * - docs/2026-08-22-types-contract-final.md       (이름 확정본)
  * - docs/2026-08-22-portfolio-assumptions-design.md (입력 계층)
  *
- * 이 파일에서 계약 문서 대비 "추가"된 것은 아래 3가지뿐이며, 모두 가산적이라
+ * 이 파일에서 계약 문서 대비 "추가"된 것은 아래 4가지뿐이며, 모두 가산적이라
  * 기존 계약을 깨지 않는다.
  *   1) RunMeta.warnings    — 결과에 동봉하는 경고 목록
  *   2) ValidationIssue     — 입력 거부 사유의 구조화
  *   3) ProgressFn / RunOptions / SimulationRunner 진입점 시그니처
+ *   4) SimulationInput.recordMonths — 연 단위 그리드 밖의 추가 기록 시점(1.1.0)
  */
 
-export const ENGINE_VERSION = "1.0.1";
+export const ENGINE_VERSION = "1.1.0";
 
 /* ============================================================
    입력
@@ -42,6 +43,12 @@ export interface SimulationInput {
   reportBasis: Basis;
   /** 없으면 성공확률·역산을 계산하지 않는다. */
   goal?: GoalSpec;
+  /**
+   * 연 단위 그리드(0, 12, 24, …, months) 외에 bands·samplePaths 에 추가로 기록할 월.
+   * 0~months 범위의 정수. FIRE 처럼 구간 경계(은퇴 시점)가 12의 배수가 아닐 때
+   * 그 시점의 실제 분포를 남기기 위해 쓴다. 계약 문서 대비 추가된 필드.
+   */
+  recordMonths?: number[];
 }
 
 export interface CashFlowSpec {
@@ -117,7 +124,7 @@ export interface SimulationResult {
   input: SimulationInput;
   assumptions: ReturnAssumption;
 
-  /** 연 단위 그리드의 백분위 밴드. 팬 차트용. reportBasis 기준. */
+  /** 연 단위 그리드(+ input.recordMonths)의 백분위 밴드. 팬 차트용. reportBasis 기준. */
   bands: PercentileBand[];
   /** 최종 잔액 분포. reportBasis 기준. */
   terminal: Distribution;

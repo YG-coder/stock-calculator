@@ -54,7 +54,10 @@ export function contributionsFromInput(input: SimulationInput, basis: Basis = in
       ? Math.pow(1 + inflationRate, Math.floor(month / 12))
       : 1;
     const contribution = cashFlow.monthlyAmount * factor + (cashFlow.overrides?.[month] ?? 0);
-    const discount = basis === "real" ? Math.pow(1 + inflationRate, month / 12) : 1;
+    // 엔진은 월초(start) 납입을 month 시점, 월말(end) 납입을 month + 1 시점 잔액에 더한다.
+    // 현재가치도 실제 납입 시점에 맞춰 할인해야 최종 자산(months 시점 할인)과 기준이 맞는다.
+    const paidAt = cashFlow.timing === "end" ? month + 1 : month;
+    const discount = basis === "real" ? Math.pow(1 + inflationRate, paidAt / 12) : 1;
     total += contribution / discount;
   }
   return total;

@@ -1,8 +1,8 @@
 # MonteCarloEngine — 모형과 구현 문서
 
 - **문서 성격**: **현재 기준 문서.** 코드가 바뀌면 이 문서를 갱신한다.
-- **최종 갱신**: 2026-09-16 (main `3f3f4c5` 기준)
-- **엔진 버전**: `1.0.1` — `ENGINE_VERSION` (`src/lib/montecarlo/types.ts`)
+- **최종 갱신**: 2026-10-13 (엔진 1.1.0 — `recordMonths` 추가 반영)
+- **엔진 버전**: `1.1.0` — `ENGINE_VERSION` (`src/lib/montecarlo/types.ts`)
 - **적용 범위**: 공개 계산기 4종이 이 엔진을 쓴다 — `/dca-calculator`, `/goal-probability-calculator`, `/fire-calculator`, `/sequence-risk-calculator`. `/dev/montecarlo` 는 개발 전용 검증 화면이다.
 - **선행 설계 문서(과거 기록)**: `2026-08-21-montecarlo-engine-contract.md`, `2026-08-22-montecarlo-implementation-plan.md`, `2026-08-22-portfolio-assumptions-design.md`, `2026-08-22-types-contract-final.md`
 
@@ -12,6 +12,9 @@
 > 이때 고친 것은 엔진 버전(1.0.0 → 1.0.1), 적용 범위(개발 화면만 → 공개 계산기 4종),
 > 파일 목록, 다단계 현금흐름(`phases`), 테스트 결과, 구현 현황이다.
 > 모형 가정·수식·설계 근거는 코드와 일치해 그대로 두었다.
+>
+> 2026-10-13 에 엔진 버전을 1.0.1 → 1.1.0 으로 올리고 추가 기록 시점(`recordMonths`)을 반영했다
+> (§2 입력 표, §3 기록 단계, §13 끝). 위 1.0.1 관련 서술은 당시 기록으로 둔다.
 
 > 이 문서는 **모형이 무엇을 가정하는지**를 적는다. 시뮬레이션 결과는 입력한 가정에 대한
 > 조건부 분포이지 미래에 대한 예측이나 보장이 아니다. 실제 시장은 이 모형이 담지 않는
@@ -76,6 +79,7 @@ tests/montecarlo/*.test.ts         8파일 110테스트
 | `reportBasis` | — | `"nominal"` / `"real"` | 화면 권장 기본은 `real` |
 | `goal.targetAmount` | 원 | 목표 금액 | `reportBasis` 와 **같은 기준**으로 해석 |
 | `goal.targetProbability` | 0~1 | 목표 확률 | 주어지면 역산 수행 |
+| `recordMonths` | 개월 | 연 단위 그리드 외에 추가로 기록할 시점 | 선택. `0 ~ months` 범위 정수만 허용(벗어나면 거부). 1.1.0 에서 추가 |
 
 **입력 범위를 벗어나면 조용히 클램프하지 않고 거부한다.** 기존 계산기 감사에서 지적된
 "음수를 조용히 0으로 치환" 패턴을 반복하지 않기 위한 규칙이다. 오류는 필드별 사유
@@ -93,8 +97,19 @@ for m in 0 .. months-1:
     if timing == "end":    balance += flow
     if 잔액이 0 이하로 떨어졌다면 (양수였던 경로에 한해):
         balance = 0; 소진 시점 기록; 경로 종료
-    if 연 단위 그리드 시점이면:  기록 (reportBasis 가 "real" 이면 이때 환산)
+    if 기록 시점이면:  기록 (reportBasis 가 "real" 이면 이때 환산)
 ```
+
+- **기록 시점(그리드)** = 연 단위 `0, 12, 24, …` + 마지막 달 `months` + 입력의 `recordMonths`.
+  오름차순으로 합치고 중복은 한 번만 남긴다. `bands` 와 `samplePaths.months` 가 이 그리드를 따른다.
+- **추가 기록 시점은 계산 결과를 바꾸지 않는다.** 월별 진행·소진 판정·난수 소비 순서는 그리드와
+  무관하고, 기록은 그 달 잔액을 복사해 두는 일뿐이다. 따라서 같은 시드에서 연 단위 밴드·최종 분포
+  (`terminal`)·소진율은 `recordMonths` 유무와 관계없이 같고, `bands` 에 행이 하나 더 생길 뿐이다.
+  `recordMonths` 를 주지 않으면 그리드도 1.0.1 과 같다.
+- **FIRE 가 쓰는 이유**: 은퇴 시점은 `round((은퇴 나이 − 현재 나이) × 12)` 개월이라 소수 나이에서는
+  12의 배수가 아니다(35.5세 → 55세 = 234개월). 연 단위 그리드만 기록하면 은퇴 시점 행이 없어 화면이
+  값을 찾지 못했다(1.1.0 이전에는 0원으로 표시). `buildFireInput` 은 은퇴 월을 `recordMonths` 로 넘기고,
+  화면은 `fireRetirementBand` 로 그 행을 읽는다.
 
 - **납입 시점을 숨기지 않는다.** 기존 복리 계산기는 기말(ordinary annuity) 기준이었는데
   화면에 표기가 없어 감사에서 지적됐다. 여기서는 `timing` 을 필수 입력으로 받는다.
@@ -450,7 +465,7 @@ NaN·Infinity, 잘못된 구간·일시금 월, 소진 이후 처리 — 전부 
 |---|---|---|
 | 적립식 투자 시뮬레이션 | `/dca-calculator` | `cashFlow.monthlyAmount > 0`, `goal` 없음. 팬 차트는 인라인 SVG (`DcaCalculator.tsx` 내부 `FanChart`) |
 | 투자 목표달성확률 | `/goal-probability-calculator` | `goal.kind = "terminal-target"` + `affine`. `sortedRequired` 로 재시뮬 없이 확률↔납입액 조회 |
-| FIRE 은퇴 시뮬레이션 | `/fire-calculator` | `cashFlow.phases` 2구간(적립 → 인출). 성공률 = `1 − depletion.rate` |
+| FIRE 은퇴 시뮬레이션 | `/fire-calculator` | `cashFlow.phases` 2구간(적립 → 인출). 성공률 = `1 − depletion.rate`. 은퇴 월을 `recordMonths` 로 넘겨 은퇴 시점 분포를 기록 |
 | 수익률 순서 위험 | `/sequence-risk-calculator` | `monthlyAmount < 0`, `timing: "start"`, `inflationIndexed: true`. 생존율 = `1 − depletion.rate`. 같은 페이지의 정순·역순 비교 도구(`SorrCalculator`)는 엔진을 쓰지 않는 결정론 계산이다 |
 
 입력 변환은 각각 `src/lib/dca.ts`, `goal-probability.ts`, `fire.ts`, `sorr.ts` 에 있다.
@@ -489,6 +504,9 @@ NaN·Infinity, 잘못된 구간·일시금 월, 소진 이후 처리 — 전부 
 **타입 계약은 이후 단계에서 깨지지 않았다.** 08-24 이후 추가된 것은 다단계 현금흐름
 (`CashFlowPhase` / `CashFlowSpec.phases`)뿐이고, 선택 필드라 기존 호출부에 영향이 없다.
 이 변경으로 `ENGINE_VERSION` 이 `1.0.1` 이 되었다.
+
+2026-10-13 에 선택 필드 `SimulationInput.recordMonths`(추가 기록 시점)가 더해져 `ENGINE_VERSION` 이
+`1.1.0` 이 되었다. 역시 선택 필드라 기존 호출부와 기존 결과에 영향이 없다(§3).
 
 ---
 

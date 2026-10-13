@@ -10,6 +10,7 @@ import {
     InputField,
 } from "@/components/ui/Shared";
 import CurrencyToggle from "@/components/calculator/CurrencyToggle";
+import { formatPrice } from "@/lib/number";
 
 type Currency = "KRW" | "USDT";
 
@@ -241,7 +242,7 @@ export default function CryptoAverageCalculator() {
             >
                 <ResultHighlight
                     label="새 평균 단가"
-                    value={formatNumber(result.avgPrice)}
+                    value={formatPrice(result.avgPrice)}
                     unit={moneyUnit}
                     tone="default"
                 />

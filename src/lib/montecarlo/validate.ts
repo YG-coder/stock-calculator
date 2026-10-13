@@ -127,6 +127,20 @@ export function validateInput(input: SimulationInput): ValidationIssue[] {
     }
   }
 
+  // ---- 추가 기록 시점 ----
+  if (input.recordMonths !== undefined) {
+    const months = isNum(input.months) ? input.months : 0;
+    if (!Array.isArray(input.recordMonths)) {
+      bad("recordMonths", "추가 기록 시점은 월 인덱스 배열이어야 합니다.");
+    } else {
+      for (const m of input.recordMonths) {
+        if (!Number.isInteger(m) || m < 0 || m > months) {
+          bad("recordMonths", `추가 기록 시점은 0~${months} 범위의 정수여야 합니다: ${m}`);
+        }
+      }
+    }
+  }
+
   // ---- 수익률 ----
   const r = input.returns;
   if (!r) {

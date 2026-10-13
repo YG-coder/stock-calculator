@@ -8,7 +8,7 @@
  *   2) 그 달의 수익 배수 적용
  *   3) timing === "end" 이면 현금흐름 반영
  *   4) 잔액이 0 이하로 떨어지면(양수였던 경로에 한해) 0 으로 클램프하고 소진 시점 기록 후 종료
- *   5) 연 단위 그리드 시점이면 기록 (reportBasis 가 "real" 이면 이때 환산)
+ *   5) 그리드 시점(연 단위 + recordMonths)이면 기록 (reportBasis 가 "real" 이면 이때 환산)
  *
  * 진행 계산은 항상 **명목**으로 돌리고 실질 환산은 기록 단계에서만 한다(이중 할인 방지).
  *
@@ -46,12 +46,16 @@ const now = (): number =>
     ? performance.now()
     : Date.now();
 
-/** 연 단위 그리드. 마지막 달은 12의 배수가 아니어도 반드시 포함한다. */
-function buildGrid(months: number): Int32Array {
-  const points: number[] = [];
-  for (let m = 0; m <= months; m += 12) points.push(m);
-  if (points[points.length - 1] !== months) points.push(months);
-  return Int32Array.from(points);
+/**
+ * 연 단위 그리드. 마지막 달은 12의 배수가 아니어도 반드시 포함한다.
+ * recordMonths 가 있으면 그 시점도 오름차순·중복 없이 합친다(예: FIRE 은퇴 234개월).
+ */
+export function buildGrid(months: number, recordMonths: readonly number[] = []): Int32Array {
+  const points = new Set<number>();
+  for (let m = 0; m <= months; m += 12) points.add(m);
+  points.add(months);
+  for (const m of recordMonths) if (m >= 0 && m <= months) points.add(m);
+  return Int32Array.from([...points].sort((a, b) => a - b));
 }
 
 export function createRunner(input: SimulationInput): SimulationRunner {
@@ -66,7 +70,7 @@ export function createRunner(input: SimulationInput): SimulationRunner {
   const rng: Rng = createRng(input.seed);
   const generator: ReturnGenerator = createReturnGenerator(input.returns);
 
-  const grid = buildGrid(months);
+  const grid = buildGrid(months, input.recordMonths);
   const gridLen = grid.length;
 
   // 그리드 시점 → 실질 환산 계수. reportBasis 가 "nominal" 이면 전부 1.

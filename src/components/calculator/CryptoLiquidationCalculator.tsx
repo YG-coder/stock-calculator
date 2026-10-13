@@ -10,6 +10,7 @@ import {
     InputField,
 } from "@/components/ui/Shared";
 import CurrencyToggle from "@/components/calculator/CurrencyToggle";
+import { formatPrice } from "@/lib/number";
 
 type Currency = "KRW" | "USDT";
 
@@ -184,7 +185,7 @@ export default function CryptoLiquidationCalculator() {
             >
                 <ResultHighlight
                     label="격리마진 근사 청산가"
-                    value={formatNumber(result.liquidationPrice)}
+                    value={formatPrice(result.liquidationPrice)}
                     unit={priceUnit}
                     tone="negative"
                 />
@@ -192,7 +193,7 @@ export default function CryptoLiquidationCalculator() {
                 <div className="grid gap-4 sm:grid-cols-2">
                     <ResultDetail
                         label="파산 가격(이론값)"
-                        value={formatNumber(result.bankruptcyPrice)}
+                        value={formatPrice(result.bankruptcyPrice)}
                         unit={priceUnit}
                     />
                     <ResultDetail

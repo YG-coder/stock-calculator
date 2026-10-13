@@ -10,6 +10,7 @@ import {
     InputField,
 } from "@/components/ui/Shared";
 import CurrencyToggle from "@/components/calculator/CurrencyToggle";
+import { calculateLeverageProfit } from "@/lib/cryptoLeverageProfit";
 
 type Currency = "KRW" | "USDT";
 
@@ -32,68 +33,18 @@ export default function CryptoLeverageProfitCalculator() {
 
     const moneyUnit = currency === "KRW" ? "원" : "USDT";
 
-    const result = useMemo(() => {
-        const entry = Number(entryPrice);
-        const exit = Number(exitPrice);
-        const marginValue = Number(margin);
-        const lev = Number(leverage);
-        const fee = Number(feeRate) / 100;
-
-        if (
-            !Number.isFinite(entry) ||
-            !Number.isFinite(exit) ||
-            !Number.isFinite(marginValue) ||
-            !Number.isFinite(lev) ||
-            !Number.isFinite(fee) ||
-            entry <= 0 ||
-            exit <= 0 ||
-            marginValue <= 0 ||
-            lev <= 0 ||
-            fee < 0
-        ) {
-            return {
-                valid: false,
-                positionSize: 0,
-                priceChangeRate: 0,
-                grossPnl: 0,
-                totalFee: 0,
-                netPnl: 0,
-                roe: 0,
-                beyondLiquidation: false,
-            };
-        }
-
-        const positionSize = marginValue * lev;
-
-        const priceChangeRate =
-            positionType === "long"
-                ? (exit - entry) / entry
-                : (entry - exit) / entry;
-
-        const grossPnl = positionSize * priceChangeRate;
-
-        const entryFee = positionSize * fee;
-        const exitFee = positionSize * fee;
-        const totalFee = entryFee + exitFee;
-
-        const netPnl = grossPnl - totalFee;
-        const roe = (netPnl / marginValue) * 100;
-        // 불리한 방향 변동폭이 1/레버리지를 넘으면 실제 거래에서는 그 전에 청산된다.
-        // 이 계산기는 청산을 모델링하지 않으므로, 도달 불가능한 구간임을 알린다.
-        const liquidationThreshold = 1 / lev;
-        const beyondLiquidation = priceChangeRate < -liquidationThreshold;
-
-        return {
-            valid: true,
-            positionSize,
-            priceChangeRate: priceChangeRate * 100,
-            grossPnl,
-            totalFee,
-            netPnl,
-            roe,
-            beyondLiquidation,
-        };
-    }, [entryPrice, exitPrice, margin, leverage, positionType, feeRate]);
+    const result = useMemo(
+        () =>
+            calculateLeverageProfit({
+                entryPrice: Number(entryPrice),
+                exitPrice: Number(exitPrice),
+                margin: Number(margin),
+                leverage: Number(leverage),
+                feeRatePercent: Number(feeRate),
+                position: positionType,
+            }),
+        [entryPrice, exitPrice, margin, leverage, positionType, feeRate]
+    );
 
     const tone =
         result.netPnl > 0 ? "positive" : result.netPnl < 0 ? "negative" : "default";
