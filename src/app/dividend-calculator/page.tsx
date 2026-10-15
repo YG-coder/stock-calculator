@@ -1,3 +1,4 @@
+import { withParticle } from "@/lib/korean";
 import DividendCalculator from "@/components/calculator/DividendCalculator";
 import SourceNote from "@/components/ui/SourceNote";
 import { DOMESTIC_DIVIDEND_TAX, FINANCIAL_INCOME_THRESHOLD, TAX_BASIS_YEAR, TAX_REVIEWED_AT } from "@/lib/taxRates";
@@ -152,7 +153,7 @@ export default function DividendCalculatorPage() {
                     intro="배당 수익 계산기는 보유 주식의 배당금, 주가, 수량을 입력하면 세전·세후 배당금과 배당수익률을 계산해주는 도구입니다. 배당 투자 전략을 세울 때 실수령 배당금을 미리 확인할 수 있습니다."
                     body="배당주 투자에서는 주가 상승뿐 아니라 매년 또는 분기별로 지급되는 배당금이 중요한 수익원입니다. 배당수익률이 높더라도 세금 후 실수령액을 기준으로 수익성을 판단해야 합니다."
                     formula="배당수익률 = 주당 배당금 ÷ 주가 × 100 | 세후 배당금 = 배당금 × (1 − 배당소득세율)"
-                    formulaNote={`국내 배당소득세는 ${DOMESTIC_DIVIDEND_TAX.rateDisplay}(${DOMESTIC_DIVIDEND_TAX.rateBreakdown})입니다. 금융소득이 연 ${FINANCIAL_INCOME_THRESHOLD.amountDisplay}을 초과하면 종합과세 대상이 될 수 있습니다. 값의 근거와 확인 범위는 위 '계산 기준과 출처'를 확인하세요.`}
+                    formulaNote={`국내 배당소득세는 ${DOMESTIC_DIVIDEND_TAX.rateDisplay}(${DOMESTIC_DIVIDEND_TAX.rateBreakdown})입니다. 금융소득이 연 ${withParticle(FINANCIAL_INCOME_THRESHOLD.amountDisplay, "을/를")} 초과하면 종합과세 대상이 될 수 있습니다. 값의 근거와 확인 범위는 위 '계산 기준과 출처'를 확인하세요.`}
                     whenToUse="배당주를 매수하기 전에 예상 배당수익률을 확인하거나, 보유 중인 배당주의 연간 세후 배당 수입을 계산할 때 활용합니다. 월 배당 수입 목표를 역산할 때도 유용합니다."
                     example={`예시: 주당 배당금 1,500원, 주가 50,000원, 100주 보유 → 세전 배당금 150,000원, 세후 배당금 약 ${new Intl.NumberFormat("ko-KR").format(Math.round(150_000 * (1 - DOMESTIC_DIVIDEND_TAX.rate)))}원(세율 ${DOMESTIC_DIVIDEND_TAX.rateDisplay} 적용), 배당수익률 3.0%.`}
                     caution="배당금은 기업 실적에 따라 변동되거나 삭감될 수 있습니다. 배당수익률이 높더라도 주가 하락 리스크를 함께 고려해야 합니다."

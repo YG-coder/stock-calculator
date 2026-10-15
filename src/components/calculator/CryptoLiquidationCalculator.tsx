@@ -1,4 +1,5 @@
 "use client";
+import { requiredNumber } from "@/lib/uiInput";
 
 import { useMemo, useState } from "react";
 import {
@@ -33,9 +34,9 @@ export default function CryptoLiquidationCalculator() {
     const priceUnit = currency === "KRW" ? "원" : "USDT";
 
     const result = useMemo(() => {
-        const entry = Number(entryPrice);
-        const lev = Number(leverage);
-        const mmr = Number(maintenanceMarginRate) / 100;
+        const entry = requiredNumber(entryPrice);
+        const lev = requiredNumber(leverage);
+        const mmr = requiredNumber(maintenanceMarginRate) / 100;
 
         if (
             !Number.isFinite(entry) ||

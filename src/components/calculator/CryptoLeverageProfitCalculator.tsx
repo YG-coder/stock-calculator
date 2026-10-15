@@ -1,4 +1,5 @@
 "use client";
+import { requiredNumber } from "@/lib/uiInput";
 
 import { useMemo, useState } from "react";
 import {
@@ -36,11 +37,11 @@ export default function CryptoLeverageProfitCalculator() {
     const result = useMemo(
         () =>
             calculateLeverageProfit({
-                entryPrice: Number(entryPrice),
-                exitPrice: Number(exitPrice),
-                margin: Number(margin),
-                leverage: Number(leverage),
-                feeRatePercent: Number(feeRate),
+                entryPrice: requiredNumber(entryPrice),
+                exitPrice: requiredNumber(exitPrice),
+                margin: requiredNumber(margin),
+                leverage: requiredNumber(leverage),
+                feeRatePercent: requiredNumber(feeRate),
                 position: positionType,
             }),
         [entryPrice, exitPrice, margin, leverage, positionType, feeRate]

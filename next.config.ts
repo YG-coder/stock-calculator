@@ -1,3 +1,4 @@
+import { SITE } from "./src/lib/site";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -8,10 +9,10 @@ const nextConfig: NextConfig = {
         has: [
           {
             type: "host",
-            value: "www.주식계산기.kr",
+            value: `www.${new URL(SITE.url).hostname}`,
           },
         ],
-        destination: "https://주식계산기.kr/:path*",
+        destination: `${SITE.url}/:path*`,
         permanent: true,
       },
     ];

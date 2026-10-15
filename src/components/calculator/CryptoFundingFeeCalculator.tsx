@@ -1,4 +1,5 @@
 "use client";
+import { requiredNumber } from "@/lib/uiInput";
 
 import { useMemo, useState } from "react";
 import {
@@ -43,7 +44,7 @@ export default function CryptoFundingFeeCalculator() {
             return { ...calc, directionText: "" };
         }
 
-        const rate = Number(fundingRate) / 100;
+        const rate = requiredNumber(fundingRate) / 100;
 
         let directionText = "";
         if (rate > 0) {

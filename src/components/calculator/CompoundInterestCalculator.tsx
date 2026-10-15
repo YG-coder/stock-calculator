@@ -34,7 +34,7 @@ export default function CompoundInterestCalculator() {
     const moneyUnit = currency === "KRW" ? "원" : "USD";
 
     const result = useMemo(
-        () => calculateCompoundInterest({ initial, monthly, rate, years }),
+        () => calculateCompoundInterest({ initial: initial.trim() || "NaN", monthly: monthly.trim() || "NaN", rate: rate.trim() || "NaN", years }),
         [initial, monthly, rate, years]
     );
 

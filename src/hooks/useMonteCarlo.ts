@@ -6,7 +6,7 @@
  *
  * - Worker 인스턴스는 훅 수명 동안 재사용한다. 실행마다 새로 만들면 초기화 비용이
  *   계산 시간을 넘긴다.
- * - 계산 중에도 이전 결과를 유지한다. 빈 화면으로 돌아가면 슬라이더를 움직일 때 깜빡인다.
+ * - 입력 변경 시 reset으로 이전 결과·경고와 진행 중인 요청을 함께 지운다.
  * - 언마운트 시 Worker 를 정리한다.
  */
 
@@ -27,12 +27,14 @@ export interface UseMonteCarloState {
   mode: "worker" | "main-thread" | "pending";
   run: (input: SimulationInput) => void;
   cancel: () => void;
+  reset: () => void;
 }
 
 export function useMonteCarlo(debounceMs = 300): UseMonteCarloState {
   const clientRef = useRef<MonteCarloClient | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(true);
+  const generationRef = useRef(0);
 
   const [status, setStatus] = useState<MonteCarloStatus>("idle");
   const [result, setResult] = useState<SimulationResult | null>(null);
@@ -63,29 +65,30 @@ export function useMonteCarlo(debounceMs = 300): UseMonteCarloState {
 
   const run = useCallback(
     (input: SimulationInput) => {
+      const generation = ++generationRef.current;
       if (timerRef.current) clearTimeout(timerRef.current);
       setStatus("running");
       setError(null);
       setProgress({ completed: 0, total: input.paths });
 
       timerRef.current = setTimeout(() => {
-        if (!mountedRef.current) return;
+        if (!mountedRef.current || generation !== generationRef.current) return;
         const client = ensureClient();
         client.run(input, {
           onProgress: (completed, total) => {
-            if (mountedRef.current) setProgress({ completed, total });
+            if (mountedRef.current && generation === generationRef.current) setProgress({ completed, total });
           },
           onResult: (next) => {
-            if (!mountedRef.current) return;
+            if (!mountedRef.current || generation !== generationRef.current) return;
             setResult(next);
             setProgress({ completed: next.meta.pathsRun, total: next.meta.pathsRun });
             setStatus("done");
           },
           onCancelled: () => {
-            if (mountedRef.current) setStatus("cancelled");
+            if (mountedRef.current && generation === generationRef.current) setStatus("cancelled");
           },
           onError: (message, issues) => {
-            if (!mountedRef.current) return;
+            if (!mountedRef.current || generation !== generationRef.current) return;
             setError({ message, issues });
             setStatus("error");
           },
@@ -96,10 +99,18 @@ export function useMonteCarlo(debounceMs = 300): UseMonteCarloState {
   );
 
   const cancel = useCallback(() => {
+    generationRef.current += 1;
     if (timerRef.current) clearTimeout(timerRef.current);
     clientRef.current?.cancel();
     setStatus("cancelled");
   }, []);
 
-  return { status, result, progress, error, mode, run, cancel };
+  const reset = useCallback(() => {
+    generationRef.current += 1;
+    if (timerRef.current) clearTimeout(timerRef.current);
+    clientRef.current?.cancel();
+    setResult(null); setError(null); setProgress(null); setStatus("idle");
+  }, []);
+
+  return { status, result, progress, error, mode, run, cancel, reset };
 }

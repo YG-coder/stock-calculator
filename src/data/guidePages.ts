@@ -1,3 +1,4 @@
+import { withParticle } from "@/lib/korean";
 /**
  * src/data/guidePages.ts
  *
@@ -456,7 +457,7 @@ export const guidePages: Record<string, GuidePageConfig> = {
         ],
         faqs: [
             {
-                question: `이익이 ${OVERSEAS_STOCK_TAX.basicDeductionDisplay}을 넘지 않으면 신고 안 해도 되나요?`,
+                question: `이익이 ${withParticle(OVERSEAS_STOCK_TAX.basicDeductionDisplay, "을/를")} 넘지 않으면 신고 안 해도 되나요?`,
                 answer:
                     "기본공제 범위 안이라 납부할 세액이 없는 경우라도, 신고 의무 여부는 상황에 따라 다를 수 있습니다. 안전하게는 본인의 거래 내역을 기준으로 홈택스 안내나 증권사 자료를 확인하는 것이 좋습니다. 이 글은 일반적인 구조 안내이며 개별 신고 판단을 대신하지 않습니다.",
             },
@@ -557,7 +558,7 @@ export const guidePages: Record<string, GuidePageConfig> = {
             {
                 heading: "금융소득이 커지면 달라지는 부분",
                 paragraphs: [
-                    `이자와 배당을 합한 연간 금융소득이 ${FINANCIAL_INCOME_THRESHOLD.amountDisplay}을 넘으면, 초과분은 다른 종합소득과 합산해 누진세율로 과세하는 '금융소득종합과세' 대상이 될 수 있습니다. 이 경우 다음 해 5월에 종합소득세를 신고해야 할 수 있습니다.`,
+                    `이자와 배당을 합한 연간 금융소득이 ${withParticle(FINANCIAL_INCOME_THRESHOLD.amountDisplay, "을/를")} 넘으면, 초과분은 다른 종합소득과 합산해 누진세율로 과세하는 '금융소득종합과세' 대상이 될 수 있습니다. 이 경우 다음 해 5월에 종합소득세를 신고해야 할 수 있습니다.`,
                     "다만 종합과세가 항상 세금을 크게 늘리는 것은 아닙니다. 본인의 다른 소득 규모에 따라 추가 세부담이 크지 않을 수도 있습니다. 또한 고배당기업 주식의 배당소득에 대한 과세특례(조세특례제한법 제104조의27)가 2025년 12월 23일 개정되어 2026년 1월 1일 시행됐습니다. 다만 적용 세율 구간과 대상 기업 요건은 이 문서에서 공식 근거로 확인하지 못해 아래 검토 기록에 남겨 두었습니다. 본인에게 어떤 기준이 적용되는지는 국세청 안내와 해당 기업 공시로 확인하세요.",
                 ],
             },

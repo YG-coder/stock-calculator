@@ -86,6 +86,8 @@ export default function CryptoAverageCalculator() {
         for (const row of rows) {
             const p = toPositive(row.price);
             const q = toPositive(row.quantity);
+      if (!row.price.trim() && !row.quantity.trim()) continue;
+      if (!row.price.trim() || !row.quantity.trim() || !Number.isFinite(p) || !Number.isFinite(q) || p <= 0 || q <= 0) { validCount = 0; break; }
             if (p > 0 && q > 0) {
                 totalQty += q;
                 totalAmount += p * q;

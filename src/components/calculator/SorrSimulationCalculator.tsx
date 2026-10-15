@@ -1,4 +1,5 @@
 "use client";
+import { requiredNumber } from "@/lib/uiInput";
 
 import { useCallback, useMemo, useState } from "react";
 import { AdvancedPanel, CalculatorCard, CalculatorLayout, GettingStarted, InputEffectNote, InputField, PercentileNote, ResultCard, ResultDetail, ResultHighlight, ResultNote, simulationIssueText } from "@/components/ui/Shared";
@@ -12,9 +13,9 @@ const percent = (value: number) => `${(value * 100).toFixed(1)}%`;
 
 export default function SorrSimulationCalculator() {
   const [fields, setFields] = useState(initialFields);
-  const { status, result, progress, error, run, cancel } = useMonteCarlo(0);
-  const set = useCallback((key: keyof Fields, value: string) => setFields((previous) => ({ ...previous, [key]: value })), []);
-  const values = useMemo<SorrSimulationValues>(() => ({ seed: Number(fields.seed), paths: Number(fields.paths), years: Number(fields.years), initialAssets: Number(fields.initialAssets), monthlyWithdrawal: Number(fields.monthlyWithdrawal), expectedReturnPercent: Number(fields.expectedReturn), volatilityPercent: Number(fields.volatility), inflationPercent: Number(fields.inflation) }), [fields]);
+  const { status, result, progress, error, run, cancel, reset } = useMonteCarlo(0);
+  const set = useCallback((key: keyof Fields, value: string) => { reset(); setFields((previous) => ({ ...previous, [key]: value })); }, [reset]);
+  const values = useMemo<SorrSimulationValues>(() => ({ seed: Number(fields.seed), paths: Number(fields.paths), years: requiredNumber(fields.years), initialAssets: requiredNumber(fields.initialAssets), monthlyWithdrawal: requiredNumber(fields.monthlyWithdrawal), expectedReturnPercent: requiredNumber(fields.expectedReturn), volatilityPercent: requiredNumber(fields.volatility), inflationPercent: requiredNumber(fields.inflation) }), [fields]);
   const start = useCallback(() => run(buildSorrSimulationInput(values)), [run, values]);
   const progressPercent = progress?.total ? progress.completed / progress.total * 100 : 0;
   const survival = result ? sorrSurvivalRate(result) : 0;

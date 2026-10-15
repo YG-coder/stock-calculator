@@ -1,4 +1,5 @@
-export const SITE_URL = "https://주식계산기.kr";
+import { SITE } from "@/lib/site";
+export const SITE_URL = SITE.url;
 
 export type CalculatorItem = {
   href: string;

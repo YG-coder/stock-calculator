@@ -1,3 +1,4 @@
+import { SITE } from "@/lib/site";
 /**
  * src/app/layout.tsx
  * 역할: 전체 레이아웃 + SEO + 애드센스 + JSON-LD
@@ -23,7 +24,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://주식계산기.kr"),
+  metadataBase: new URL(SITE.url),
   title: {
     default: "주식 계산기 모음 | 손절가, 평단가, 수익률 계산기",
     template: "%s | 주식계산기.kr",
@@ -45,19 +46,19 @@ export const metadata: Metadata = {
   authors: [
     {
       name: "주식계산기.kr",
-      url: "https://주식계산기.kr",
+      url: SITE.url,
     },
   ],
   creator: "주식계산기.kr",
   publisher: "주식계산기.kr",
   alternates: {
-    canonical: "https://주식계산기.kr",
+    canonical: SITE.url,
   },
   openGraph: {
     title: "주식 계산기 모음 | 손익, 평단가, 리스크 관리 종합 툴",
     description:
         "어려운 수식을 엑셀로 만들 필요 없이, 즉각적이고 정확한 주식 계산기로 투자 판단을 도와드립니다.",
-    url: "https://주식계산기.kr",
+    url: SITE.url,
     siteName: "주식계산기.kr",
     locale: "ko_KR",
     type: "website",

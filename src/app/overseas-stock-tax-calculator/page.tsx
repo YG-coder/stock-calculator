@@ -1,3 +1,4 @@
+import { withParticle } from "@/lib/korean";
 import type { Metadata } from "next";
 import Link from "next/link";
 import SourceNote from "@/components/ui/SourceNote";
@@ -38,7 +39,7 @@ const EX_B = example(6_000_000);
 export const metadata: Metadata = withPageMetadata(config.metadata, "/overseas-stock-tax-calculator");
 
 const FAQ_ITEMS = [
-  { question: "해외주식 양도소득세는 얼마인가요?", answer: `기본공제 ${DEDUCTION}을 초과한 양도차익에 대해 ${RATE}의 세율이 적용됩니다. 예를 들어 수익이 ${manwon(EX_A.gain)}이면 ${manwon(EX_A.taxable)}에 대해 ${RATE}인 ${manwon(EX_A.tax)}의 세금이 발생합니다. (${OVERSEAS_STOCK_TAX.rateBreakdown}, ${TAX_BASIS_YEAR}년 기준)` },
+  { question: "해외주식 양도소득세는 얼마인가요?", answer: `기본공제 ${withParticle(DEDUCTION, "을/를")} 초과한 양도차익에 대해 ${RATE}의 세율이 적용됩니다. 예를 들어 수익이 ${manwon(EX_A.gain)}이면 ${manwon(EX_A.taxable)}에 대해 ${RATE}인 ${manwon(EX_A.tax)}의 세금이 발생합니다. (${OVERSEAS_STOCK_TAX.rateBreakdown}, ${TAX_BASIS_YEAR}년 기준)` },
   { question: "환차익도 과세 대상인가요?", answer: "네, 해외주식 매매 시 환율 변동으로 발생한 손익도 과세 대상 양도차익에 포함됩니다. 이 계산기는 매수 금액과 매도 금액을 각각 그 시점 환율로 환산한 실제 원화 금액으로 입력받으므로, 환율 변동 효과는 두 금액의 차이에 자동으로 반영됩니다. 따라서 별도로 환차익을 더해 입력할 필요는 없습니다." },
   { question: "국내주식도 같은 방식으로 계산하나요?", answer: "아니요. 일반 개인투자자의 국내주식 매매차익은 현재 비과세입니다. 해외주식은 양도소득세 대상이므로 세금 구조가 다릅니다." },
   { question: "손익 통산은 어떻게 하나요?", answer: "같은 해에 여러 해외주식 종목에서 수익과 손실이 모두 발생했다면, 이를 합산한 순수익에 기본공제를 적용합니다. 예를 들어 A종목 +700만, B종목 -200만이면 합산 수익은 500만 원이 됩니다." },
@@ -123,8 +124,8 @@ export default function OverseasStockTaxCalculatorPage() {
                             </div>
                         </div>
                         <p>
-                            예를 들어 미국 주식에서 {manwon(EX_A.gain)} 수익을 냈다면 기본공제 {DEDUCTION}을 뺀
-                            {manwon(EX_A.taxable)}이 과세 대상이며, 세금은 {manwon(EX_A.tax)}입니다. 세후 수익은 {manwon(EX_A.net)}이 됩니다.
+                            예를 들어 미국 주식에서 {manwon(EX_A.gain)} 수익을 냈다면 기본공제 {withParticle(DEDUCTION, "을/를")} 뺀
+                            {withParticle(manwon(EX_A.taxable), "이/가")} 과세 대상이며, 세금은 {manwon(EX_A.tax)}입니다. 세후 수익은 {withParticle(manwon(EX_A.net), "이/가")} 됩니다.
                         </p>
                         <p>
                             실제 신고 시에는 증권사 거래내역에 반영된 필요경비와 수수료 등에 따라
@@ -140,7 +141,7 @@ export default function OverseasStockTaxCalculatorPage() {
                             해당 연도의 실제 신고·납부 기한을 확인하세요.
                         </p>
                         <p>
-                            기본공제 {DEDUCTION}은 1년에 1회 적용되며, 여러 종목에서 발생한 손익을 합산한 뒤
+                            기본공제 {withParticle(DEDUCTION, "은/는")} 1년에 1회 적용되며, 여러 종목에서 발생한 손익을 합산한 뒤
                             공제합니다.
                         </p>
                         <p>
@@ -191,10 +192,10 @@ export default function OverseasStockTaxCalculatorPage() {
 
                 <SeoContent
                     title="해외주식 세금 계산기"
-                    intro={`해외주식에 투자할 때는 수익뿐 아니라 세금도 함께 고려해야 합니다. 양도소득세 기본공제 ${DEDUCTION}을 초과하는 수익에 대해 ${RATE}의 세율이 적용되므로, 수익 실현 전에 예상 세금을 미리 파악하는 것이 중요합니다.`}
+                    intro={`해외주식에 투자할 때는 수익뿐 아니라 세금도 함께 고려해야 합니다. 양도소득세 기본공제 ${withParticle(DEDUCTION, "을/를")} 초과하는 수익에 대해 ${RATE}의 세율이 적용되므로, 수익 실현 전에 예상 세금을 미리 파악하는 것이 중요합니다.`}
                     body="특히 연말 절세 전략을 세울 때, 올해 남은 기본공제 한도를 파악하거나 손실 종목을 활용한 손익 통산 계획을 세울 때 이 계산기가 유용합니다."
                     formula={`세금 = (양도차익 − ${DEDUCTION} 기본공제) × ${RATE}`}
-                    formulaNote={`기본공제 ${DEDUCTION}은 연간 1회 적용됩니다. ${OVERSEAS_STOCK_TAX.rateBreakdown}를 합해 ${RATE}입니다. 값의 근거와 확인 범위는 위 '계산 기준과 출처'를 확인하세요. 세법 개정 시 변동될 수 있습니다.`}
+                    formulaNote={`기본공제 ${withParticle(DEDUCTION, "은/는")} 연간 1회 적용됩니다. ${withParticle(OVERSEAS_STOCK_TAX.rateBreakdown, "을/를")} 합해 ${RATE}입니다. 값의 근거와 확인 범위는 위 '계산 기준과 출처'를 확인하세요. 세법 개정 시 변동될 수 있습니다.`}
                     whenToUse="미국 주식, ETF 등 해외 자산 매도를 검토할 때, 또는 연말 절세를 위해 손익을 통산할 시기를 계획할 때 활용하면 좋습니다. 세후 실수익이 얼마인지 미리 파악하면 더 나은 투자 결정을 내릴 수 있습니다."
                     example={`예시: 미국 주식을 매수 1,000만 원, 매도 1,600만 원에 처분 → 양도차익 ${manwon(EX_B.gain)}, 기본공제 ${DEDUCTION} 차감 후 과세 표준 ${manwon(EX_B.taxable)} × ${RATE} = 세금 ${manwon(EX_B.tax)}, 세후 수익 ${manwon(EX_B.net)}.`}
                     caution="본 계산기는 참고용이며 실제 세금은 환율, 거래 수수료, 다른 해외 소득과의 합산 여부에 따라 달라질 수 있습니다. 정확한 세액은 세무사 또는 국세청에 문의하세요."

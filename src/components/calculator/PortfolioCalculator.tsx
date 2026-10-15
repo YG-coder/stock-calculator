@@ -14,15 +14,16 @@ const defaults: AssetInput[] = [
 export default function PortfolioCalculator() {
   const [assets, setAssets] = useState(defaults);
   const [correlations, setCorrelations] = useState(["", "", ""]);
-  const parsed = useMemo<PortfolioAsset[]>(() => assets.map((asset) => ({ name: asset.name, weight: Number(asset.weight) / 100, expectedReturn: Number(asset.expectedReturn) / 100, volatility: Number(asset.volatility) / 100 })), [assets]);
-  const matrix = useMemo(() => [[1, Number(correlations[0]), Number(correlations[1])], [Number(correlations[0]), 1, Number(correlations[2])], [Number(correlations[1]), Number(correlations[2]), 1]], [correlations]);
-  const calculated = useMemo(() => { try { return { result: calculatePortfolio(parsed, matrix), error: "" }; } catch (error) { return { result: null, error: error instanceof Error ? error.message : "입력값을 확인해 주세요." }; } }, [parsed, matrix]);
+  const parsed = useMemo<PortfolioAsset[]>(() => assets.map((asset) => ({ name: asset.name, weight: Number(asset.weight) / 100, expectedReturn: Number(asset.weight) === 0 ? 0 : Number(asset.expectedReturn) / 100, volatility: Number(asset.weight) === 0 ? 0 : Number(asset.volatility) / 100 })), [assets]);
+  const matrix = useMemo(() => [[1, (parsed[0].weight && parsed[1].weight ? Number(correlations[0]) : 0), (parsed[0].weight && parsed[2].weight ? Number(correlations[1]) : 0)], [(parsed[0].weight && parsed[1].weight ? Number(correlations[0]) : 0), 1, (parsed[1].weight && parsed[2].weight ? Number(correlations[2]) : 0)], [(parsed[0].weight && parsed[2].weight ? Number(correlations[1]) : 0), (parsed[1].weight && parsed[2].weight ? Number(correlations[2]) : 0), 1]], [correlations, parsed]);
+  const complete = assets.every(a => a.weight.trim() !== "" && (Number(a.weight) === 0 || (a.expectedReturn.trim() !== "" && a.volatility.trim() !== ""))) && [[0,1],[0,2],[1,2]].every(([a,b], i) => Number(assets[a].weight) === 0 || Number(assets[b].weight) === 0 || correlations[i].trim() !== "");
+  const calculated = useMemo(() => { if (!complete) return { result: null, error: "적용되는 자산의 비중·수익률·변동성·상관계수를 입력해 주세요. 0도 직접 입력해야 합니다." }; try { return { result: calculatePortfolio(parsed, matrix), error: "" }; } catch (error) { return { result: null, error: error instanceof Error ? error.message : "입력값을 확인해 주세요." }; } }, [parsed, matrix, complete]);
   const hasInput = assets.some((asset) => asset.weight !== "" || asset.expectedReturn !== "" || asset.volatility !== "") || correlations.some((value) => value !== "");
   const updateAsset = (index: number, key: keyof AssetInput, value: string) => setAssets((items) => items.map((item, itemIndex) => itemIndex === index ? { ...item, [key]: value } : item));
   const updateCorrelation = (index: number, value: string) => setCorrelations((items) => items.map((item, itemIndex) => itemIndex === index ? value : item));
 
   return <CalculatorLayout>
-    <CalculatorCard title="자산별 가정" description="직접 입력한 기대수익률·변동성·상관계수로 계산합니다. 기본값은 예시일 뿐 시장 전망이나 추천값이 아닙니다.">
+    <CalculatorCard title="자산별 가정" description="직접 입력한 기대수익률·변동성·상관계수로 계산합니다. 입력값은 시장 전망이나 추천값이 아닌 가정입니다. 비중이 0인 자산의 수익률·변동성과 관련 상관계수는 사용하지 않습니다.">
       {assets.map((asset, index) => <div key={index} className="grid gap-3 border-b border-slate-100 pb-5 last:border-0 sm:grid-cols-2 lg:grid-cols-4">
         <InputField id={`portfolio-name-${index}`} label="자산명" value={asset.name} onChange={(event) => updateAsset(index, "name", event.target.value)} placeholder={index === 0 ? "예: 주식" : index === 1 ? "예: 채권" : "예: 현금"} />
         <InputField id={`portfolio-weight-${index}`} label="비중" type="number" value={asset.weight} onChange={(event) => updateAsset(index, "weight", event.target.value)} unit="%" placeholder={`예: ${[60, 30, 10][index]}`} />

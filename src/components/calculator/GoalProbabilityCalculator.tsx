@@ -1,4 +1,5 @@
 "use client";
+import { requiredNumber } from "@/lib/uiInput";
 
 import { useCallback, useMemo, useState } from "react";
 import { AdvancedPanel, CalculatorCard, CalculatorLayout, InputEffectNote, InputField, PercentileNote, ResultCard, ResultDetail, ResultHighlight, ResultNote, SelectField, simulationIssueText } from "@/components/ui/Shared";
@@ -13,10 +14,10 @@ const pct = (v: number) => Number.isFinite(v) ? `${(v * 100).toFixed(1)}%` : "-"
 
 export default function GoalProbabilityCalculator() {
   const [fields, setFields] = useState<Fields>(INITIAL);
-  const { status, result, progress, error, run, cancel } = useMonteCarlo(0);
-  const set = useCallback(<K extends keyof Fields>(key: K, value: Fields[K]) => setFields((prev) => ({ ...prev, [key]: value })), []);
+  const { status, result, progress, error, run, cancel, reset } = useMonteCarlo(0);
+  const set = useCallback(<K extends keyof Fields>(key: K, value: Fields[K]) => { reset(); setFields((prev) => ({ ...prev, [key]: value })); }, [reset]);
   const values = useMemo<GoalProbabilityValues>(() => ({
-    seed: Number(fields.seed), paths: Number(fields.paths), years: Number(fields.years), initialBalance: Number(fields.initialBalance), monthlyAmount: Number(fields.monthlyAmount), expectedReturnPercent: Number(fields.expectedReturn), volatilityPercent: Number(fields.volatility), inflationPercent: Number(fields.inflation), timing: "end", inflationIndexed: false, reportBasis: fields.reportBasis, targetAmount: Number(fields.targetAmount), targetProbabilityPercent: Number(fields.targetProbability),
+    seed: Number(fields.seed), paths: Number(fields.paths), years: requiredNumber(fields.years), initialBalance: requiredNumber(fields.initialBalance), monthlyAmount: requiredNumber(fields.monthlyAmount), expectedReturnPercent: requiredNumber(fields.expectedReturn), volatilityPercent: requiredNumber(fields.volatility), inflationPercent: requiredNumber(fields.inflation), timing: "end", inflationIndexed: false, reportBasis: fields.reportBasis, targetAmount: requiredNumber(fields.targetAmount), targetProbabilityPercent: requiredNumber(fields.targetProbability),
   }), [fields]);
   const start = useCallback(() => run(buildGoalProbabilityInput(values)), [run, values]);
   const inversion = result?.goal?.inversion;

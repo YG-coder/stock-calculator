@@ -1,5 +1,7 @@
 "use client";
+import { requiredNumber } from "@/lib/uiInput";
 
+import { withParticle } from "@/lib/korean";
 import { useMemo, useState, type ChangeEvent } from "react";
 import {
     DOMESTIC_DIVIDEND_TAX,
@@ -57,10 +59,10 @@ export default function DividendCalculator() {
     const taxRateEntered = taxRate.trim() !== "";
 
     const result = useMemo(() => {
-        const qty = Number(shares);
-        const dividend = Number(dividendPerShare);
-        const price = Number(buyPrice);
-        const tax = Number(taxRate) / 100;
+        const qty = requiredNumber(shares);
+        const dividend = requiredNumber(dividendPerShare);
+        const price = requiredNumber(buyPrice);
+        const tax = requiredNumber(taxRate) / 100;
 
         if (taxRate.trim() === "") {
             return {
@@ -222,7 +224,7 @@ export default function DividendCalculator() {
                 </div>
 
                 <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                    연간 이자·배당 금융소득 합계가 {FINANCIAL_INCOME_THRESHOLD.amountDisplay}을 초과하면
+                    연간 이자·배당 금융소득 합계가 {withParticle(FINANCIAL_INCOME_THRESHOLD.amountDisplay, "을/를")} 초과하면
                     금융소득종합과세 대상이 될 수 있으며 실제 세금은 달라질 수 있습니다.
                 </div>
             </ResultCard>

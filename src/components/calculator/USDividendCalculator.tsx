@@ -1,5 +1,6 @@
 "use client";
 
+import { withParticle } from "@/lib/korean";
 import { useMemo, useState } from "react";
 import { FINANCIAL_INCOME_THRESHOLD } from "@/lib/taxRates";
 import { calculateUsDividend } from "@/lib/usDividend";
@@ -152,7 +153,7 @@ export default function USDividendCalculator() {
                 <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-800">
                     이 계산기의 세율은 미국 현지에서 먼저 떼는 원천징수세율이며, 국내에서 정산되는
                     최종 세금과 동일한 개념이 아닙니다. 국내에서 다른 이자·배당소득과 합산하여 연간
-                    금융소득이 {FINANCIAL_INCOME_THRESHOLD.amountDisplay}을 초과하면 종합과세 대상이 될 수
+                    금융소득이 {withParticle(FINANCIAL_INCOME_THRESHOLD.amountDisplay, "을/를")} 초과하면 종합과세 대상이 될 수
                     있습니다.
                 </div>
             </ResultCard>

@@ -1,4 +1,5 @@
 "use client";
+import { requiredNumber } from "@/lib/uiInput";
 
 import { useMemo, useState } from "react";
 import {
@@ -47,11 +48,11 @@ export default function CryptoEntryCalculator() {
     const moneyUnit = currency === "KRW" ? "원" : "USDT";
 
     const result = useMemo(() => {
-        const entry = Number(entryPrice);
-        const stop = Number(stopPrice);
-        const seedValue = Number(seed);
-        const risk = Number(riskPercent);
-        const rr = Number(rewardRatio);
+        const entry = requiredNumber(entryPrice);
+        const stop = requiredNumber(stopPrice);
+        const seedValue = requiredNumber(seed);
+        const risk = requiredNumber(riskPercent);
+        const rr = requiredNumber(rewardRatio);
 
         const empty = {
             valid: false as const,

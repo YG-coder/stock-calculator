@@ -11,8 +11,7 @@ const won=(v:number)=>Number.isFinite(v)?new Intl.NumberFormat("ko-KR",{maximumF
 const pct=(v:number)=>Number.isFinite(v)?`${(v*100).toFixed(1)}%`:"-";
 
 export default function FireCalculator(){
-  const [f,setF]=useState<Fields>(INITIAL); const {status,result,progress,error,mode,run,cancel}=useMonteCarlo(0);
-  const set=useCallback(<K extends keyof Fields>(k:K,v:Fields[K])=>setF(p=>({...p,[k]:v})),[]);
+  const [f,setF]=useState<Fields>(INITIAL); const {status,result,progress,error,mode,run,cancel,reset}=useMonteCarlo(0);
   const parsed=useMemo(()=>parseFireFields(f),[f]);
   // 빈칸 안내는 실행을 한 번 시도한 뒤에만 띄운다(첫 화면부터 경고로 덮지 않기 위해). 음수·나이 순서 오류는 입력 즉시 안내한다.
   const [attempted,setAttempted]=useState(false);
@@ -20,6 +19,7 @@ export default function FireCalculator(){
   const localError=localIssues.length?localIssues:null;
   // 마지막으로 실행을 요청한 입력의 비교 키(요청 기준·경로 수 상한 없음). 계산 중 안내 문구를 고르는 데만 쓴다.
   const [submittedKey,setSubmittedKey]=useState<string|null>(null);
+  const set=useCallback(<K extends keyof Fields>(k:K,v:Fields[K])=>{reset();setAttempted(false);setSubmittedKey(null);setF(p=>({...p,[k]:v}));},[reset]);
   const start=useCallback(()=>{setAttempted(true);if(!parsed.ok)return;setSubmittedKey(fireRequestKey(f));run(buildFireInput(parsed.values));},[f,parsed,run]);
   // 표시 중인 결과가 현재 입력의 결과인지 결과 자체의 input 으로 판정한다(입력 변경·빈칸·음수·늦게 도착한 결과 모두 같은 규칙).
   const pathsCap=mode==="main-thread"?FALLBACK_MAX_PATHS:undefined;

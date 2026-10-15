@@ -88,6 +88,8 @@ export default function AveragePriceCalculator() {
     for (const row of rows) {
       const p = parsePositive(row.price);
       const q = parsePositive(row.quantity);
+      if (!row.price.trim() && !row.quantity.trim()) continue;
+      if (!row.price.trim() || !row.quantity.trim() || !Number.isFinite(p) || !Number.isFinite(q) || p <= 0 || q <= 0) { validCount = 0; break; }
       if (p > 0 && q > 0) {
         totalQuantity += q;
         totalAmount += p * q;
@@ -247,7 +249,7 @@ export default function AveragePriceCalculator() {
 
       <ResultCard
         title="평단가 계산 결과"
-        emptyMessage="매수가와 수량을 입력하면 결과가 표시됩니다."
+        emptyMessage="입력한 행의 매수가와 수량을 모두 채워 주세요. 빈 행은 계산에 포함하지 않습니다."
         isValid={result.valid}
       >
         <ResultHighlight

@@ -1,4 +1,5 @@
 "use client";
+import { requiredNumber } from "@/lib/uiInput";
 
 import { useMemo, useState } from "react";
 import {
@@ -32,11 +33,11 @@ export default function CryptoProfitCalculator() {
     const moneyUnit = currency === "KRW" ? "원" : "USDT";
 
     const result = useMemo(() => {
-        const buy = Number(buyPrice);
-        const sell = Number(sellPrice);
-        const qty = Number(quantity);
-        const buyFee = Number(buyFeeRate) / 100;
-        const sellFee = Number(sellFeeRate) / 100;
+        const buy = requiredNumber(buyPrice);
+        const sell = requiredNumber(sellPrice);
+        const qty = requiredNumber(quantity);
+        const buyFee = requiredNumber(buyFeeRate) / 100;
+        const sellFee = requiredNumber(sellFeeRate) / 100;
 
         if (
             !Number.isFinite(buy) ||

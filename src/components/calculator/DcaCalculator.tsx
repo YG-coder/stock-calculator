@@ -1,4 +1,5 @@
 "use client";
+import { requiredNumber } from "@/lib/uiInput";
 
 import { useCallback, useMemo, useState } from "react";
 import { AdvancedPanel, CalculatorCard, CalculatorLayout, InputField, PercentileNote, ResultCard, ResultDetail, ResultHighlight, ResultNote, SelectField, simulationIssueText } from "@/components/ui/Shared";
@@ -74,14 +75,14 @@ function FanChart({ bands }: { bands: PercentileBand[] }) {
 
 export default function DcaCalculator() {
   const [fields, setFields] = useState<Fields>(INITIAL);
-  const { status, result, progress, error, run, cancel } = useMonteCarlo(0);
-  const set = useCallback(<K extends keyof Fields>(key: K, value: Fields[K]) => setFields((prev) => ({ ...prev, [key]: value })), []);
+  const { status, result, progress, error, run, cancel, reset } = useMonteCarlo(0);
+  const set = useCallback(<K extends keyof Fields>(key: K, value: Fields[K]) => { reset(); setFields((prev) => ({ ...prev, [key]: value })); }, [reset]);
 
   const values = useMemo<DcaFormValues>(() => ({
-    seed: Number(fields.seed), paths: Number(fields.paths), years: Number(fields.years),
-    initialBalance: Number(fields.initialBalance), monthlyAmount: Number(fields.monthlyAmount),
-    expectedReturnPercent: Number(fields.expectedReturn), volatilityPercent: Number(fields.volatility),
-    inflationPercent: Number(fields.inflation), timing: fields.timing,
+    seed: Number(fields.seed), paths: Number(fields.paths), years: requiredNumber(fields.years),
+    initialBalance: requiredNumber(fields.initialBalance), monthlyAmount: requiredNumber(fields.monthlyAmount),
+    expectedReturnPercent: requiredNumber(fields.expectedReturn), volatilityPercent: requiredNumber(fields.volatility),
+    inflationPercent: requiredNumber(fields.inflation), timing: fields.timing,
     inflationIndexed: fields.inflationIndexed, reportBasis: fields.reportBasis,
   }), [fields]);
 
@@ -90,8 +91,9 @@ export default function DcaCalculator() {
   const principal = result ? contributionsFromInput(result.input) : 0;
   const medianGain = result ? result.terminal.p50 - principal : 0;
   const applyExampleAssumptions = useCallback(() => {
+    reset();
     setFields((prev) => ({ ...prev, ...EXAMPLE_ASSUMPTIONS }));
-  }, []);
+  }, [reset]);
 
   return (
     <CalculatorLayout>

@@ -1,4 +1,5 @@
 "use client";
+import { requiredNumber } from "@/lib/uiInput";
 
 import { useMemo, useState } from "react";
 import {
@@ -23,7 +24,7 @@ export default function StockTransactionTaxCalculator() {
   const [market, setMarket] = useState<StockMarket>("kospi");
   const [saleAmount, setSaleAmount] = useState("");
 
-  const amount = Number(saleAmount);
+  const amount = requiredNumber(saleAmount);
   const valid = saleAmount.trim() !== "" && Number.isFinite(amount) && amount > 0;
   const result = useMemo(
     () => (valid ? calculateStockTransactionTax(amount, market) : null),

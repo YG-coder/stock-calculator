@@ -13,7 +13,7 @@ vi.mock("next/navigation", () => ({ usePathname: () => "/fire-calculator" }));
 const { default: FireCalculator } = await import("@/components/calculator/FireCalculator");
 
 const result = runSimulation(buildFireInput({ seed: 1, paths: 10, currentAge: 35.5, retirementAge: 55, planToAge: 85, currentAssets: 10_000_000, monthlyContribution: 0, monthlyExpenses: 0, expectedReturnPercent: 0, volatilityPercent: 0, inflationPercent: 0 }));
-const state = (overrides: Partial<UseMonteCarloState>): UseMonteCarloState => ({ status: "done", result, progress: null, error: null, mode: "worker", run: () => {}, cancel: () => {}, ...overrides });
+const state = (overrides: Partial<UseMonteCarloState>): UseMonteCarloState => ({ status: "done", result, progress: null, error: null, mode: "worker", run: () => {}, cancel: () => {}, reset: () => {}, ...overrides });
 
 describe("FireCalculator 이전 결과 표시", () => {
   it("현재 입력(빈칸)과 다른 결과는 변경 안내와 '이전 계산 결과'로 표시한다", () => {

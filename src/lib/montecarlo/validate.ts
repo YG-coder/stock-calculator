@@ -122,7 +122,7 @@ export function validateInput(input: SimulationInput): ValidationIssue[] {
         });
       }
       if (cf.monthlyAmount !== 0) {
-        bad("cashFlow.monthlyAmount", "다단계 현금흐름(phases)을 사용할 때 monthlyAmount는 0이어야 합니다. 각 구간의 monthlyAmount를 사용하세요.");
+        bad("cashFlow.monthlyAmount", "다단계 현금흐름을 사용할 때 공통 월 금액은 0이어야 합니다. 각 구간의 월 금액을 입력하세요.");
       }
     }
   }

@@ -16,6 +16,7 @@ export default function CurrencyToggle<T extends string>({
             <button
                 type="button"
                 onClick={() => onChange(left)}
+                aria-pressed={value === left}
                 className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${value === left
                         ? "bg-white text-slate-900 shadow-sm"
                         : "text-slate-500 hover:text-slate-700"
@@ -26,6 +27,7 @@ export default function CurrencyToggle<T extends string>({
             <button
                 type="button"
                 onClick={() => onChange(right)}
+                aria-pressed={value === right}
                 className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${value === right
                         ? "bg-white text-slate-900 shadow-sm"
                         : "text-slate-500 hover:text-slate-700"

@@ -1,4 +1,5 @@
 "use client";
+import { requiredNumber } from "@/lib/uiInput";
 
 import { useMemo, useState } from "react";
 import {
@@ -28,11 +29,11 @@ export default function USExchangeProfitCalculator() {
     const [sellFeeKrw, setSellFeeKrw] = useState("");
 
     const result = useMemo(() => {
-        const buyPrice = Number(buyPriceUsd);
-        const sellPrice = Number(sellPriceUsd);
-        const qty = Number(quantity);
-        const buyRate = Number(buyExchangeRate);
-        const sellRate = Number(sellExchangeRate);
+        const buyPrice = requiredNumber(buyPriceUsd);
+        const sellPrice = requiredNumber(sellPriceUsd);
+        const qty = requiredNumber(quantity);
+        const buyRate = requiredNumber(buyExchangeRate);
+        const sellRate = requiredNumber(sellExchangeRate);
         const buyFee = Number(buyFeeKrw || "0");
         const sellFee = Number(sellFeeKrw || "0");
 

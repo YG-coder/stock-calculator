@@ -49,7 +49,7 @@ describe("다단계 현금흐름", () => {
   it("phases와 0이 아닌 최상위 monthlyAmount를 함께 전달하면 거부한다", () => {
     expect(() => runSimulation(baseInput({ cashFlow: { monthlyAmount: 999_999, timing: "end", inflationIndexed: false, phases: [
       { fromMonth: 0, toMonth: 12, monthlyAmount: 100, timing: "end", inflationIndexed: false },
-    ] } }))).toThrow(/monthlyAmount는 0/);
+    ] } }))).toThrow(/공통 월 금액은 0/);
   });
 
   it("phases에서 지원하지 않는 필요 납입액 역산 요청을 명시적으로 거부한다", () => {
