@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { BASE_URL, OG_IMAGE } from "@/lib/metadata";
+import { BASE_URL, withPageMetadata } from "@/lib/metadata";
 import { CALCULATORS } from "@/lib/constants";
 import { getIndexableGuides } from "@/data/guidePages";
 
@@ -12,33 +12,17 @@ const HOME_DESCRIPTION =
 const HOME_INTRO =
   "주식 계산기는 매수가·현재가·수량 등 입력값으로 손익과 투자 조건을 계산하는 도구입니다. 이 사이트에서는 수익률·평단가·손절가·목표가·배당·복리를 무료로 계산할 수 있습니다. 보유 손익을 확인하려면 수익률 계산기로, 추가 매수를 비교하려면 평단가 계산기로 시작하세요.";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL),
-  title: { absolute: HOME_TITLE },
-  description: HOME_DESCRIPTION,
-  alternates: { canonical: HOME_URL },
-  robots: { index: true, follow: true },
-  openGraph: {
-    type: "website",
-    locale: "ko_KR",
-    siteName: "주식계산기.kr",
-    url: HOME_URL,
-    title: HOME_TITLE,
+// 공통 메타데이터 함수로 canonical·og:url·공유 이미지·큰 카드를 함께 만든다(기존 출력값 유지).
+export const metadata: Metadata = withPageMetadata(
+  {
+    title: { absolute: HOME_TITLE },
     description: HOME_DESCRIPTION,
-    images: [{
-      url: new URL(OG_IMAGE, BASE_URL).href,
-      width: 1200,
-      height: 630,
-      alt: "주식계산기.kr",
-    }],
+    robots: { index: true, follow: true },
+    openGraph: { title: HOME_TITLE, description: HOME_DESCRIPTION },
   },
-  twitter: {
-    card: "summary_large_image",
-    title: HOME_TITLE,
-    description: HOME_DESCRIPTION,
-    images: [new URL(OG_IMAGE, BASE_URL).href],
-  },
-};
+  "/",
+  { imageAlt: "주식계산기.kr" }
+);
 
 const HOME_SCHEMA = {
   "@context": "https://schema.org",

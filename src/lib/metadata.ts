@@ -75,10 +75,15 @@ export function buildMetadata({
  * 이 래퍼가 없으면 Next.js 가 정의되지 않은 필드를 루트 레이아웃에서 상속하므로
  * canonical 이 홈(/)으로, twitter 카드가 홈 문구로 지정된다.
  */
-export function withPageMetadata(meta: Metadata, path: string): Metadata {
+export function withPageMetadata(
+    meta: Metadata,
+    path: string,
+    options: { imageAlt?: string } = {}
+): Metadata {
     const normalizedPath =
-        !path || path === "/" ? "" : path.startsWith("/") ? path : `/${path}`;
-    const url = `${BASE_URL}${normalizedPath}`;
+        !path || path === "/" ? "/" : path.startsWith("/") ? path : `/${path}`;
+    // URL 파서로 만든다. 홈은 기존 canonical 과 같은 "https://…kr/" 형태가 된다.
+    const url = new URL(normalizedPath, BASE_URL).href;
 
     const og = meta.openGraph as
         | { title?: string; description?: string }
@@ -107,7 +112,7 @@ export function withPageMetadata(meta: Metadata, path: string): Metadata {
                     url: OG_IMAGE,
                     width: 1200,
                     height: 630,
-                    alt: `${ogTitle ?? SITE_NAME}`,
+                    alt: options.imageAlt ?? `${ogTitle ?? SITE_NAME}`,
                 },
             ],
         },
