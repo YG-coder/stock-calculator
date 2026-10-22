@@ -76,6 +76,7 @@ export default function StopLossCalculatorPageClient() {
           >
             <div className="space-y-5">
               <InputField
+                  id="sl-buy-price"
                   label="매수가 (원)"
                   type="number"
                   inputMode="decimal"
@@ -85,6 +86,7 @@ export default function StopLossCalculatorPageClient() {
               />
 
               <InputField
+                  id="sl-quantity"
                   label="보유 수량 (주)"
                   type="number"
                   inputMode="numeric"
@@ -94,6 +96,7 @@ export default function StopLossCalculatorPageClient() {
               />
 
               <InputField
+                  id="sl-percent"
                   label="손절 비율 (%)"
                   type="number"
                   inputMode="decimal"

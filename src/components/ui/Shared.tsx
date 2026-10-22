@@ -175,7 +175,7 @@ export function ResultCard({
       {isValid ? (
         children
       ) : (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center whitespace-pre-line text-slate-400">
+        <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center whitespace-pre-line text-slate-500">
           {emptyMessage ?? "값을 입력하면 결과가 표시됩니다."}
         </div>
       )}
@@ -487,7 +487,7 @@ type TextareaFieldProps = {
 };
 
 export function TextareaField({ id, label, value, onChange, placeholder, className = "" }: TextareaFieldProps) {
-  return <div className={`space-y-2 ${className}`}><label htmlFor={id} className="block text-sm font-semibold text-slate-700">{label}</label><textarea id={id} value={value} onChange={onChange} placeholder={placeholder} className="min-h-32 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500" /></div>;
+  return <div className={`space-y-2 ${className}`}><label htmlFor={id} className="block text-sm font-semibold text-slate-700">{label}</label><textarea id={id} value={value} onChange={onChange} placeholder={placeholder} className="min-h-32 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-500 focus:border-slate-500" /></div>;
 }
 
 /* =========================

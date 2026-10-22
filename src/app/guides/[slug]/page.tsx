@@ -267,7 +267,7 @@ export default async function GuideDetailPage({
                         <ul className="mt-3 space-y-2 text-sm leading-relaxed text-slate-700">
                             {guide.nextSteps.items.map((item) => (
                                 <li key={item} className="flex gap-2">
-                                    <span aria-hidden="true" className="text-slate-400">
+                                    <span aria-hidden="true" className="text-slate-500">
                                         □
                                     </span>
                                     <span>{item}</span>

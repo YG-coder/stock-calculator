@@ -147,7 +147,7 @@ export default function RootLayout({
             </a>
           </p>
 
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500">
             운영: 인컴랩 · © {new Date().getFullYear()} 주식계산기.kr All rights reserved.
           </p>
         </div>

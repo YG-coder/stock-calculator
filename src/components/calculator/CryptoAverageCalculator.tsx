@@ -166,7 +166,7 @@ export default function CryptoAverageCalculator() {
                                     <button
                                         type="button"
                                         onClick={() => removeRow(row.id)}
-                                        className="rounded-lg px-2 py-1 text-xs font-semibold text-slate-400 transition hover:bg-slate-100 hover:text-red-500"
+                                        className="rounded-lg px-2 py-1 text-xs font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-red-500"
                                         aria-label={`${index + 1}차 매수 삭제`}
                                     >
                                         삭제
@@ -214,7 +214,7 @@ export default function CryptoAverageCalculator() {
                         초기화
                     </button>
                     {rows.length >= MAX_ROWS ? (
-                        <span className="self-center text-xs text-slate-400">
+                        <span className="self-center text-xs text-slate-500">
                             최대 {MAX_ROWS}회까지 입력할 수 있습니다.
                         </span>
                     ) : null}
