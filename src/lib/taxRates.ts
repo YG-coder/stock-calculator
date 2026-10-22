@@ -84,7 +84,7 @@ export const US_DIVIDEND_WITHHOLDING = {
 export const FINANCIAL_INCOME_THRESHOLD = {
     amount: 20_000_000,
     amountDisplay: "2,000만 원",
-    note: "이자·배당을 합한 연간 금융소득이 이 금액을 넘으면 초과분이 종합과세 대상이 될 수 있습니다.",
+    note: "비과세·분리과세 소득 등을 제외한 연간 금융소득이 이 금액을 넘으면 종합과세 대상이 될 수 있습니다. 최종 세액은 소득세법 제62조의 비교과세, 다른 소득과 공제 등을 함께 적용하므로 초과분에 단일 세율을 곱한 값과 다를 수 있습니다.",
     asOf: TAX_REVIEWED_AT,
     sources: [TAX_SOURCES.nts],
 } as const;

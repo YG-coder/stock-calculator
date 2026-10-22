@@ -67,11 +67,16 @@ export default function DividendCalculatorPage() {
           ]}
           conditions={[
             "세율은 기본값이며 직접 수정할 수 있습니다. 계좌 종류와 소득 구간에 따라 실제 세율이 달라질 수 있습니다.",
-            "이자·배당을 합한 연간 금융소득이 2,000만 원을 넘으면 초과분이 종합과세 대상이 될 수 있습니다.",
+            FINANCIAL_INCOME_THRESHOLD.note,
+            "금융소득종합과세 기준금액과 비교과세는 소득세법 제14조·제62조의 2026년 시행본으로 2026-10-21 확인했습니다. 다른 세율의 검토일은 위 표시와 같습니다.",
             "매수 수수료는 총 투자금에 반영되지 않았습니다.",
             "배당 지급 주기(연·반기·분기·월)는 입력한 주당 배당금에 이미 반영되어 있다고 가정합니다.",
           ]}
-          sources={DOMESTIC_DIVIDEND_TAX.sources}
+          sources={[
+            ...DOMESTIC_DIVIDEND_TAX.sources,
+            { label: "국가법령정보센터", url: "https://www.law.go.kr/법령/소득세법/제14조", document: "소득세법 제14조제3항제6호 — 금융소득종합과세 기준금액" },
+            { label: "국가법령정보센터", url: "https://www.law.go.kr/법령/소득세법/제62조", document: "소득세법 제62조 — 비교과세" },
+          ]}
         />
 
                 <SectionCard>
