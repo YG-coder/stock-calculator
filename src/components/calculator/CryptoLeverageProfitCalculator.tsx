@@ -1,5 +1,5 @@
 "use client";
-import { requiredNumber } from "@/lib/uiInput";
+import { formatGrouped, requiredFiniteNumberExact, sign, type Exact } from "@/lib/exactDecimal";
 
 import { useMemo, useState } from "react";
 import {
@@ -11,16 +11,14 @@ import {
     InputField,
 } from "@/components/ui/Shared";
 import CurrencyToggle from "@/components/calculator/CurrencyToggle";
-import { calculateLeverageProfit } from "@/lib/cryptoLeverageProfit";
+import CommaBreaks from "@/components/calculator/CommaBreaks";
+import { calculateLeverageProfitExact } from "@/lib/cryptoLeverageProfit";
 
 type Currency = "KRW" | "USDT";
 
-function formatNumber(value: number, maximumFractionDigits = 2) {
-    if (!Number.isFinite(value)) return "0";
-    return new Intl.NumberFormat("ko-KR", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits,
-    }).format(value);
+/** Intl.NumberFormat("ko-KR", { maximumFractionDigits: 2 }) 기준 표시(정확값을 표시할 때 한 번만 반올림) */
+function formatNumber(value: Exact, maximumFractionDigits = 2) {
+    return formatGrouped(value, maximumFractionDigits);
 }
 
 export default function CryptoLeverageProfitCalculator() {
@@ -36,19 +34,20 @@ export default function CryptoLeverageProfitCalculator() {
 
     const result = useMemo(
         () =>
-            calculateLeverageProfit({
-                entryPrice: requiredNumber(entryPrice),
-                exitPrice: requiredNumber(exitPrice),
-                margin: requiredNumber(margin),
-                leverage: requiredNumber(leverage),
-                feeRatePercent: requiredNumber(feeRate),
+            // 입력 십진값 그대로 정확히 계산한다(빈칸·숫자가 아닌 값은 기존처럼 무효).
+            calculateLeverageProfitExact({
+                entryPrice: requiredFiniteNumberExact(entryPrice),
+                exitPrice: requiredFiniteNumberExact(exitPrice),
+                margin: requiredFiniteNumberExact(margin),
+                leverage: requiredFiniteNumberExact(leverage),
+                feeRatePercent: requiredFiniteNumberExact(feeRate),
                 position: positionType,
             }),
         [entryPrice, exitPrice, margin, leverage, positionType, feeRate]
     );
 
     const tone =
-        result.netPnl > 0 ? "positive" : result.netPnl < 0 ? "negative" : "default";
+        sign(result.netPnl) > 0 ? "positive" : sign(result.netPnl) < 0 ? "negative" : "default";
 
     return (
         <CalculatorLayout>
@@ -135,39 +134,43 @@ export default function CryptoLeverageProfitCalculator() {
                 emptyMessage="진입가, 종료가, 증거금, 레버리지를 입력하면 예상 수익이 계산됩니다."
                 isValid={result.valid}
             >
-                <ResultHighlight
-                    label="실제 순손익"
-                    value={formatNumber(result.netPnl)}
-                    unit={moneyUnit}
-                    tone={tone}
-                />
+                <CommaBreaks>
+                    <ResultHighlight
+                        label="실제 순손익"
+                        value={formatNumber(result.netPnl)}
+                        unit={moneyUnit}
+                        tone={tone}
+                    />
+                </CommaBreaks>
 
                 <div className="grid gap-4 sm:grid-cols-2">
-                    <ResultDetail
-                        label="포지션 규모"
-                        value={formatNumber(result.positionSize)}
-                        unit={moneyUnit}
-                    />
-                    <ResultDetail
-                        label="가격 변동률"
-                        value={formatNumber(result.priceChangeRate)}
-                        unit="%"
-                    />
-                    <ResultDetail
-                        label="수수료 반영 전 손익"
-                        value={formatNumber(result.grossPnl)}
-                        unit={moneyUnit}
-                    />
-                    <ResultDetail
-                        label="총 수수료"
-                        value={formatNumber(result.totalFee)}
-                        unit={moneyUnit}
-                    />
-                    <ResultDetail
-                        label="증거금 대비 수익률(ROE)"
-                        value={formatNumber(result.roe)}
-                        unit="%"
-                    />
+                    <CommaBreaks>
+                        <ResultDetail
+                            label="포지션 규모"
+                            value={formatNumber(result.positionSize)}
+                            unit={moneyUnit}
+                        />
+                        <ResultDetail
+                            label="가격 변동률"
+                            value={formatNumber(result.priceChangeRate)}
+                            unit="%"
+                        />
+                        <ResultDetail
+                            label="수수료 반영 전 손익"
+                            value={formatNumber(result.grossPnl)}
+                            unit={moneyUnit}
+                        />
+                        <ResultDetail
+                            label="총 수수료"
+                            value={formatNumber(result.totalFee)}
+                            unit={moneyUnit}
+                        />
+                        <ResultDetail
+                            label="증거금 대비 수익률(ROE)"
+                            value={formatNumber(result.roe)}
+                            unit="%"
+                        />
+                    </CommaBreaks>
                 </div>
                 {result.beyondLiquidation ? (
                     <div

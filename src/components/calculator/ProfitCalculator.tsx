@@ -1,7 +1,19 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { parsePositive } from "@/lib/number";
+import {
+  EXACT_ZERO,
+  div,
+  formatGrouped,
+  fromInt,
+  isPositive,
+  mul,
+  parsePositiveExact,
+  sign,
+  sub,
+  toFixedExact,
+  type Exact,
+} from "@/lib/exactDecimal";
 import {
   CalculatorLayout,
   CalculatorCard,
@@ -25,23 +37,23 @@ export default function ProfitCalculator() {
   // 통화별 표시 정밀도: USD는 소수점 2자리, KRW는 정수.
   // 공용 formatNumber()를 바꾸지 않고 컴포넌트 단위로만 처리.
   const priceDigits = currency === "USD" ? 2 : 0;
-  const fmtMoney = (v: number) =>
-    Number.isFinite(v)
-      ? new Intl.NumberFormat("ko-KR", { maximumFractionDigits: priceDigits }).format(v)
-      : "-";
+  // 입력 십진값으로 정확히 계산한 값을 기존 Intl 규칙(0에서 먼 쪽 반올림)으로 표시 단계에서 한 번만 반올림한다.
+  const fmtMoney = (v: Exact) => formatGrouped(v, priceDigits);
 
   const result = useMemo(() => {
-    const buy = parsePositive(buyPrice);
-    const current = parsePositive(currentPrice);
-    const qty = parsePositive(quantity);
+    const buy = parsePositiveExact(buyPrice);
+    const current = parsePositiveExact(currentPrice);
+    const qty = parsePositiveExact(quantity);
 
-    if (buy <= 0 || current <= 0 || qty <= 0) {
-      return { valid: false, profitRate: 0, profitAmount: 0, evalAmount: 0 };
+    if (!isPositive(buy) || !isPositive(current) || !isPositive(qty)) {
+      return { valid: false, profitRate: EXACT_ZERO, profitAmount: EXACT_ZERO, evalAmount: EXACT_ZERO };
     }
 
-    const profitRate = ((current - buy) / buy) * 100;
-    const profitAmount = (current - buy) * qty;
-    const evalAmount = current * qty;
+    // 정확한 유리수로 계산하고, 부호(+)는 반올림 전 정확값으로 판정한다.
+    const diff = sub(current, buy);
+    const profitRate = mul(div(diff, buy), fromInt(100));
+    const profitAmount = mul(diff, qty);
+    const evalAmount = mul(current, qty);
 
     return {
       valid: true,
@@ -103,13 +115,13 @@ export default function ProfitCalculator() {
         >
           <ResultHighlight
               label="예상 수익률"
-              value={`${result.profitRate > 0 ? "+" : ""}${result.profitRate.toFixed(2)}`}
+              value={`${sign(result.profitRate) > 0 ? "+" : ""}${toFixedExact(result.profitRate, 2)}`}
               unit="%"
           />
           <div className="grid gap-4 sm:grid-cols-2">
             <ResultDetail
                 label="평가 손익"
-                value={`${result.profitAmount > 0 ? "+" : ""}${fmtMoney(result.profitAmount)}`}
+                value={`${sign(result.profitAmount) > 0 ? "+" : ""}${fmtMoney(result.profitAmount)}`}
                 unit={moneyUnit}
             />
             <ResultDetail

@@ -1,7 +1,22 @@
 "use client";
-import { requiredNumber } from "@/lib/uiInput";
+import {
+    add,
+    compare,
+    div,
+    formatGrouped,
+    formatGroupedFixed,
+    fromInt,
+    fromNumber,
+    mul,
+    requiredFiniteNumberExact,
+    sign,
+    sub,
+    toPlainDecimal,
+    EXACT_ZERO,
+    type Exact,
+} from "@/lib/exactDecimal";
 
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import {
     CalculatorLayout,
     CalculatorCard,
@@ -11,30 +26,50 @@ import {
     InputField,
 } from "@/components/ui/Shared";
 import CurrencyToggle from "@/components/calculator/CurrencyToggle";
+import CommaBreaks from "@/components/calculator/CommaBreaks";
 
 type Currency = "KRW" | "USDT";
 
 /** 손익비 목표가 표에 표시할 비율 (엑셀 1:1.1 ~ 1:10 기준) */
 const RR_STEPS = [1.1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
+/** 손익비 단계의 정확값(코드에 적힌 십진 표기 그대로, 1.1 → 11/10) */
+const RR_STEP_VALUES = RR_STEPS.map(fromNumber);
+
 /** 복리 시뮬레이션 회차 */
 const SIM_ROUNDS = 10;
 
-function formatNumber(value: number, maximumFractionDigits = 4) {
-    if (!Number.isFinite(value)) return "0";
-    return new Intl.NumberFormat("ko-KR", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits,
-    }).format(value);
+/** 두 결과표의 제목. 카드 제목과 가로 스크롤 영역의 접근 가능한 이름에 같이 쓴다. */
+const RR_TABLE_TITLE = "손익비별 목표가";
+const SIM_TABLE_TITLE = "연속 익절 / 연속 손절 시뮬레이션";
+
+const HUNDRED = fromInt(100);
+
+/** Intl.NumberFormat("ko-KR", { maximumFractionDigits: 4 }) 기준 표시(정확값을 표시할 때 한 번만 반올림) */
+function formatNumber(value: Exact, maximumFractionDigits = 4) {
+    return formatGrouped(value, maximumFractionDigits);
 }
 
-/** 표 안에서 자릿수를 고정해 세로 정렬을 맞추기 위한 포맷터 */
-function formatFixed(value: number, digits = 2) {
-    if (!Number.isFinite(value)) return (0).toFixed(digits);
-    return new Intl.NumberFormat("ko-KR", {
-        minimumFractionDigits: digits,
-        maximumFractionDigits: digits,
-    }).format(value);
+/** 표 안에서 자릿수를 고정해 세로 정렬을 맞추기 위한 포맷터(Intl 최소·최대 소수 자릿수 같음) */
+function formatFixed(value: Exact, digits = 2) {
+    return formatGroupedFixed(value, digits);
+}
+
+type RrRow = { ratio: Exact; label: string; price: Exact; profit: Exact; isCurrent: boolean };
+
+/** 표 셀의 긴 숫자에 쉼표 뒤 줄바꿈 기회(<wbr>)만 넣는다. 글자·자릿수는 그대로라 화면 텍스트는 같다. */
+function breakAtCommas(text: string) {
+    const parts = text.split(",");
+    return parts.map((part, i) => (
+        <Fragment key={i}>
+            {part}
+            {i < parts.length - 1 ? (
+                <>
+                    ,<wbr />
+                </>
+            ) : null}
+        </Fragment>
+    ));
 }
 
 export default function CryptoEntryCalculator() {
@@ -48,66 +83,73 @@ export default function CryptoEntryCalculator() {
     const moneyUnit = currency === "KRW" ? "원" : "USDT";
 
     const result = useMemo(() => {
-        const entry = requiredNumber(entryPrice);
-        const stop = requiredNumber(stopPrice);
-        const seedValue = requiredNumber(seed);
-        const risk = requiredNumber(riskPercent);
-        const rr = requiredNumber(rewardRatio);
+        // 입력 십진값 그대로 정확히 계산한다. 유효성·손익비 정렬·현재 행 판정도 반올림 전 정확값으로 한다.
+        const entry = requiredFiniteNumberExact(entryPrice);
+        const stop = requiredFiniteNumberExact(stopPrice);
+        const seedValue = requiredFiniteNumberExact(seed);
+        const risk = requiredFiniteNumberExact(riskPercent);
+        const rr = requiredFiniteNumberExact(rewardRatio);
 
         const empty = {
             valid: false as const,
-            lossPercent: 0,
-            leverage: 0,
-            riskAmount: 0,
-            positionSize: 0,
-            takeProfitPrice: 0,
-            risk: 0,
-            rr: 0,
-            seedValue: 0,
-            rrTable: [] as { ratio: number; price: number; profit: number }[],
-            winSeries: [] as number[],
-            lossSeries: [] as number[],
+            lossPercent: EXACT_ZERO,
+            leverage: EXACT_ZERO,
+            riskAmount: EXACT_ZERO,
+            positionSize: EXACT_ZERO,
+            takeProfitPrice: EXACT_ZERO,
+            risk: EXACT_ZERO,
+            rr: EXACT_ZERO,
+            seedValue: EXACT_ZERO,
+            rrTable: [] as RrRow[],
+            winSeries: [] as Exact[],
+            lossSeries: [] as Exact[],
         };
 
         if (
-            !Number.isFinite(entry) ||
-            !Number.isFinite(stop) ||
-            !Number.isFinite(seedValue) ||
-            !Number.isFinite(risk) ||
-            !Number.isFinite(rr) ||
-            entry <= 0 ||
-            stop <= 0 ||
-            seedValue <= 0 ||
-            risk <= 0 ||
-            rr <= 0 ||
-            risk >= 100 ||
-            stop >= entry
+            !entry ||
+            !stop ||
+            !seedValue ||
+            !risk ||
+            !rr ||
+            sign(entry) <= 0 ||
+            sign(stop) <= 0 ||
+            sign(seedValue) <= 0 ||
+            sign(risk) <= 0 ||
+            sign(rr) <= 0 ||
+            compare(risk, HUNDRED) >= 0 ||
+            compare(stop, entry) >= 0
         ) {
             return empty;
         }
 
-        const lossPercent = ((entry - stop) / entry) * 100;
-        const leverage = lossPercent > 0 ? 100 / lossPercent : 0;
-        const riskAmount = seedValue * (risk / 100);
-        const positionSize = leverage * riskAmount;
-        const takeProfitPrice = entry + (entry - stop) * rr;
+        const stopDistance = sub(entry, stop);
+        const lossPercent = mul(div(stopDistance, entry), HUNDRED);
+        const leverage = sign(lossPercent) > 0 ? div(HUNDRED, lossPercent) : EXACT_ZERO;
+        const riskRate = div(risk, HUNDRED);
+        const riskAmount = mul(seedValue, riskRate);
+        const positionSize = mul(leverage, riskAmount);
+        const takeProfitPrice = add(entry, mul(stopDistance, rr));
 
-        // 손익비별 목표가 (엑셀 E2:N3) + 현재 입력한 손익비를 정렬 위치에 병합
-        const ratios = Array.from(new Set([...RR_STEPS, rr])).sort((a, b) => a - b);
-        const rrTable = ratios.map((ratio) => ({
+        // 손익비별 목표가 (엑셀 E2:N3) + 현재 입력한 손익비를 정렬 위치에 병합(같은 값은 한 행)
+        const ratios = [...RR_STEP_VALUES, rr]
+            .filter((ratio, index, all) => all.findIndex((other) => compare(other, ratio) === 0) === index)
+            .sort(compare);
+        const rrTable: RrRow[] = ratios.map((ratio) => ({
             ratio,
-            price: entry + (entry - stop) * ratio,
-            profit: riskAmount * ratio,
+            label: toPlainDecimal(ratio),
+            price: add(entry, mul(stopDistance, ratio)),
+            profit: mul(riskAmount, ratio),
+            isCurrent: compare(ratio, rr) === 0,
         }));
 
         // 연속 익절 / 연속 손절 복리 시뮬레이션 (엑셀 E11:I21)
-        const winSeries: number[] = [];
-        const lossSeries: number[] = [];
+        const winSeries: Exact[] = [];
+        const lossSeries: Exact[] = [];
         let win = seedValue;
         let loss = seedValue;
         for (let i = 0; i < SIM_ROUNDS; i += 1) {
-            win = win + win * (risk / 100) * rr;
-            loss = loss * (1 - risk / 100);
+            win = add(win, mul(mul(win, riskRate), rr));
+            loss = mul(loss, sub(fromInt(1), riskRate));
             winSeries.push(win);
             lossSeries.push(loss);
         }
@@ -199,34 +241,38 @@ export default function CryptoEntryCalculator() {
                 emptyMessage="진입가, 손절가, 투자 원금, 리스크 비율을 입력하면 결과가 계산됩니다."
                 isValid={result.valid}
             >
-                <ResultHighlight
-                    label="주문 명목가치"
-                    value={formatNumber(result.positionSize)}
-                    unit={moneyUnit}
-                    tone="default"
-                />
+                <CommaBreaks>
+                    <ResultHighlight
+                        label="주문 명목가치"
+                        value={formatNumber(result.positionSize)}
+                        unit={moneyUnit}
+                        tone="default"
+                    />
+                </CommaBreaks>
 
                 <div className="grid gap-4 sm:grid-cols-2">
-                    <ResultDetail
-                        label="손절폭"
-                        value={formatNumber(result.lossPercent)}
-                        unit="%"
-                    />
-                    <ResultDetail
-                        label="이론 배율"
-                        value={formatNumber(result.leverage)}
-                        unit="배"
-                    />
-                    <ResultDetail
-                        label="리스크 금액"
-                        value={formatNumber(result.riskAmount)}
-                        unit={moneyUnit}
-                    />
-                    <ResultDetail
-                        label="익절가"
-                        value={formatNumber(result.takeProfitPrice)}
-                        unit={moneyUnit}
-                    />
+                    <CommaBreaks>
+                        <ResultDetail
+                            label="손절폭"
+                            value={formatNumber(result.lossPercent)}
+                            unit="%"
+                        />
+                        <ResultDetail
+                            label="이론 배율"
+                            value={formatNumber(result.leverage)}
+                            unit="배"
+                        />
+                        <ResultDetail
+                            label="리스크 금액"
+                            value={formatNumber(result.riskAmount)}
+                            unit={moneyUnit}
+                        />
+                        <ResultDetail
+                            label="익절가"
+                            value={formatNumber(result.takeProfitPrice)}
+                            unit={moneyUnit}
+                        />
+                    </CommaBreaks>
                 </div>
 
                 <p className="mt-4 text-xs leading-relaxed text-slate-500">
@@ -239,10 +285,11 @@ export default function CryptoEntryCalculator() {
             {result.valid ? (
                 <CalculatorCard
                     className="min-w-0"
-                    title="손익비별 목표가"
+                    title={RR_TABLE_TITLE}
                     description="같은 손절폭에서 손익비를 1:1.1부터 1:10까지 잡았을 때의 목표가와 예상 수익입니다. 현재 입력한 손익비 행은 강조 표시됩니다."
                 >
-                    <div className="-mx-2 overflow-x-auto">
+                    {/* 좁은 화면에서 표가 가로로 스크롤되므로 키보드로도 이 영역에 초점을 두고 화살표로 스크롤할 수 있게 한다(기본 Tab 순서). */}
+                    <div className="-mx-2 overflow-x-auto" tabIndex={0} role="region" aria-label={RR_TABLE_TITLE}>
                         <table className="w-full min-w-[300px] border-collapse text-sm">
                             <thead>
                                 <tr className="border-b border-slate-200 text-left text-slate-500">
@@ -253,19 +300,19 @@ export default function CryptoEntryCalculator() {
                             </thead>
                             <tbody>
                                 {result.rrTable.map((row) => {
-                                    const isCurrent = Math.abs(row.ratio - result.rr) < 1e-9;
+                                    const isCurrent = row.isCurrent;
                                     return (
                                         <tr
-                                            key={row.ratio}
+                                            key={row.label}
                                             className={`border-b border-slate-100 last:border-0 ${isCurrent ? "bg-slate-50 font-semibold text-slate-900" : "text-slate-700"
                                                 }`}
                                         >
-                                            <td className="px-2 py-2">1 : {row.ratio}</td>
+                                            <td className="px-2 py-2">1 : {row.label}</td>
                                             <td className="px-2 py-2 text-right tabular-nums">
-                                                {formatNumber(row.price)}
+                                                {breakAtCommas(formatNumber(row.price))}
                                             </td>
                                             <td className="px-2 py-2 text-right tabular-nums text-red-600">
-                                                +{formatFixed(row.profit)}
+                                                {breakAtCommas(`+${formatFixed(row.profit)}`)}
                                             </td>
                                         </tr>
                                     );
@@ -283,10 +330,10 @@ export default function CryptoEntryCalculator() {
             {result.valid ? (
                 <CalculatorCard
                     className="min-w-0"
-                    title="연속 익절 / 연속 손절 시뮬레이션"
+                    title={SIM_TABLE_TITLE}
                     description={`매 회차 투자 원금의 ${formatNumber(result.risk, 2)}%를 리스크로 잡고 손익비 1:${formatNumber(result.rr, 2)}로 거래했을 때, 10회 연속 익절한 경우와 10회 연속 손절한 경우의 원금 변화입니다.`}
                 >
-                    <div className="-mx-2 overflow-x-auto">
+                    <div className="-mx-2 overflow-x-auto" tabIndex={0} role="region" aria-label={SIM_TABLE_TITLE}>
                         <table className="w-full min-w-[300px] border-collapse text-sm">
                             <thead>
                                 <tr className="border-b border-slate-200 text-left text-slate-500">
@@ -299,10 +346,10 @@ export default function CryptoEntryCalculator() {
                                 <tr className="border-b border-slate-100 text-slate-500">
                                     <td className="px-2 py-2">첫 투자 원금</td>
                                     <td className="px-2 py-2 text-right tabular-nums">
-                                        {formatFixed(result.seedValue)}
+                                        {breakAtCommas(formatFixed(result.seedValue))}
                                     </td>
                                     <td className="px-2 py-2 text-right tabular-nums">
-                                        {formatFixed(result.seedValue)}
+                                        {breakAtCommas(formatFixed(result.seedValue))}
                                     </td>
                                 </tr>
                                 {result.winSeries.map((winValue, index) => (
@@ -312,10 +359,10 @@ export default function CryptoEntryCalculator() {
                                     >
                                         <td className="px-2 py-2">{index + 1}회</td>
                                         <td className="px-2 py-2 text-right tabular-nums text-red-600">
-                                            {formatFixed(winValue)}
+                                            {breakAtCommas(formatFixed(winValue))}
                                         </td>
                                         <td className="px-2 py-2 text-right tabular-nums text-blue-600">
-                                            {formatFixed(result.lossSeries[index])}
+                                            {breakAtCommas(formatFixed(result.lossSeries[index]))}
                                         </td>
                                     </tr>
                                 ))}

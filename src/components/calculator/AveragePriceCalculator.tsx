@@ -1,7 +1,21 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { parsePositive } from "@/lib/number";
+import {
+  EXACT_ZERO,
+  add,
+  compare,
+  div,
+  formatGrouped,
+  fromInt,
+  isPositive,
+  mul,
+  parsePositiveExact,
+  sign,
+  sub,
+  toFixedExact,
+  type Exact,
+} from "@/lib/exactDecimal";
 import {
   CalculatorLayout,
   CalculatorCard,
@@ -35,19 +49,10 @@ export default function AveragePriceCalculator() {
 
   // 통화별 소수점 처리: USD는 소수점 2자리까지, KRW는 정수 표기
   const priceDigits = currency === "USD" ? 2 : 0;
-  const fmtMoney = (v: number) => {
-    if (!Number.isFinite(v)) return "-";
-    return new Intl.NumberFormat("ko-KR", {
-      maximumFractionDigits: priceDigits,
-    }).format(v);
-  };
+  // 입력 십진값으로 정확히 계산한 값을 기존 Intl 규칙(0에서 먼 쪽 반올림·쉼표)으로 표시 단계에서 한 번만 반올림한다.
+  const fmtMoney = (v: Exact) => formatGrouped(v, priceDigits);
   // 수량은 소수점 매매(예: 0.5주)를 고려해 소수점 4자리까지 표기
-  const fmtQty = (v: number) => {
-    if (!Number.isFinite(v)) return "-";
-    return new Intl.NumberFormat("ko-KR", {
-      maximumFractionDigits: 4,
-    }).format(v);
-  };
+  const fmtQty = (v: Exact) => formatGrouped(v, 4);
 
   const updateRow = (id: number, field: "price" | "quantity", value: string) => {
     setRows((prev) =>
@@ -80,48 +85,47 @@ export default function AveragePriceCalculator() {
   };
 
   const result = useMemo(() => {
-    let totalQuantity = 0;
-    let totalAmount = 0;
+    // 합계·평균·손익은 입력 십진값의 정확한 유리수(중간 반올림 없음)
+    let totalQuantity: Exact = EXACT_ZERO;
+    let totalAmount: Exact = EXACT_ZERO;
     let validCount = 0;
-    let firstValidPrice = 0; // 첫 번째 '유효한' 매수가 (물타기/불타기 판정 기준)
+    let firstValidPrice: Exact = EXACT_ZERO; // 첫 번째 '유효한' 매수가 (물타기/불타기 판정 기준)
 
     for (const row of rows) {
-      const p = parsePositive(row.price);
-      const q = parsePositive(row.quantity);
+      const p = parsePositiveExact(row.price);
+      const q = parsePositiveExact(row.quantity);
       if (!row.price.trim() && !row.quantity.trim()) continue;
-      if (!row.price.trim() || !row.quantity.trim() || !Number.isFinite(p) || !Number.isFinite(q) || p <= 0 || q <= 0) { validCount = 0; break; }
-      if (p > 0 && q > 0) {
-        totalQuantity += q;
-        totalAmount += p * q;
-        validCount += 1;
-        if (firstValidPrice === 0) firstValidPrice = p;
-      }
+      if (!row.price.trim() || !row.quantity.trim() || !isPositive(p) || !isPositive(q)) { validCount = 0; break; }
+      totalQuantity = add(totalQuantity, q);
+      totalAmount = add(totalAmount, mul(p, q));
+      validCount += 1;
+      if (!isPositive(firstValidPrice)) firstValidPrice = p;
     }
 
-    if (validCount === 0 || totalQuantity <= 0) {
+    if (validCount === 0 || !isPositive(totalQuantity)) {
       return {
         valid: false,
-        averagePrice: 0,
-        totalQuantity: 0,
-        totalAmount: 0,
-        firstPrice: 0,
+        averagePrice: EXACT_ZERO,
+        totalQuantity: EXACT_ZERO,
+        totalAmount: EXACT_ZERO,
+        firstPrice: EXACT_ZERO,
         buyCount: 0,
         hasCurrent: false,
-        evalAmount: 0,
-        profit: 0,
-        profitRate: 0,
+        evalAmount: EXACT_ZERO,
+        profit: EXACT_ZERO,
+        profitRate: EXACT_ZERO,
       };
     }
 
-    const averagePrice = totalAmount / totalQuantity;
+    const averagePrice = div(totalAmount, totalQuantity);
 
     // 현재가(선택 입력) 기준 평가손익
-    const cp = parsePositive(currentPrice);
-    const hasCurrent = cp > 0;
-    const evalAmount = hasCurrent ? cp * totalQuantity : 0;
-    const profit = hasCurrent ? evalAmount - totalAmount : 0;
+    const cp = parsePositiveExact(currentPrice);
+    const hasCurrent = isPositive(cp);
+    const evalAmount = hasCurrent ? mul(cp, totalQuantity) : EXACT_ZERO;
+    const profit = hasCurrent ? sub(evalAmount, totalAmount) : EXACT_ZERO;
     const profitRate =
-      hasCurrent && totalAmount > 0 ? (profit / totalAmount) * 100 : 0;
+      hasCurrent && isPositive(totalAmount) ? mul(div(profit, totalAmount), fromInt(100)) : EXACT_ZERO;
 
     return {
       valid: true,
@@ -137,12 +141,13 @@ export default function AveragePriceCalculator() {
     };
   }, [rows, currentPrice]);
 
-  // 평단가 방향 안내 (물타기 = 평단 하락 / 불타기 = 평단 상승)
+  // 평단가 방향 안내 (물타기 = 평단 하락 / 불타기 = 평단 상승) — 반올림 전 정확값으로 비교
+  const direction = compare(result.averagePrice, result.firstPrice);
   const directionNote =
-    result.valid && result.firstPrice > 0
-      ? result.averagePrice < result.firstPrice
+    result.valid && isPositive(result.firstPrice)
+      ? direction < 0
         ? { text: "평단가 하락 · 물타기 효과", tone: "down" as const }
-        : result.averagePrice > result.firstPrice
+        : direction > 0
           ? { text: "평단가 상승 · 불타기", tone: "up" as const }
           : { text: "평단가 변동 없음", tone: "flat" as const }
       : null;
@@ -290,14 +295,14 @@ export default function AveragePriceCalculator() {
           <div className="mt-6 border-t border-slate-100 pt-6">
             <ResultHighlight
               label="평가 손익"
-              value={`${result.profit >= 0 ? "+" : ""}${fmtMoney(result.profit)}`}
+              value={`${sign(result.profit) >= 0 ? "+" : ""}${fmtMoney(result.profit)}`}
               unit={moneyUnit}
-              tone={result.profit >= 0 ? "positive" : "negative"}
+              tone={sign(result.profit) >= 0 ? "positive" : "negative"}
             />
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <ResultDetail
                 label="수익률"
-                value={`${result.profitRate >= 0 ? "+" : ""}${result.profitRate.toFixed(2)}`}
+                value={`${sign(result.profitRate) >= 0 ? "+" : ""}${toFixedExact(result.profitRate, 2)}`}
                 unit="%"
               />
               <ResultDetail

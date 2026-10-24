@@ -3,7 +3,8 @@
 import { withParticle } from "@/lib/korean";
 import { useMemo, useState } from "react";
 import { FINANCIAL_INCOME_THRESHOLD } from "@/lib/taxRates";
-import { calculateUsDividend } from "@/lib/usDividend";
+import { calculateUsDividendExact } from "@/lib/usDividend";
+import { formatGrouped, type Exact } from "@/lib/exactDecimal";
 import {
     CalculatorLayout,
     CalculatorCard,
@@ -12,13 +13,11 @@ import {
     ResultDetail,
     InputField,
 } from "@/components/ui/Shared";
+import CommaBreaks from "@/components/calculator/CommaBreaks";
 
-function formatNumber(value: number, maximumFractionDigits = 2) {
-    if (!Number.isFinite(value)) return "0";
-    return new Intl.NumberFormat("ko-KR", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits,
-    }).format(value);
+// 정확히 계산한 값을 기존 Intl 규칙(최대 2자리, 0에서 먼 쪽, 쉼표)으로 표시 단계에서 한 번만 반올림한다.
+function formatNumber(value: Exact, maximumFractionDigits = 2) {
+    return formatGrouped(value, maximumFractionDigits);
 }
 
 export default function USDividendCalculator() {
@@ -30,7 +29,7 @@ export default function USDividendCalculator() {
 
     const result = useMemo(
         () =>
-            calculateUsDividend({
+            calculateUsDividendExact({
                 shares,
                 annualDividendPerShareUsd,
                 buyPriceUsd,
@@ -107,11 +106,14 @@ export default function USDividendCalculator() {
                 emptyMessage={emptyMessage}
                 isValid={result.valid}
             >
-                <ResultHighlight
-                    label="월 예상 세후 배당금"
-                    value={formatNumber(result.monthlyNetDividendKrw)}
-                    unit="원"
-                />
+                {/* 긴 월 배당금이 좁은 화면에서 카드 밖으로 넘치지 않게 쉼표 뒤 줄바꿈(글자 크기·숫자·단위 그대로). 세부 항목은 측정 범위에서 넘치지 않아 그대로 둔다 */}
+                <CommaBreaks>
+                    <ResultHighlight
+                        label="월 예상 세후 배당금"
+                        value={formatNumber(result.monthlyNetDividendKrw)}
+                        unit="원"
+                    />
+                </CommaBreaks>
                 <div className="grid gap-4 sm:grid-cols-2">
                     <ResultDetail
                         label="연간 세전 배당금"

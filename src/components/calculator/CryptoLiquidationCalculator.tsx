@@ -1,5 +1,18 @@
 "use client";
-import { requiredNumber } from "@/lib/uiInput";
+import {
+    add,
+    compare,
+    div,
+    formatGrouped,
+    formatPriceExact,
+    fromInt,
+    mul,
+    requiredFiniteNumberExact,
+    sign,
+    sub,
+    EXACT_ZERO,
+    type Exact,
+} from "@/lib/exactDecimal";
 
 import { useMemo, useState } from "react";
 import {
@@ -11,17 +24,17 @@ import {
     InputField,
 } from "@/components/ui/Shared";
 import CurrencyToggle from "@/components/calculator/CurrencyToggle";
-import { formatPrice } from "@/lib/number";
+import CommaBreaks from "@/components/calculator/CommaBreaks";
 
 type Currency = "KRW" | "USDT";
 
-function formatNumber(value: number, maximumFractionDigits = 2) {
-    if (!Number.isFinite(value)) return "0";
-    return new Intl.NumberFormat("ko-KR", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits,
-    }).format(value);
+/** Intl.NumberFormat("ko-KR", { maximumFractionDigits: 2 }) 기준 표시(정확값을 표시할 때 한 번만 반올림) */
+function formatNumber(value: Exact, maximumFractionDigits = 2) {
+    return formatGrouped(value, maximumFractionDigits);
 }
+
+const ONE = fromInt(1);
+const HUNDRED = fromInt(100);
 
 export default function CryptoLiquidationCalculator() {
     const [currency, setCurrency] = useState<Currency>("USDT");
@@ -34,24 +47,26 @@ export default function CryptoLiquidationCalculator() {
     const priceUnit = currency === "KRW" ? "원" : "USDT";
 
     const result = useMemo(() => {
-        const entry = requiredNumber(entryPrice);
-        const lev = requiredNumber(leverage);
-        const mmr = requiredNumber(maintenanceMarginRate) / 100;
+        // 입력 십진값 그대로 정확히 계산한다. 유효성·경고 구간·가격 표시 구간도 반올림 전 정확값으로 판정한다.
+        const entry = requiredFiniteNumberExact(entryPrice);
+        const lev = requiredFiniteNumberExact(leverage);
+        const mmrPercent = requiredFiniteNumberExact(maintenanceMarginRate);
+        const mmr = mmrPercent ? div(mmrPercent, HUNDRED) : null;
 
         if (
-            !Number.isFinite(entry) ||
-            !Number.isFinite(lev) ||
-            !Number.isFinite(mmr) ||
-            entry <= 0 ||
-            lev <= 0 ||
-            mmr < 0 ||
-            mmr >= 1
+            !entry ||
+            !lev ||
+            !mmr ||
+            sign(entry) <= 0 ||
+            sign(lev) <= 0 ||
+            sign(mmr) < 0 ||
+            compare(mmr, ONE) >= 0
         ) {
             return {
                 valid: false,
-                liquidationPrice: 0,
-                bankruptcyPrice: 0,
-                lossPercent: 0,
+                liquidationPrice: EXACT_ZERO,
+                bankruptcyPrice: EXACT_ZERO,
+                lossPercent: EXACT_ZERO,
                 warning: "",
             };
         }
@@ -61,30 +76,31 @@ export default function CryptoLiquidationCalculator() {
         // 계좌 잔고를 알아야 계산할 수 있다. 근거 없이 유지증거금률을 깎지 않고
         // 격리 기준으로 계산한 뒤, 교차는 안내 문구로 차이를 알린다.
         const effectiveMmr = mmr;
+        const inverseLeverage = div(ONE, lev);
 
-        let liquidationPrice = 0;
-        let bankruptcyPrice = 0;
-        let lossPercent = 0;
+        let liquidationPrice: Exact;
+        let bankruptcyPrice: Exact;
+        let lossPercent: Exact;
 
         if (positionType === "long") {
-            bankruptcyPrice = entry * (1 - 1 / lev);
-            liquidationPrice = entry * (1 - 1 / lev + effectiveMmr);
-            lossPercent = ((entry - liquidationPrice) / entry) * 100;
+            bankruptcyPrice = mul(entry, sub(ONE, inverseLeverage));
+            liquidationPrice = mul(entry, add(sub(ONE, inverseLeverage), effectiveMmr));
+            lossPercent = mul(div(sub(entry, liquidationPrice), entry), HUNDRED);
         } else {
-            bankruptcyPrice = entry * (1 + 1 / lev);
-            liquidationPrice = entry * (1 + 1 / lev - effectiveMmr);
-            lossPercent = ((liquidationPrice - entry) / entry) * 100;
+            bankruptcyPrice = mul(entry, add(ONE, inverseLeverage));
+            liquidationPrice = mul(entry, sub(add(ONE, inverseLeverage), effectiveMmr));
+            lossPercent = mul(div(sub(liquidationPrice, entry), entry), HUNDRED);
         }
 
         let warning = "";
-        if (lev >= 20) {
+        if (compare(lev, fromInt(20)) >= 0) {
             warning = "고배율 구간입니다. 작은 변동에도 청산될 수 있습니다.";
-        } else if (lev >= 10) {
+        } else if (compare(lev, fromInt(10)) >= 0) {
             warning = "레버리지가 높습니다. 진입 전 청산 가격을 반드시 확인하세요.";
         }
 
         return {
-            valid: liquidationPrice > 0,
+            valid: sign(liquidationPrice) > 0,
             liquidationPrice,
             bankruptcyPrice,
             lossPercent,
@@ -184,24 +200,28 @@ export default function CryptoLiquidationCalculator() {
                 emptyMessage="진입 가격과 레버리지를 입력하면 청산 가격이 계산됩니다."
                 isValid={result.valid}
             >
-                <ResultHighlight
-                    label="격리마진 근사 청산가"
-                    value={formatPrice(result.liquidationPrice)}
-                    unit={priceUnit}
-                    tone="negative"
-                />
+                <CommaBreaks>
+                    <ResultHighlight
+                        label="격리마진 근사 청산가"
+                        value={formatPriceExact(result.liquidationPrice)}
+                        unit={priceUnit}
+                        tone="negative"
+                    />
+                </CommaBreaks>
 
                 <div className="grid gap-4 sm:grid-cols-2">
-                    <ResultDetail
-                        label="파산 가격(이론값)"
-                        value={formatPrice(result.bankruptcyPrice)}
-                        unit={priceUnit}
-                    />
-                    <ResultDetail
-                        label="진입가 대비 변동 폭"
-                        value={formatNumber(result.lossPercent)}
-                        unit="%"
-                    />
+                    <CommaBreaks>
+                        <ResultDetail
+                            label="파산 가격(이론값)"
+                            value={formatPriceExact(result.bankruptcyPrice)}
+                            unit={priceUnit}
+                        />
+                        <ResultDetail
+                            label="진입가 대비 변동 폭"
+                            value={formatNumber(result.lossPercent)}
+                            unit="%"
+                        />
+                    </CommaBreaks>
                 </div>
 
                 {result.warning ? (

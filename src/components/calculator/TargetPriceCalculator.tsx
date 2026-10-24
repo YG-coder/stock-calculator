@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { parsePositive } from "@/lib/number";
+import { EXACT_ZERO, add, formatGrouped, fromInt, isPositive, mul, div, parsePositiveExact, type Exact } from "@/lib/exactDecimal";
 import {
   CalculatorLayout,
   CalculatorCard,
@@ -24,25 +24,24 @@ export default function TargetPriceCalculator() {
   // 통화별 표시 정밀도: USD는 소수점 2자리, KRW는 정수.
   // 공용 formatNumber()를 바꾸지 않고 컴포넌트 단위로만 처리(다른 KRW 계산기 회귀 방지).
   const priceDigits = currency === "USD" ? 2 : 0;
-  const fmtMoney = (v: number) =>
-    Number.isFinite(v)
-      ? new Intl.NumberFormat("ko-KR", { maximumFractionDigits: priceDigits }).format(v)
-      : "-";
+  // 입력 십진값으로 정확히 계산한 값을 기존 Intl 규칙(0에서 먼 쪽 반올림)으로 한 번만 반올림해 표시한다.
+  const fmtMoney = (v: Exact) => formatGrouped(v, priceDigits);
 
   const result = useMemo(() => {
-    const buy = parsePositive(buyPrice);
-    const rate = parsePositive(targetRate);
+    const buy = parsePositiveExact(buyPrice);
+    const rate = parsePositiveExact(targetRate);
 
-    if (buy <= 0 || rate <= 0) {
+    if (!isPositive(buy) || !isPositive(rate)) {
       return {
         valid: false,
-        targetPrice: 0,
-        expectedProfitPerShare: 0,
+        targetPrice: EXACT_ZERO,
+        expectedProfitPerShare: EXACT_ZERO,
       };
     }
 
-    const targetPrice = buy * (1 + rate / 100);
-    const expectedProfitPerShare = targetPrice - buy;
+    // 목표가 = 매수가 × (1 + 수익률 ÷ 100), 주당 수익 = 목표가 − 매수가 (정확한 유리수)
+    const expectedProfitPerShare = mul(buy, div(rate, fromInt(100)));
+    const targetPrice = add(buy, expectedProfitPerShare);
 
     return {
       valid: true,

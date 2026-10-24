@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { Children, Fragment, cloneElement, isValidElement, useMemo, useRef, useState, type ReactNode } from "react";
 import {
     CalculatorLayout,
     CalculatorCard,
@@ -10,7 +10,21 @@ import {
     InputField,
 } from "@/components/ui/Shared";
 import CurrencyToggle from "@/components/calculator/CurrencyToggle";
-import { formatPrice } from "@/lib/number";
+import {
+    add,
+    compare,
+    div,
+    finiteNumberExact,
+    formatGrouped,
+    formatPriceExact,
+    fromInt,
+    mul,
+    sign,
+    sub,
+    toFixedExact,
+    EXACT_ZERO,
+    type Exact,
+} from "@/lib/exactDecimal";
 
 type Currency = "KRW" | "USDT";
 
@@ -22,18 +36,48 @@ type BuyRow = {
 
 const MAX_ROWS = 10;
 
-function formatNumber(value: number, maximumFractionDigits = 2) {
-    if (!Number.isFinite(value)) return "0";
-    return new Intl.NumberFormat("ko-KR", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits,
-    }).format(value);
+/** 8자 미만 값은 320px 화면에서도 한 줄에 들어가므로 줄바꿈 기회를 넣지 않는다. */
+const SHORT_VALUE_LENGTH = 8;
+
+function withCommaBreaks(text: string): ReactNode {
+    const parts = text.split(",");
+    return parts.map((part, i) => (
+        <Fragment key={i}>
+            {part}
+            {i < parts.length - 1 ? (
+                <>
+                    ,<wbr />
+                </>
+            ) : null}
+        </Fragment>
+    ));
 }
 
-function toPositive(value: string): number {
-    const n = Number(value);
-    if (!Number.isFinite(n) || n < 0) return 0;
-    return n;
+/**
+ * 결과 항목의 긴 값에만 쉼표 뒤 줄바꿈 기회(<wbr>)와 `wrap-anywhere` 대비책을 붙인다(글자·자릿수·단위·글자 크기는 그대로).
+ * CommaBreaks.tsx와 같은 방식이며, 짧은 값의 결과 HTML은 이전과 같게 둔다(기존 행 동작 테스트가 "2,000" 문자열을 확인).
+ */
+function CommaBreaks({ children }: { children: ReactNode }) {
+    return (
+        <>
+            {Children.map(children, (child) =>
+                isValidElement<{ value?: ReactNode; className?: string }>(child) &&
+                typeof child.props.value === "string" &&
+                child.props.value.length >= SHORT_VALUE_LENGTH
+                    ? cloneElement(child, {
+                          value: withCommaBreaks(child.props.value),
+                          className: [child.props.className, "wrap-anywhere"].filter(Boolean).join(" "),
+                      })
+                    : child,
+            )}
+        </>
+    );
+}
+
+/** 기존 toPositive(Number(값)) 계약: 숫자가 아니거나(±Infinity 포함) 음수면 0, 그 밖은 입력 십진값 그대로. */
+function toPositive(value: string): Exact {
+    const x = finiteNumberExact(value);
+    return x && sign(x) >= 0 ? x : EXACT_ZERO;
 }
 
 export default function CryptoAverageCalculator() {
@@ -78,48 +122,47 @@ export default function CryptoAverageCalculator() {
     };
 
     const result = useMemo(() => {
-        let totalQty = 0;
-        let totalAmount = 0;
+        // 입력 십진값 그대로 정확히 계산하고, 표시할 때만 한 번 반올림한다(분기·부호는 반올림 전 정확값).
+        let totalQty: Exact = EXACT_ZERO;
+        let totalAmount: Exact = EXACT_ZERO;
         let validCount = 0;
-        let firstValidPrice = 0; // 첫 번째 '유효한' 매수가 (물타기/불타기 판정 기준)
+        let firstValidPrice: Exact | null = null; // 첫 번째 '유효한' 매수가 (물타기/불타기 판정 기준)
 
         for (const row of rows) {
             const p = toPositive(row.price);
             const q = toPositive(row.quantity);
       if (!row.price.trim() && !row.quantity.trim()) continue;
-      if (!row.price.trim() || !row.quantity.trim() || !Number.isFinite(p) || !Number.isFinite(q) || p <= 0 || q <= 0) { validCount = 0; break; }
-            if (p > 0 && q > 0) {
-                totalQty += q;
-                totalAmount += p * q;
-                validCount += 1;
-                if (firstValidPrice === 0) firstValidPrice = p;
-            }
+      if (!row.price.trim() || !row.quantity.trim() || sign(p) <= 0 || sign(q) <= 0) { validCount = 0; break; }
+            totalQty = add(totalQty, q);
+            totalAmount = add(totalAmount, mul(p, q));
+            validCount += 1;
+            if (!firstValidPrice) firstValidPrice = p;
         }
 
-        if (validCount === 0 || totalQty <= 0) {
+        if (validCount === 0 || sign(totalQty) <= 0 || !firstValidPrice) {
             return {
                 valid: false,
-                avgPrice: 0,
-                totalQty: 0,
-                totalAmount: 0,
-                firstPrice: 0,
+                avgPrice: EXACT_ZERO,
+                totalQty: EXACT_ZERO,
+                totalAmount: EXACT_ZERO,
+                firstPrice: EXACT_ZERO,
                 buyCount: 0,
                 hasCurrent: false,
-                evalAmount: 0,
-                profit: 0,
-                profitRate: 0,
+                evalAmount: EXACT_ZERO,
+                profit: EXACT_ZERO,
+                profitRate: EXACT_ZERO,
             };
         }
 
-        const avgPrice = totalAmount / totalQty;
+        const avgPrice = div(totalAmount, totalQty);
         const firstPrice = firstValidPrice;
 
         const cp = toPositive(currentPrice);
-        const hasCurrent = cp > 0;
-        const evalAmount = hasCurrent ? cp * totalQty : 0;
-        const profit = hasCurrent ? evalAmount - totalAmount : 0;
+        const hasCurrent = sign(cp) > 0;
+        const evalAmount = hasCurrent ? mul(cp, totalQty) : EXACT_ZERO;
+        const profit = hasCurrent ? sub(evalAmount, totalAmount) : EXACT_ZERO;
         const profitRate =
-            hasCurrent && totalAmount > 0 ? (profit / totalAmount) * 100 : 0;
+            hasCurrent && sign(totalAmount) > 0 ? mul(div(profit, totalAmount), fromInt(100)) : EXACT_ZERO;
 
         return {
             valid: true,
@@ -136,10 +179,10 @@ export default function CryptoAverageCalculator() {
     }, [rows, currentPrice]);
 
     const directionNote =
-        result.valid && result.firstPrice > 0
-            ? result.avgPrice < result.firstPrice
+        result.valid && sign(result.firstPrice) > 0
+            ? compare(result.avgPrice, result.firstPrice) < 0
                 ? { text: "평단가 하락 · 물타기 효과", tone: "down" as const }
-                : result.avgPrice > result.firstPrice
+                : compare(result.avgPrice, result.firstPrice) > 0
                     ? { text: "평단가 상승 · 불타기", tone: "up" as const }
                     : { text: "평단가 변동 없음", tone: "flat" as const }
             : null;
@@ -242,12 +285,14 @@ export default function CryptoAverageCalculator() {
                 emptyMessage="매수 가격과 수량을 입력하면 평균 단가가 계산됩니다."
                 isValid={result.valid}
             >
-                <ResultHighlight
-                    label="새 평균 단가"
-                    value={formatPrice(result.avgPrice)}
-                    unit={moneyUnit}
-                    tone="default"
-                />
+                <CommaBreaks>
+                    <ResultHighlight
+                        label="새 평균 단가"
+                        value={formatPriceExact(result.avgPrice)}
+                        unit={moneyUnit}
+                        tone="default"
+                    />
+                </CommaBreaks>
 
                 {directionNote ? (
                     <p
@@ -264,37 +309,43 @@ export default function CryptoAverageCalculator() {
                 ) : null}
 
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                    <ResultDetail
-                        label="총 보유 수량"
-                        value={formatNumber(result.totalQty, 8)}
-                    />
-                    <ResultDetail
-                        label="총 매수 금액"
-                        value={formatNumber(result.totalAmount)}
-                        unit={moneyUnit}
-                    />
-                    <ResultDetail label="매수 횟수" value={result.buyCount} unit="회" />
+                    <CommaBreaks>
+                        <ResultDetail
+                            label="총 보유 수량"
+                            value={formatGrouped(result.totalQty, 8)}
+                        />
+                        <ResultDetail
+                            label="총 매수 금액"
+                            value={formatGrouped(result.totalAmount, 2)}
+                            unit={moneyUnit}
+                        />
+                        <ResultDetail label="매수 횟수" value={result.buyCount} unit="회" />
+                    </CommaBreaks>
                 </div>
 
                 {result.hasCurrent ? (
                     <div className="mt-6 border-t border-slate-100 pt-6">
-                        <ResultHighlight
-                            label="평가 손익"
-                            value={`${result.profit >= 0 ? "+" : ""}${formatNumber(result.profit)}`}
-                            unit={moneyUnit}
-                            tone={result.profit >= 0 ? "positive" : "negative"}
-                        />
-                        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                            <ResultDetail
-                                label="수익률"
-                                value={`${result.profitRate >= 0 ? "+" : ""}${result.profitRate.toFixed(2)}`}
-                                unit="%"
-                            />
-                            <ResultDetail
-                                label="평가 금액"
-                                value={formatNumber(result.evalAmount)}
+                        <CommaBreaks>
+                            <ResultHighlight
+                                label="평가 손익"
+                                value={`${sign(result.profit) >= 0 ? "+" : ""}${formatGrouped(result.profit, 2)}`}
                                 unit={moneyUnit}
+                                tone={sign(result.profit) >= 0 ? "positive" : "negative"}
                             />
+                        </CommaBreaks>
+                        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                            <CommaBreaks>
+                                <ResultDetail
+                                    label="수익률"
+                                    value={`${sign(result.profitRate) >= 0 ? "+" : ""}${toFixedExact(result.profitRate, 2)}`}
+                                    unit="%"
+                                />
+                                <ResultDetail
+                                    label="평가 금액"
+                                    value={formatGrouped(result.evalAmount, 2)}
+                                    unit={moneyUnit}
+                                />
+                            </CommaBreaks>
                         </div>
                     </div>
                 ) : null}

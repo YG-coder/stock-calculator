@@ -1,5 +1,5 @@
 "use client";
-import { requiredNumber } from "@/lib/uiInput";
+import { add, div, formatGrouped, fromInt, mul, requiredFiniteNumberExact, sign, sub, EXACT_ZERO, type Exact } from "@/lib/exactDecimal";
 
 import { useMemo, useState } from "react";
 import {
@@ -11,16 +11,16 @@ import {
     InputField,
 } from "@/components/ui/Shared";
 import CurrencyToggle from "@/components/calculator/CurrencyToggle";
+import CommaBreaks from "@/components/calculator/CommaBreaks";
 
 type Currency = "KRW" | "USDT";
 
-function formatNumber(value: number, maximumFractionDigits = 2) {
-    if (!Number.isFinite(value)) return "0";
-    return new Intl.NumberFormat("ko-KR", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits,
-    }).format(value);
+/** Intl.NumberFormat("ko-KR", { maximumFractionDigits: 2 }) 기준 표시(정확값을 표시할 때 한 번만 반올림) */
+function formatNumber(value: Exact, maximumFractionDigits = 2) {
+    return formatGrouped(value, maximumFractionDigits);
 }
+
+const HUNDRED = fromInt(100);
 
 export default function CryptoProfitCalculator() {
     const [currency, setCurrency] = useState<Currency>("USDT");
@@ -33,47 +33,51 @@ export default function CryptoProfitCalculator() {
     const moneyUnit = currency === "KRW" ? "원" : "USDT";
 
     const result = useMemo(() => {
-        const buy = requiredNumber(buyPrice);
-        const sell = requiredNumber(sellPrice);
-        const qty = requiredNumber(quantity);
-        const buyFee = requiredNumber(buyFeeRate) / 100;
-        const sellFee = requiredNumber(sellFeeRate) / 100;
+        // 입력 십진값 그대로 정확히 계산하고, 표시할 때만 한 번 반올림한다(색은 반올림 전 정확값의 부호).
+        const buy = requiredFiniteNumberExact(buyPrice);
+        const sell = requiredFiniteNumberExact(sellPrice);
+        const qty = requiredFiniteNumberExact(quantity);
+        const buyFeePercent = requiredFiniteNumberExact(buyFeeRate);
+        const sellFeePercent = requiredFiniteNumberExact(sellFeeRate);
 
         if (
-            !Number.isFinite(buy) ||
-            !Number.isFinite(sell) ||
-            !Number.isFinite(qty) ||
-            !Number.isFinite(buyFee) ||
-            !Number.isFinite(sellFee) ||
-            buy <= 0 ||
-            sell <= 0 ||
-            qty <= 0 ||
-            buyFee < 0 ||
-            sellFee < 0
+            !buy ||
+            !sell ||
+            !qty ||
+            !buyFeePercent ||
+            !sellFeePercent ||
+            sign(buy) <= 0 ||
+            sign(sell) <= 0 ||
+            sign(qty) <= 0 ||
+            sign(buyFeePercent) < 0 ||
+            sign(sellFeePercent) < 0
         ) {
             return {
                 valid: false,
-                totalBuy: 0,
-                totalSell: 0,
-                totalFee: 0,
-                grossProfit: 0,
-                netProfit: 0,
-                profitRate: 0,
+                totalBuy: EXACT_ZERO,
+                totalSell: EXACT_ZERO,
+                totalFee: EXACT_ZERO,
+                grossProfit: EXACT_ZERO,
+                netProfit: EXACT_ZERO,
+                profitRate: EXACT_ZERO,
             };
         }
 
-        const buyAmount = buy * qty;
-        const sellAmount = sell * qty;
+        const buyFee = div(buyFeePercent, HUNDRED);
+        const sellFee = div(sellFeePercent, HUNDRED);
 
-        const buyFeeAmount = buyAmount * buyFee;
-        const sellFeeAmount = sellAmount * sellFee;
+        const buyAmount = mul(buy, qty);
+        const sellAmount = mul(sell, qty);
 
-        const totalBuy = buyAmount + buyFeeAmount;
-        const totalSell = sellAmount - sellFeeAmount;
-        const grossProfit = sellAmount - buyAmount;
-        const netProfit = totalSell - totalBuy;
-        const totalFee = buyFeeAmount + sellFeeAmount;
-        const profitRate = totalBuy > 0 ? (netProfit / totalBuy) * 100 : 0;
+        const buyFeeAmount = mul(buyAmount, buyFee);
+        const sellFeeAmount = mul(sellAmount, sellFee);
+
+        const totalBuy = add(buyAmount, buyFeeAmount);
+        const totalSell = sub(sellAmount, sellFeeAmount);
+        const grossProfit = sub(sellAmount, buyAmount);
+        const netProfit = sub(totalSell, totalBuy);
+        const totalFee = add(buyFeeAmount, sellFeeAmount);
+        const profitRate = sign(totalBuy) > 0 ? mul(div(netProfit, totalBuy), HUNDRED) : EXACT_ZERO;
 
         return {
             valid: true,
@@ -87,7 +91,7 @@ export default function CryptoProfitCalculator() {
     }, [buyPrice, sellPrice, quantity, buyFeeRate, sellFeeRate]);
 
     const tone =
-        result.netProfit > 0 ? "positive" : result.netProfit < 0 ? "negative" : "default";
+        sign(result.netProfit) > 0 ? "positive" : sign(result.netProfit) < 0 ? "negative" : "default";
 
     return (
         <CalculatorLayout>
@@ -159,44 +163,48 @@ export default function CryptoProfitCalculator() {
                 emptyMessage="매수 가격, 매도 가격, 수량을 입력하면 예상 수익이 계산됩니다."
                 isValid={result.valid}
             >
-                <ResultHighlight
-                    label="실제 순손익"
-                    value={formatNumber(result.netProfit)}
-                    unit={moneyUnit}
-                    tone={tone}
-                />
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <ResultDetail
-                        label="총 매수 금액(수수료 포함)"
-                        value={formatNumber(result.totalBuy)}
-                        unit={moneyUnit}
-                    />
-                    <ResultDetail
-                        label="총 매도 금액(수수료 차감)"
-                        value={formatNumber(result.totalSell)}
-                        unit={moneyUnit}
-                    />
-                    <ResultDetail
-                        label="총 수수료"
-                        value={formatNumber(result.totalFee)}
-                        unit={moneyUnit}
-                    />
-                    <ResultDetail
-                        label="수익률"
-                        value={formatNumber(result.profitRate)}
-                        unit="%"
-                    />
-                    <ResultDetail
-                        label="수수료 반영 전 손익"
-                        value={formatNumber(result.grossProfit)}
-                        unit={moneyUnit}
-                    />
-                    <ResultDetail
+                <CommaBreaks>
+                    <ResultHighlight
                         label="실제 순손익"
                         value={formatNumber(result.netProfit)}
                         unit={moneyUnit}
+                        tone={tone}
                     />
+                </CommaBreaks>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <CommaBreaks>
+                        <ResultDetail
+                            label="총 매수 금액(수수료 포함)"
+                            value={formatNumber(result.totalBuy)}
+                            unit={moneyUnit}
+                        />
+                        <ResultDetail
+                            label="총 매도 금액(수수료 차감)"
+                            value={formatNumber(result.totalSell)}
+                            unit={moneyUnit}
+                        />
+                        <ResultDetail
+                            label="총 수수료"
+                            value={formatNumber(result.totalFee)}
+                            unit={moneyUnit}
+                        />
+                        <ResultDetail
+                            label="수익률"
+                            value={formatNumber(result.profitRate)}
+                            unit="%"
+                        />
+                        <ResultDetail
+                            label="수수료 반영 전 손익"
+                            value={formatNumber(result.grossProfit)}
+                            unit={moneyUnit}
+                        />
+                        <ResultDetail
+                            label="실제 순손익"
+                            value={formatNumber(result.netProfit)}
+                            unit={moneyUnit}
+                        />
+                    </CommaBreaks>
                 </div>
             </ResultCard>
         </CalculatorLayout>

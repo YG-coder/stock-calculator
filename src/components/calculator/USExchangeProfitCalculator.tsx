@@ -1,5 +1,17 @@
 "use client";
-import { requiredNumber } from "@/lib/uiInput";
+import {
+    EXACT_ZERO,
+    add,
+    div,
+    formatGrouped,
+    fromInt,
+    mul,
+    parseNumberExact,
+    requiredNumberExact,
+    sign,
+    sub,
+    type Exact,
+} from "@/lib/exactDecimal";
 
 import { useMemo, useState } from "react";
 import {
@@ -10,14 +22,26 @@ import {
     ResultDetail,
     InputField,
 } from "@/components/ui/Shared";
+import CommaBreaks from "@/components/calculator/CommaBreaks";
 
-function formatNumber(value: number, maximumFractionDigits = 2) {
-    if (!Number.isFinite(value)) return "0";
-    return new Intl.NumberFormat("ko-KR", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits,
-    }).format(value);
+// 정확히 계산한 값을 기존 Intl 규칙(최대 2자리, 0에서 먼 쪽, 쉼표, 0으로 반올림되는 음수는 "-0")으로 표시 단계에서 한 번만 반올림한다.
+function formatNumber(value: Exact, maximumFractionDigits = 2) {
+    return formatGrouped(value, maximumFractionDigits);
 }
+
+const INVALID = {
+    valid: false,
+    totalBuyUsd: EXACT_ZERO,
+    totalSellUsd: EXACT_ZERO,
+    totalBuyKrw: EXACT_ZERO,
+    totalSellKrw: EXACT_ZERO,
+    usdProfit: EXACT_ZERO,
+    krwProfit: EXACT_ZERO,
+    krwProfitRate: EXACT_ZERO,
+    exchangeEffectKrw: EXACT_ZERO,
+    noFxProfitKrw: EXACT_ZERO,
+    totalFeeKrw: EXACT_ZERO,
+};
 
 export default function USExchangeProfitCalculator() {
     const [buyPriceUsd, setBuyPriceUsd] = useState("");
@@ -29,61 +53,51 @@ export default function USExchangeProfitCalculator() {
     const [sellFeeKrw, setSellFeeKrw] = useState("");
 
     const result = useMemo(() => {
-        const buyPrice = requiredNumber(buyPriceUsd);
-        const sellPrice = requiredNumber(sellPriceUsd);
-        const qty = requiredNumber(quantity);
-        const buyRate = requiredNumber(buyExchangeRate);
-        const sellRate = requiredNumber(sellExchangeRate);
-        const buyFee = Number(buyFeeKrw || "0");
-        const sellFee = Number(sellFeeKrw || "0");
+        // requiredNumber·Number(값 || "0")과 같은 계약으로 입력 십진값을 정확히 읽는다.
+        const buyPrice = requiredNumberExact(buyPriceUsd);
+        const sellPrice = requiredNumberExact(sellPriceUsd);
+        const qty = requiredNumberExact(quantity);
+        const buyRate = requiredNumberExact(buyExchangeRate);
+        const sellRate = requiredNumberExact(sellExchangeRate);
+        const buyFee = parseNumberExact(buyFeeKrw || "0");
+        const sellFee = parseNumberExact(sellFeeKrw || "0");
 
         if (
-            !Number.isFinite(buyPrice) ||
-            !Number.isFinite(sellPrice) ||
-            !Number.isFinite(qty) ||
-            !Number.isFinite(buyRate) ||
-            !Number.isFinite(sellRate) ||
-            !Number.isFinite(buyFee) ||
-            !Number.isFinite(sellFee) ||
-            buyPrice <= 0 ||
-            sellPrice <= 0 ||
-            qty <= 0 ||
-            buyRate <= 0 ||
-            sellRate <= 0 ||
-            buyFee < 0 ||
-            sellFee < 0
+            !buyPrice ||
+            !sellPrice ||
+            !qty ||
+            !buyRate ||
+            !sellRate ||
+            !buyFee ||
+            !sellFee ||
+            sign(buyPrice) <= 0 ||
+            sign(sellPrice) <= 0 ||
+            sign(qty) <= 0 ||
+            sign(buyRate) <= 0 ||
+            sign(sellRate) <= 0 ||
+            sign(buyFee) < 0 ||
+            sign(sellFee) < 0
         ) {
-            return {
-                valid: false,
-                totalBuyUsd: 0,
-                totalSellUsd: 0,
-                totalBuyKrw: 0,
-                totalSellKrw: 0,
-                usdProfit: 0,
-                krwProfit: 0,
-                krwProfitRate: 0,
-                exchangeEffectKrw: 0,
-                noFxProfitKrw: 0,
-                totalFeeKrw: 0,
-            };
+            return INVALID;
         }
 
-        const totalBuyUsd = buyPrice * qty;
-        const totalSellUsd = sellPrice * qty;
+        // 정확한 유리수 계산(비슷한 두 큰 값의 뺄셈도 자릿수 손실 없음)
+        const totalBuyUsd = mul(buyPrice, qty);
+        const totalSellUsd = mul(sellPrice, qty);
 
-        const totalBuyKrw = totalBuyUsd * buyRate + buyFee;
-        const totalSellKrw = totalSellUsd * sellRate - sellFee;
+        const totalBuyKrw = add(mul(totalBuyUsd, buyRate), buyFee);
+        const totalSellKrw = sub(mul(totalSellUsd, sellRate), sellFee);
 
-        const usdProfit = totalSellUsd - totalBuyUsd;
-        const krwProfit = totalSellKrw - totalBuyKrw;
-        const krwProfitRate = totalBuyKrw > 0 ? (krwProfit / totalBuyKrw) * 100 : 0;
+        const usdProfit = sub(totalSellUsd, totalBuyUsd);
+        const krwProfit = sub(totalSellKrw, totalBuyKrw);
+        const krwProfitRate = sign(totalBuyKrw) > 0 ? mul(div(krwProfit, totalBuyKrw), fromInt(100)) : EXACT_ZERO;
 
         // 환율 효과는 "매도 시점 원화 가치 - 매수 환율로 환산했을 때의 원화 가치" 차이만이다.
         // 수수료는 환율과 무관하므로 여기에 섞지 않는다.
         // (이전 구현은 krwProfit 에서 빼는 방식이라 수수료 전액이 환율 효과로 잡혔다.)
-        const exchangeEffectKrw = totalSellUsd * (sellRate - buyRate);
+        const exchangeEffectKrw = mul(totalSellUsd, sub(sellRate, buyRate));
         // 수수료를 뺀 순수 매매손익(매수 환율 고정 기준). 표시용 보조 값.
-        const noFxProfitKrw = (totalSellUsd - totalBuyUsd) * buyRate;
+        const noFxProfitKrw = mul(sub(totalSellUsd, totalBuyUsd), buyRate);
 
         return {
             valid: true,
@@ -96,7 +110,7 @@ export default function USExchangeProfitCalculator() {
             krwProfitRate,
             exchangeEffectKrw,
             noFxProfitKrw,
-            totalFeeKrw: buyFee + sellFee,
+            totalFeeKrw: add(buyFee, sellFee),
         };
     }, [
         buyPriceUsd,
@@ -108,8 +122,9 @@ export default function USExchangeProfitCalculator() {
         sellFeeKrw,
     ]);
 
+    // 색·'+' 부호는 반올림 전 정확값으로 판정한다(0으로 반올림되는 아주 작은 손익도 부호를 따른다).
     const tone =
-        result.krwProfit > 0 ? "positive" : result.krwProfit < 0 ? "negative" : "default";
+        sign(result.krwProfit) > 0 ? "positive" : sign(result.krwProfit) < 0 ? "negative" : "default";
 
     return (
         <CalculatorLayout>
@@ -191,55 +206,60 @@ export default function USExchangeProfitCalculator() {
                 emptyMessage="값을 입력하면 결과가 자동으로 계산됩니다."
                 isValid={result.valid}
             >
-                <ResultHighlight
-                    label="원화 기준 실제 손익"
-                    value={`${result.krwProfit > 0 ? "+" : ""}${formatNumber(result.krwProfit)}`}
-                    unit="원"
-                    tone={tone}
-                />
+                {/* 긴 금액이 좁은 화면에서 카드 밖으로 넘치지 않게 쉼표 뒤 줄바꿈(글자 크기·숫자·부호·단위 그대로) */}
+                <CommaBreaks>
+                    <ResultHighlight
+                        label="원화 기준 실제 손익"
+                        value={`${sign(result.krwProfit) > 0 ? "+" : ""}${formatNumber(result.krwProfit)}`}
+                        unit="원"
+                        tone={tone}
+                    />
+                </CommaBreaks>
                 <div className="grid gap-4 sm:grid-cols-2">
-                    <ResultDetail
-                        label="총 매수 금액"
-                        value={formatNumber(result.totalBuyUsd)}
-                        unit="USD"
-                    />
-                    <ResultDetail
-                        label="총 매도 금액"
-                        value={formatNumber(result.totalSellUsd)}
-                        unit="USD"
-                    />
-                    <ResultDetail
-                        label="원화 매수 금액"
-                        value={formatNumber(result.totalBuyKrw)}
-                        unit="원"
-                    />
-                    <ResultDetail
-                        label="원화 매도 금액"
-                        value={formatNumber(result.totalSellKrw)}
-                        unit="원"
-                    />
-                    <ResultDetail
-                        label="달러 기준 손익"
-                        value={`${result.usdProfit > 0 ? "+" : ""}${formatNumber(result.usdProfit)}`}
-                        unit="USD"
-                    />
-                    <ResultDetail
-                        label="원화 기준 수익률"
-                        value={formatNumber(result.krwProfitRate)}
-                        unit="%"
-                    />
-                    <ResultDetail
-                        label="환율 효과 (수수료 제외)"
-                        value={`${result.exchangeEffectKrw > 0 ? "+" : ""}${formatNumber(
-                            result.exchangeEffectKrw
-                        )}`}
-                        unit="원"
-                    />
-                    <ResultDetail
-                        label="매매 수수료 합계"
-                        value={formatNumber(result.totalFeeKrw)}
-                        unit="원"
-                    />
+                    <CommaBreaks>
+                        <ResultDetail
+                            label="총 매수 금액"
+                            value={formatNumber(result.totalBuyUsd)}
+                            unit="USD"
+                        />
+                        <ResultDetail
+                            label="총 매도 금액"
+                            value={formatNumber(result.totalSellUsd)}
+                            unit="USD"
+                        />
+                        <ResultDetail
+                            label="원화 매수 금액"
+                            value={formatNumber(result.totalBuyKrw)}
+                            unit="원"
+                        />
+                        <ResultDetail
+                            label="원화 매도 금액"
+                            value={formatNumber(result.totalSellKrw)}
+                            unit="원"
+                        />
+                        <ResultDetail
+                            label="달러 기준 손익"
+                            value={`${sign(result.usdProfit) > 0 ? "+" : ""}${formatNumber(result.usdProfit)}`}
+                            unit="USD"
+                        />
+                        <ResultDetail
+                            label="원화 기준 수익률"
+                            value={formatNumber(result.krwProfitRate)}
+                            unit="%"
+                        />
+                        <ResultDetail
+                            label="환율 효과 (수수료 제외)"
+                            value={`${sign(result.exchangeEffectKrw) > 0 ? "+" : ""}${formatNumber(
+                                result.exchangeEffectKrw
+                            )}`}
+                            unit="원"
+                        />
+                        <ResultDetail
+                            label="매매 수수료 합계"
+                            value={formatNumber(result.totalFeeKrw)}
+                            unit="원"
+                        />
+                    </CommaBreaks>
                 </div>
                 <p className="text-sm leading-relaxed text-slate-500">
                     환율 효과는 매도 대금에 매도 환율과 매수 환율을 각각 적용했을 때의 원화 차이입니다.

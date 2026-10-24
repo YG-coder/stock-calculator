@@ -1,5 +1,5 @@
 "use client";
-import { requiredNumber } from "@/lib/uiInput";
+import { formatGrouped, sign, type Exact } from "@/lib/exactDecimal";
 
 import { useMemo, useState } from "react";
 import {
@@ -11,7 +11,8 @@ import {
     InputField,
 } from "@/components/ui/Shared";
 import CurrencyToggle from "@/components/calculator/CurrencyToggle";
-import { calculateFundingFee, type FundingFlow } from "@/lib/fundingFee";
+import CommaBreaks from "@/components/calculator/CommaBreaks";
+import { calculateFundingFeeExact, type FundingFlow } from "@/lib/fundingFee";
 
 type Currency = "KRW" | "USDT";
 
@@ -21,12 +22,9 @@ const FLOW_LABELS: Record<FundingFlow, string> = {
     none: "지급·수령 없음",
 };
 
-function formatNumber(value: number, maximumFractionDigits = 2) {
-    if (!Number.isFinite(value)) return "0";
-    return new Intl.NumberFormat("ko-KR", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits,
-    }).format(value);
+/** Intl.NumberFormat("ko-KR", { maximumFractionDigits: 2 }) 기준 표시(정확값을 표시할 때 한 번만 반올림) */
+function formatNumber(value: Exact, maximumFractionDigits = 2) {
+    return formatGrouped(value, maximumFractionDigits);
 }
 
 export default function CryptoFundingFeeCalculator() {
@@ -39,20 +37,21 @@ export default function CryptoFundingFeeCalculator() {
     const moneyUnit = currency === "KRW" ? "원" : "USDT";
 
     const result = useMemo(() => {
-        const calc = calculateFundingFee({ positionSize, fundingRate, fundingCount, positionType });
+        // 입력 십진값 그대로 정확히 계산한다. 지급·수령과 안내 문구는 반올림 전 정확값의 부호로 정한다.
+        const calc = calculateFundingFeeExact({ positionSize, fundingRate, fundingCount, positionType });
         if (!calc.valid) {
             return { ...calc, directionText: "" };
         }
 
-        const rate = requiredNumber(fundingRate) / 100;
+        const rateSign = sign(calc.fundingRate);
 
         let directionText = "";
-        if (rate > 0) {
+        if (rateSign > 0) {
             directionText =
                 positionType === "long"
                     ? "양(+) 펀딩비 기준으로 롱 포지션은 펀딩비를 지급하고, 숏 포지션은 수령합니다."
                     : "양(+) 펀딩비 기준으로 숏 포지션은 펀딩비를 수령하고, 롱 포지션은 지급합니다.";
-        } else if (rate < 0) {
+        } else if (rateSign < 0) {
             directionText =
                 positionType === "long"
                     ? "음(-) 펀딩비 기준으로 롱 포지션은 펀딩비를 수령하고, 숏 포지션은 지급합니다."
@@ -66,9 +65,9 @@ export default function CryptoFundingFeeCalculator() {
 
     // 순현금흐름 기준: 양수 = 수령(수익 색), 음수 = 지급(비용 색)
     const tone =
-        result.netTotal > 0 ? "positive" : result.netTotal < 0 ? "negative" : "default";
+        sign(result.netTotal) > 0 ? "positive" : sign(result.netTotal) < 0 ? "negative" : "default";
     const flowLabel = FLOW_LABELS[result.flow];
-    const signed = (value: number) => `${value > 0 ? "+" : ""}${formatNumber(value)}`;
+    const signed = (value: Exact) => `${sign(value) > 0 ? "+" : ""}${formatNumber(value)}`;
 
     return (
         <CalculatorLayout>
@@ -132,24 +131,28 @@ export default function CryptoFundingFeeCalculator() {
                 emptyMessage="포지션 규모와 펀딩비율을 입력하면 예상 펀딩비가 계산됩니다."
                 isValid={result.valid}
             >
-                <ResultHighlight
-                    label={`총 예상 펀딩비 (${flowLabel})`}
-                    value={signed(result.netTotal)}
-                    unit={moneyUnit}
-                    tone={tone}
-                />
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <ResultDetail
-                        label="1회당 펀딩비"
-                        value={signed(result.netOneTime)}
-                        unit={moneyUnit}
-                    />
-                    <ResultDetail
-                        label="누적 펀딩비"
+                <CommaBreaks>
+                    <ResultHighlight
+                        label={`총 예상 펀딩비 (${flowLabel})`}
                         value={signed(result.netTotal)}
                         unit={moneyUnit}
+                        tone={tone}
                     />
+                </CommaBreaks>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <CommaBreaks>
+                        <ResultDetail
+                            label="1회당 펀딩비"
+                            value={signed(result.netOneTime)}
+                            unit={moneyUnit}
+                        />
+                        <ResultDetail
+                            label="누적 펀딩비"
+                            value={signed(result.netTotal)}
+                            unit={moneyUnit}
+                        />
+                    </CommaBreaks>
                 </div>
 
                 <p className="text-sm leading-relaxed text-slate-500">

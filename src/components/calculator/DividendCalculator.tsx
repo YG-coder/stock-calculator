@@ -1,5 +1,16 @@
 "use client";
-import { requiredNumber } from "@/lib/uiInput";
+import {
+    EXACT_ZERO,
+    compare,
+    div,
+    formatGrouped,
+    fromInt,
+    mul,
+    requiredNumberExact,
+    sign,
+    sub,
+    type Exact,
+} from "@/lib/exactDecimal";
 
 import { withParticle } from "@/lib/korean";
 import { useMemo, useState, type ChangeEvent } from "react";
@@ -17,6 +28,7 @@ import {
     InputField,
 } from "@/components/ui/Shared";
 import CurrencyToggle from "@/components/calculator/CurrencyToggle";
+import CommaBreaks from "@/components/calculator/CommaBreaks";
 
 type Currency = "KRW" | "USD";
 
@@ -27,13 +39,20 @@ const DEFAULT_TAX_RATE: Record<Currency, string> = {
     USD: String(US_DIVIDEND_WITHHOLDING.ratePercent),
 };
 
-function formatNumber(value: number, maximumFractionDigits = 2) {
-    if (!Number.isFinite(value)) return "0";
-    return new Intl.NumberFormat("ko-KR", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits,
-    }).format(value);
+// 입력 십진값으로 정확히 계산한 값을 기존 Intl 규칙(최대 2자리, 0에서 먼 쪽, 쉼표)으로 표시 단계에서 한 번만 반올림한다.
+function formatNumber(value: Exact, maximumFractionDigits = 2) {
+    return formatGrouped(value, maximumFractionDigits);
 }
+
+const INVALID = {
+    valid: false,
+    grossDividend: EXACT_ZERO,
+    taxAmount: EXACT_ZERO,
+    netDividend: EXACT_ZERO,
+    totalInvestment: EXACT_ZERO,
+    grossYield: EXACT_ZERO,
+    netYield: EXACT_ZERO,
+};
 
 export default function DividendCalculator() {
     const [currency, setCurrency] = useState<Currency>("KRW");
@@ -59,53 +78,37 @@ export default function DividendCalculator() {
     const taxRateEntered = taxRate.trim() !== "";
 
     const result = useMemo(() => {
-        const qty = requiredNumber(shares);
-        const dividend = requiredNumber(dividendPerShare);
-        const price = requiredNumber(buyPrice);
-        const tax = requiredNumber(taxRate) / 100;
+        // requiredNumber와 같은 계약(빈칸은 미입력)으로 입력 십진값을 정확히 읽는다.
+        const qty = requiredNumberExact(shares);
+        const dividend = requiredNumberExact(dividendPerShare);
+        const price = requiredNumberExact(buyPrice);
+        const taxPercent = requiredNumberExact(taxRate);
 
         if (taxRate.trim() === "") {
-            return {
-                valid: false,
-                grossDividend: 0,
-                taxAmount: 0,
-                netDividend: 0,
-                totalInvestment: 0,
-                grossYield: 0,
-                netYield: 0,
-            };
+            return INVALID;
         }
 
         if (
-            !Number.isFinite(qty) ||
-            !Number.isFinite(dividend) ||
-            !Number.isFinite(price) ||
-            !Number.isFinite(tax) ||
-            qty <= 0 ||
-            dividend < 0 ||
-            price <= 0 ||
-            tax < 0 ||
-            tax >= 1
+            !qty ||
+            !dividend ||
+            !price ||
+            !taxPercent ||
+            sign(qty) <= 0 ||
+            sign(dividend) < 0 ||
+            sign(price) <= 0 ||
+            sign(taxPercent) < 0 ||
+            compare(taxPercent, fromInt(100)) >= 0
         ) {
-            return {
-                valid: false,
-                grossDividend: 0,
-                taxAmount: 0,
-                netDividend: 0,
-                totalInvestment: 0,
-                grossYield: 0,
-                netYield: 0,
-            };
+            return INVALID;
         }
 
-        const grossDividend = qty * dividend;
-        const taxAmount = grossDividend * tax;
-        const netDividend = grossDividend - taxAmount;
-        const totalInvestment = qty * price;
-        const grossYield =
-            totalInvestment > 0 ? (grossDividend / totalInvestment) * 100 : 0;
-        const netYield =
-            totalInvestment > 0 ? (netDividend / totalInvestment) * 100 : 0;
+        // 정확한 유리수 계산(중간 반올림 없음)
+        const grossDividend = mul(qty, dividend);
+        const taxAmount = mul(grossDividend, div(taxPercent, fromInt(100)));
+        const netDividend = sub(grossDividend, taxAmount);
+        const totalInvestment = mul(qty, price);
+        const grossYield = mul(div(grossDividend, totalInvestment), fromInt(100));
+        const netYield = mul(div(netDividend, totalInvestment), fromInt(100));
 
         return {
             valid: true,
@@ -188,39 +191,44 @@ export default function DividendCalculator() {
                 }
                 isValid={result.valid}
             >
-                <ResultHighlight
-                    label="세후 총 배당금"
-                    value={formatNumber(result.netDividend)}
-                    unit={moneyUnit}
-                    tone="positive"
-                />
+                {/* 긴 금액이 좁은 화면에서 카드 밖으로 넘치지 않게 쉼표 뒤 줄바꿈(글자 크기·숫자·단위 그대로) */}
+                <CommaBreaks>
+                    <ResultHighlight
+                        label="세후 총 배당금"
+                        value={formatNumber(result.netDividend)}
+                        unit={moneyUnit}
+                        tone="positive"
+                    />
+                </CommaBreaks>
 
                 <div className="grid gap-4 sm:grid-cols-2">
-                    <ResultDetail
-                        label="세전 총 배당금"
-                        value={formatNumber(result.grossDividend)}
-                        unit={moneyUnit}
-                    />
-                    <ResultDetail
-                        label="세금"
-                        value={formatNumber(result.taxAmount)}
-                        unit={moneyUnit}
-                    />
-                    <ResultDetail
-                        label="총 투자금"
-                        value={formatNumber(result.totalInvestment)}
-                        unit={moneyUnit}
-                    />
-                    <ResultDetail
-                        label="세전 배당수익률"
-                        value={formatNumber(result.grossYield)}
-                        unit="%"
-                    />
-                    <ResultDetail
-                        label="세후 배당수익률"
-                        value={formatNumber(result.netYield)}
-                        unit="%"
-                    />
+                    <CommaBreaks>
+                        <ResultDetail
+                            label="세전 총 배당금"
+                            value={formatNumber(result.grossDividend)}
+                            unit={moneyUnit}
+                        />
+                        <ResultDetail
+                            label="세금"
+                            value={formatNumber(result.taxAmount)}
+                            unit={moneyUnit}
+                        />
+                        <ResultDetail
+                            label="총 투자금"
+                            value={formatNumber(result.totalInvestment)}
+                            unit={moneyUnit}
+                        />
+                        <ResultDetail
+                            label="세전 배당수익률"
+                            value={formatNumber(result.grossYield)}
+                            unit="%"
+                        />
+                        <ResultDetail
+                            label="세후 배당수익률"
+                            value={formatNumber(result.netYield)}
+                            unit="%"
+                        />
+                    </CommaBreaks>
                 </div>
 
                 <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">

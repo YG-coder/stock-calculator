@@ -1,3 +1,5 @@
+import { add, div, fromInt, fromNumber, mul, sign, sub, toNumber, compare, EXACT_ZERO, type Exact } from "@/lib/exactDecimal";
+
 /**
  * 코인 선물(선형 USDT 계약) 레버리지 손익.
  *
@@ -7,6 +9,9 @@
  * 근거: Bybit "Trading Fee = Order Value × Trading Fee Rate, Order Value = Quantity × Executed Price"
  * (https://www.bybit.com/en/help-center/article/Futures-Contracts-Fees-Explained).
  * 진입·종료 수수료율은 같은 값으로 가정한다(메이커/테이커 구분 없음). 펀딩비·청산은 반영하지 않는다.
+ *
+ * 계산은 입력 십진값 그대로의 정확한 유리수로 한다(중간에 Number로 반올림하지 않는다).
+ * 화면은 calculateLeverageProfitExact를 쓰고, 표시 단계에서만 반올림한다.
  */
 export type LeveragePosition = "long" | "short";
 
@@ -37,37 +42,90 @@ export interface LeverageProfitResult {
   beyondLiquidation: boolean;
 }
 
+/** 정확 계산 입력. null은 빈칸·숫자가 아닌 값(기존 NaN)이다. */
+export interface LeverageProfitExactInput {
+  entryPrice: Exact | null;
+  exitPrice: Exact | null;
+  margin: Exact | null;
+  leverage: Exact | null;
+  /** 퍼센트 단위. 0.1 → 0.1% */
+  feeRatePercent: Exact | null;
+  position: LeveragePosition;
+}
+
+export interface LeverageProfitExactResult {
+  valid: boolean;
+  positionSize: Exact;
+  quantity: Exact;
+  priceChangeRate: Exact;
+  grossPnl: Exact;
+  entryFee: Exact;
+  exitFee: Exact;
+  totalFee: Exact;
+  netPnl: Exact;
+  roe: Exact;
+  beyondLiquidation: boolean;
+}
+
 const INVALID: LeverageProfitResult = {
   valid: false, positionSize: 0, quantity: 0, priceChangeRate: 0, grossPnl: 0,
   entryFee: 0, exitFee: 0, totalFee: 0, netPnl: 0, roe: 0, beyondLiquidation: false,
 };
 
-export function calculateLeverageProfit(input: LeverageProfitInput): LeverageProfitResult {
-  const { entryPrice: entry, exitPrice: exit, margin, leverage: lev, position } = input;
-  const fee = input.feeRatePercent / 100;
-  if (
-    ![entry, exit, margin, lev, fee].every(Number.isFinite) ||
-    entry <= 0 || exit <= 0 || margin <= 0 || lev <= 0 || fee < 0
-  ) {
-    return INVALID;
+const INVALID_EXACT: LeverageProfitExactResult = {
+  valid: false, positionSize: EXACT_ZERO, quantity: EXACT_ZERO, priceChangeRate: EXACT_ZERO, grossPnl: EXACT_ZERO,
+  entryFee: EXACT_ZERO, exitFee: EXACT_ZERO, totalFee: EXACT_ZERO, netPnl: EXACT_ZERO, roe: EXACT_ZERO, beyondLiquidation: false,
+};
+
+const HUNDRED = fromInt(100);
+
+/** 레버리지 손익 정확 계산. 유효성·산식·순서는 calculateLeverageProfit과 같다(분기는 반올림 전 정확값으로 판정). */
+export function calculateLeverageProfitExact(input: LeverageProfitExactInput): LeverageProfitExactResult {
+  const { entryPrice: entry, exitPrice: exit, margin, leverage: lev, feeRatePercent, position } = input;
+  if (!entry || !exit || !margin || !lev || !feeRatePercent) return INVALID_EXACT;
+  const fee = div(feeRatePercent, HUNDRED);
+  if (sign(entry) <= 0 || sign(exit) <= 0 || sign(margin) <= 0 || sign(lev) <= 0 || sign(fee) < 0) {
+    return INVALID_EXACT;
   }
 
-  const positionSize = margin * lev;
-  const quantity = positionSize / entry;
-  const priceChangeRate = position === "long" ? (exit - entry) / entry : (entry - exit) / entry;
-  const grossPnl = position === "long" ? quantity * (exit - entry) : quantity * (entry - exit);
+  const positionSize = mul(margin, lev);
+  const quantity = div(positionSize, entry);
+  const move = position === "long" ? sub(exit, entry) : sub(entry, exit);
+  const priceChangeRate = div(move, entry);
+  const grossPnl = mul(quantity, move);
 
-  const entryFee = quantity * entry * fee;
-  const exitFee = quantity * exit * fee;
-  const totalFee = entryFee + exitFee;
+  const entryFee = mul(mul(quantity, entry), fee);
+  const exitFee = mul(mul(quantity, exit), fee);
+  const totalFee = add(entryFee, exitFee);
 
-  const netPnl = grossPnl - totalFee;
-  const roe = (netPnl / margin) * 100;
+  const netPnl = sub(grossPnl, totalFee);
+  const roe = mul(div(netPnl, margin), HUNDRED);
   // 불리한 방향 변동폭이 1/레버리지를 넘으면 실제 거래에서는 그 전에 청산된다.
-  const beyondLiquidation = priceChangeRate < -1 / lev;
+  const beyondLiquidation = compare(priceChangeRate, div(fromInt(-1), lev)) < 0;
 
   return {
-    valid: true, positionSize, quantity, priceChangeRate: priceChangeRate * 100,
+    valid: true, positionSize, quantity, priceChangeRate: mul(priceChangeRate, HUNDRED),
     grossPnl, entryFee, exitFee, totalFee, netPnl, roe, beyondLiquidation,
+  };
+}
+
+/**
+ * 레버리지 손익(기존 Number API). 이름·입력·반환 구조와 유효성은 그대로다.
+ * 입력 Number의 십진 표기(String)를 정확값으로 읽어 calculateLeverageProfitExact로 계산하고,
+ * 각 값은 정확한 결과에 가장 가까운 Number로 돌려준다.
+ */
+export function calculateLeverageProfit(input: LeverageProfitInput): LeverageProfitResult {
+  const { entryPrice, exitPrice, margin, leverage, feeRatePercent, position } = input;
+  if (![entryPrice, exitPrice, margin, leverage, feeRatePercent].every(Number.isFinite)) return INVALID;
+  const r = calculateLeverageProfitExact({
+    entryPrice: fromNumber(entryPrice), exitPrice: fromNumber(exitPrice), margin: fromNumber(margin),
+    leverage: fromNumber(leverage), feeRatePercent: fromNumber(feeRatePercent), position,
+  });
+  if (!r.valid) return INVALID;
+  return {
+    valid: true, positionSize: toNumber(r.positionSize), quantity: toNumber(r.quantity),
+    priceChangeRate: toNumber(r.priceChangeRate), grossPnl: toNumber(r.grossPnl), entryFee: toNumber(r.entryFee),
+    exitFee: toNumber(r.exitFee), totalFee: toNumber(r.totalFee), netPnl: toNumber(r.netPnl), roe: toNumber(r.roe),
+    beyondLiquidation: r.beyondLiquidation,
   };
 }

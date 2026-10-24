@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { parsePositive } from "@/lib/number";
+import { compare, formatRoundedInteger, fromInt, isPositive, mul, div, parsePositiveExact, sub, toFixedExact, type Exact } from "@/lib/exactDecimal";
 import {
   CalculatorLayout,
   CalculatorCard,
@@ -11,9 +11,9 @@ import {
   InputField,
 } from "@/components/ui/Shared";
 
-function formatNumber(value: number) {
-  if (!Number.isFinite(value)) return "-";
-  return new Intl.NumberFormat("ko-KR").format(Math.round(value));
+// 기존 표시 규칙(Math.round 후 쉼표)을 정확한 값에 한 번만 적용한다.
+function formatNumber(value: Exact) {
+  return formatRoundedInteger(value);
 }
 
 export default function StopLossCalculatorPageClient() {
@@ -29,34 +29,35 @@ export default function StopLossCalculatorPageClient() {
         stopLossPercent.trim() !== "";
     if (!touched) return null;
 
-    const buy = parsePositive(buyPrice);
-    const qty = parsePositive(quantity);
-    const stopPercent = parsePositive(stopLossPercent);
+    const buy = parsePositiveExact(buyPrice);
+    const qty = parsePositiveExact(quantity);
+    const stopPercent = parsePositiveExact(stopLossPercent);
 
-    if (buyPrice.trim() !== "" && !buy) return "매수가는 0보다 큰 값이어야 합니다.";
-    if (quantity.trim() !== "" && !qty) return "보유 수량은 0보다 큰 값이어야 합니다.";
-    if (stopLossPercent.trim() !== "" && !stopPercent)
+    if (buyPrice.trim() !== "" && !isPositive(buy)) return "매수가는 0보다 큰 값이어야 합니다.";
+    if (quantity.trim() !== "" && !isPositive(qty)) return "보유 수량은 0보다 큰 값이어야 합니다.";
+    if (stopLossPercent.trim() !== "" && !isPositive(stopPercent))
       return "손절 비율은 0보다 큰 값이어야 합니다.";
-    if (stopPercent >= 100)
+    if (compare(stopPercent, fromInt(100)) >= 0)
       return "손절 비율은 100% 미만이어야 합니다. 100% 이상이면 손절가가 0원 이하가 됩니다.";
     return null;
   }, [buyPrice, quantity, stopLossPercent]);
 
   const result = useMemo(() => {
-    const buy = parsePositive(buyPrice);
-    const qty = parsePositive(quantity);
-    const stopPercent = parsePositive(stopLossPercent);
+    const buy = parsePositiveExact(buyPrice);
+    const qty = parsePositiveExact(quantity);
+    const stopPercent = parsePositiveExact(stopLossPercent);
 
-    // parsePositive 는 음수·NaN 을 0 으로 만들므로 아래 조건에서 함께 걸러진다.
-    if (!buy || !qty || !stopPercent || stopPercent >= 100) {
+    // parsePositiveExact 는 빈칸·음수·숫자가 아닌 값을 0 으로 만들므로 아래 조건에서 함께 걸러진다.
+    if (!isPositive(buy) || !isPositive(qty) || !isPositive(stopPercent) || compare(stopPercent, fromInt(100)) >= 0) {
       return null;
     }
 
-    const stopPrice = buy * (1 - stopPercent / 100);
-    const lossPerShare = buy - stopPrice;
-    const totalLoss = lossPerShare * qty;
-    const totalBuyAmount = buy * qty;
-    const lossRate = totalBuyAmount > 0 ? (totalLoss / totalBuyAmount) * 100 : 0;
+    // 입력 십진값으로 정확히 계산하고 표시 단계에서만 반올림한다.
+    const stopPrice = mul(buy, sub(fromInt(1), div(stopPercent, fromInt(100))));
+    const lossPerShare = sub(buy, stopPrice);
+    const totalLoss = mul(lossPerShare, qty);
+    const totalBuyAmount = mul(buy, qty);
+    const lossRate = mul(div(totalLoss, totalBuyAmount), fromInt(100));
 
     return {
       stopPrice,
@@ -130,7 +131,7 @@ export default function StopLossCalculatorPageClient() {
                     />
                     <ResultDetail
                         label="총 손실 비율"
-                        value={`${result.lossRate.toFixed(2)}%`}
+                        value={`${toFixedExact(result.lossRate, 2)}%`}
                     />
                   </div>
                 </div>

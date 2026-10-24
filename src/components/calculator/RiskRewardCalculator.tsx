@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { parsePositive } from "@/lib/number";
+import { EXACT_ZERO, add, div, formatGrouped, fromInt, isPositive, mul, parsePositiveExact, sub, toFixedExact, type Exact } from "@/lib/exactDecimal";
 import {
   CalculatorLayout,
   CalculatorCard,
@@ -25,42 +25,36 @@ export default function RiskRewardCalculator() {
   // 통화별 표시 정밀도: USD는 소수점 2자리, KRW는 정수.
   // 공용 formatNumber()를 바꾸지 않고 컴포넌트 단위로만 처리.
   const priceDigits = currency === "USD" ? 2 : 0;
-  const fmtMoney = (v: number) =>
-    Number.isFinite(v)
-      ? new Intl.NumberFormat("ko-KR", { maximumFractionDigits: priceDigits }).format(v)
-      : "-";
+  // 입력 십진값으로 정확히 계산한 값을 기존 Intl 규칙(0에서 먼 쪽 반올림)으로 한 번만 반올림해 표시한다.
+  const fmtMoney = (v: Exact) => formatGrouped(v, priceDigits);
 
   const result = useMemo(() => {
-    const entry = parsePositive(entryPrice);
-    const stop = parsePositive(stopPrice);
-    const target = parsePositive(targetPrice);
+    const entry = parsePositiveExact(entryPrice);
+    const stop = parsePositiveExact(stopPrice);
+    const target = parsePositiveExact(targetPrice);
+    const invalid = {
+      valid: false,
+      riskAmount: EXACT_ZERO,
+      rewardAmount: EXACT_ZERO,
+      riskRewardRatio: EXACT_ZERO,
+      breakevenWinRate: EXACT_ZERO,
+    };
 
-    if (entry <= 0 || stop <= 0 || target <= 0) {
-      return {
-        valid: false,
-        riskAmount: 0,
-        rewardAmount: 0,
-        riskRewardRatio: 0,
-        breakevenWinRate: 0,
-      };
+    if (!isPositive(entry) || !isPositive(stop) || !isPositive(target)) {
+      return invalid;
     }
 
-    const riskAmount = entry - stop;
-    const rewardAmount = target - entry;
+    // 입력 십진값으로 정확히 계산하고 표시 단계에서만 반올림한다.
+    const riskAmount = sub(entry, stop);
+    const rewardAmount = sub(target, entry);
 
-    if (riskAmount <= 0 || rewardAmount <= 0) {
-      return {
-        valid: false,
-        riskAmount: 0,
-        rewardAmount: 0,
-        riskRewardRatio: 0,
-        breakevenWinRate: 0,
-      };
+    if (!isPositive(riskAmount) || !isPositive(rewardAmount)) {
+      return invalid;
     }
 
-    const riskRewardRatio = rewardAmount / riskAmount;
+    const riskRewardRatio = div(rewardAmount, riskAmount);
     // 손익분기 승률 = 1 ÷ (1 + 손익비) × 100. 이 승률을 넘어야 장기 기대값이 (+).
-    const breakevenWinRate = (1 / (1 + riskRewardRatio)) * 100;
+    const breakevenWinRate = mul(div(fromInt(1), add(fromInt(1), riskRewardRatio)), fromInt(100));
 
     return {
       valid: true,
@@ -123,7 +117,7 @@ export default function RiskRewardCalculator() {
         >
           <ResultHighlight
               label="손익비"
-              value={result.riskRewardRatio.toFixed(2)}
+              value={toFixedExact(result.riskRewardRatio, 2)}
               unit="R"
           />
           <div className="grid gap-4 sm:grid-cols-2">
@@ -139,12 +133,12 @@ export default function RiskRewardCalculator() {
             />
             <ResultDetail
                 label="손익분기 승률"
-                value={result.breakevenWinRate.toFixed(1)}
+                value={toFixedExact(result.breakevenWinRate, 1)}
                 unit="%"
             />
           </div>
           <p className="mt-4 text-sm leading-relaxed text-slate-500">
-            실제 승률이 손익분기 승률(<span className="font-semibold text-slate-700">{result.breakevenWinRate.toFixed(1)}%</span>)을 넘어야 장기적으로 기대값이 플러스가 됩니다.
+            실제 승률이 손익분기 승률(<span className="font-semibold text-slate-700">{toFixedExact(result.breakevenWinRate, 1)}%</span>)을 넘어야 장기적으로 기대값이 플러스가 됩니다.
           </p>
         </ResultCard>
       </CalculatorLayout>

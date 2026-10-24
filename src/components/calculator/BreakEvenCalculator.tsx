@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { parsePositive } from "@/lib/number";
+import { compare, div, fromInt, isPositive, mul, parsePositiveExact, sub, toFixedExact, toPlainDecimal } from "@/lib/exactDecimal";
 import {
   CalculatorLayout,
   CalculatorCard,
@@ -14,18 +14,19 @@ export default function BreakEvenCalculator() {
   const [lossRate, setLossRate] = useState("");
 
   const result = useMemo(() => {
-    const loss = parsePositive(lossRate);
+    const loss = parsePositiveExact(lossRate);
 
-    if (loss <= 0 || loss >= 100) {
-      return { valid: false, requiredRate: 0, loss: 0 };
+    if (!isPositive(loss) || compare(loss, fromInt(100)) >= 0) {
+      return { valid: false, requiredRate: "0.00", loss: "0" };
     }
 
-    const requiredRate = (loss / (100 - loss)) * 100;
+    // 필요 상승률 = 손실률 ÷ (100 − 손실률) × 100 — 정확한 유리수로 계산하고 표시할 때 toFixed(2) 규칙으로 한 번만 반올림
+    const requiredRate = toFixedExact(mul(div(loss, sub(fromInt(100), loss)), fromInt(100)), 2);
 
     return {
       valid: true,
       requiredRate,
-      loss,
+      loss: toPlainDecimal(loss),
     };
   }, [lossRate]);
 
@@ -54,7 +55,7 @@ export default function BreakEvenCalculator() {
       >
         <ResultHighlight
           label="본전 회복 요구 상승률"
-          value={`+${result.requiredRate.toFixed(2)}`}
+          value={`+${result.requiredRate}`}
           unit="%"
           tone="positive"
         />
@@ -62,7 +63,7 @@ export default function BreakEvenCalculator() {
           <p className="text-sm font-medium text-slate-700 leading-relaxed">
             현재 <strong className="text-blue-600">-{result.loss}%</strong> 손실 상태에서 원금을 회복하려면,
             남은 자금으로 무려{" "}
-            <strong className="text-red-600">+{result.requiredRate.toFixed(2)}%</strong>
+            <strong className="text-red-600">+{result.requiredRate}%</strong>
             의 수익을 내야 합니다.
           </p>
         </div>
