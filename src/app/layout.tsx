@@ -25,6 +25,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
+  other: {
+    "google-adsense-account": "ca-pub-5409512073649722",
+  },
   title: {
     default: "주식 계산기 모음 | 손절가, 평단가, 수익률 계산기",
     template: "%s | 주식계산기.kr",
