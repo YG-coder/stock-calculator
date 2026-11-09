@@ -1,8 +1,12 @@
 /**
  * src/app/profit-calculator/page.tsx
- * 역할: 주식 수익률 계산기 페이지 (SEO + 애드센스 최적화 완료)
+ * 역할: 주식 수익률 계산기 페이지
+ *
+ * 본문의 계산 사례 숫자는 src/data/stockCalculatorExamples.ts 에서만 가져온다.
+ * 같은 입력을 실제 계산기에 넣어 대조하는 테스트가 있다(tests/stockCalculatorExamples.test.ts).
  */
 
+import Link from "next/link";
 import ProfitCalculator from "@/components/calculator/ProfitCalculator";
 import { buildMetadata } from "@/lib/metadata";
 import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
@@ -15,15 +19,23 @@ import {
   RelatedCalculators,
   Disclaimer,
 } from "@/components/ui/Shared";
-
-import SeoContent from "@/components/seo/SeoContent";
 import InternalLinks from "@/components/seo/InternalLinks";
 import GuideLinks from "@/components/seo/GuideLinks";
+import {
+  PROFIT_AVERAGE_BASIS,
+  PROFIT_BASIC,
+  PROFIT_FEE_ILLUSTRATION,
+  PROFIT_SPLIT_BUYS,
+  PROFIT_WRONG_BASIS,
+} from "@/data/stockCalculatorExamples";
+
+const TITLE = "주식 수익률 계산기";
+const DESCRIPTION =
+    "매수가·현재가·보유 수량으로 주식 수익률(%)과 평가 손익, 평가 금액을 계산합니다. 현재가 칸에 목표가를 넣으면 그 가격에서의 예상 수익도 볼 수 있습니다. 수수료·세금·환율은 반영하지 않은 가격 기준 결과입니다.";
 
 export const metadata = buildMetadata({
-  title: "주식 수익률 계산기",
-  description:
-      "매수가와 현재가, 보유 수량을 입력하면 예상 수익률과 총 평가 손익, 평가 금액을 계산하는 주식 수익률 계산기입니다. 수수료·세금·환율은 반영하지 않습니다.",
+  title: `${TITLE} | 수익률·평가 손익 계산`,
+  description: DESCRIPTION,
   path: "/profit-calculator",
   keywords: [
     "주식 수익률 계산기",
@@ -36,69 +48,110 @@ export const metadata = buildMetadata({
 });
 
 const FAQ_ITEMS = [
-  { question: "계산 결과는 세금이 포함된 수치인가요?", answer: "아니요, 현재 제공되는 수익률 계산 수식은 순수 가격 변동률만을 나타냅니다. 증권사 거래 수수료 및 제세공과금은 거래소마다 다르기 때문에 실제 수익과 차이가 발생할 수 있습니다." },
+  { question: "계산 결과에 수수료나 세금이 포함되나요?", answer: "아니요. 매수가와 현재가의 가격 차이만으로 계산합니다. 거래 수수료와 매도 시 세금은 반영하지 않으므로 수수료·세금을 반영해 보여주는 증권사 앱 수치와 다를 수 있습니다." },
   { question: "마이너스(-) 수익률의 의미가 무엇인가요?", answer: "현재가가 매수가보다 낮아 손실 상태임을 의미합니다." },
-  { question: "물타기 후 수익률은 어떻게 계산하나요?", answer: "먼저 평단가 계산기를 이용해 평균 매입 단가를 구한 후 해당 값을 입력하세요." },
+  { question: "여러 번 나눠 샀다면 매수가에 무엇을 넣나요?", answer: "첫 매수가가 아니라 전체 보유분의 평균 단가를 넣어야 합니다. 평단가 계산기로 평균 단가를 먼저 구한 뒤 입력하세요." },
 ];
 
+const b = PROFIT_BASIC;
+const w = PROFIT_WRONG_BASIS;
+const a = PROFIT_AVERAGE_BASIS;
+const s = PROFIT_SPLIT_BUYS;
+const f = PROFIT_FEE_ILLUSTRATION;
+const won = (v: string) => Number(v).toLocaleString("ko-KR");
 
 export default function ProfitCalculatorPage() {
   return (
       <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-slate-200 selection:text-slate-900 pb-20">
         <CalculatorJsonLd
-            title="주식 수익률 계산기"
-            description="매수가와 현재가, 보유 수량을 입력하면 예상 수익률과 총 평가 손익, 평가 금액을 계산하는 주식 수익률 계산기입니다. 수수료·세금·환율은 반영하지 않습니다."
+            title={TITLE}
+            description={DESCRIPTION}
             path="/profit-calculator"
             faqs={FAQ_ITEMS}
         />
         <PageHeader
             badge="필수 금융 계산기"
-            title="주식 수익률 계산기"
-            description="주식 수익률 계산기는 매수가와 현재가, 보유 수량을 기준으로 예상 수익률과 총 평가 손익, 평가 금액을 자동 계산하는 도구입니다. 투자 결과를 퍼센트로 빠르게 확인하고 매매 전략을 점검할 수 있습니다. 현재가 칸에 목표 가격을 넣으면 그 가격에 도달했을 때의 예상 수익률과 손익을 확인할 수 있습니다."
+            title={TITLE}
+            description="매수가와 현재가, 보유 수량을 넣으면 수익률과 평가 손익, 평가 금액을 바로 계산합니다. 현재가 칸에 목표 가격을 넣으면 그 가격에 도달했을 때의 예상 수익을 확인할 수 있습니다. 수수료·세금·환율은 반영하지 않습니다."
         />
 
         <div className="mx-auto max-w-5xl px-6 py-12 md:px-8 md:py-16">
-          {/* 계산기 */}
           <ProfitCalculator />
 
-          {/* 설명 */}
           <SectionCard>
-            <Article title="수익률 계산기 설명">
+            <Article title="계산 방법">
+              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 my-6 space-y-2 text-center">
+                <p className="font-mono text-base sm:text-lg text-slate-800 font-bold tracking-tight">수익률 = (현재가 − 매수가) ÷ 매수가 × 100</p>
+                <p className="font-mono text-sm sm:text-base text-slate-700">평가 손익 = (현재가 − 매수가) × 보유 수량</p>
+                <p className="font-mono text-sm sm:text-base text-slate-700">평가 금액 = 현재가 × 보유 수량</p>
+              </div>
               <p>
-                <strong>주식 수익률 계산기</strong>는 매수가와 현재가 또는 목표가를 기준으로 실제 수익률과 손익을 계산하는 도구입니다.
-                주식, ETF, 코인 등 다양한 자산의 투자 성과를 퍼센트와 금액으로 확인할 수 있어 현재 수익 상태를 점검하는 데 도움이 됩니다.
+                예를 들어 매수가 {won(b.buy)}원, 현재가 {won(b.current)}원, 보유 수량 {won(b.quantity)}주를 입력하면
+                수익률 <strong>{b.expected.rate}%</strong>, 평가 손익 <strong>{b.expected.profit}원</strong>, 평가 금액{" "}
+                <strong>{b.expected.evalAmount}원</strong>이 나옵니다. 수익률은 소수 셋째 자리에서 반올림해 표시합니다.
               </p>
               <p>
-                수익률 계산은 단순히 현재 수익 상태를 확인하는 데서 끝나지 않습니다.
-                목표 수익률에 도달했는지 점검하거나, 손실 구간에서 대응 전략을 세우는 기준으로도 활용할 수 있어
-                매수 이후의 의사결정을 더 객관적으로 만드는 데 도움이 됩니다.
+                현재가 칸에는 지금 가격 대신 목표 가격이나 손절 가격을 넣어도 됩니다. 그 가격에 도달했을 때의 수익률과
+                손익을 미리 확인할 수 있습니다.
               </p>
             </Article>
 
-            <Article title="수익률 계산 방법 (공식)">
-              <p>수익률을 구하는 수학적 계산 공식은 다음과 같습니다:</p>
-              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 text-center my-6">
-                <p className="font-mono text-xl text-slate-800 font-bold tracking-tight">
-                  ((현재가 - 매수가) ÷ 매수가) × 100
-                </p>
-              </div>
+            <Article title="증권사 앱 수익률과 계산기 결과가 다른 이유">
+              <p>같은 종목인데 증권사 앱과 결과가 다르다면 아래 세 가지를 차례로 확인해 보세요.</p>
+
+              <h3 className="mt-6 text-lg font-bold text-slate-900">1. 매수가에 평균 단가를 넣었나요?</h3>
               <p>
-                예를 들어 삼성전자를 <strong>70,000원</strong>에 매수했고 현재가가 <strong>80,000원</strong>이 되었다면,
-                <code>(80,000 - 70,000) / 70,000 = 0.142857…</code>이 되며 100을 곱하고 소수 둘째 자리까지 반올림하면 <strong>약 +14.29%</strong>의 수익률을 계산해 낼 수 있습니다.
+                {won(s.rows[0].price)}원에 {s.rows[0].quantity}주, {won(s.rows[1].price)}원에 {s.rows[1].quantity}주를 나눠 사고
+                현재가가 {won(w.current)}원이라고 해 보겠습니다. 매수가에 첫 매수가 {won(w.buy)}원을 넣으면 수익률이{" "}
+                <strong>{w.expected.rate}%</strong>(손익 {w.expected.profit}원)으로 손실처럼 보입니다. 실제 평균 단가는{" "}
+                {s.expected.average}원이므로 이 값을 넣어야 수익률 <strong>{a.expected.rate}%</strong>(손익 {a.expected.profit}원)이
+                됩니다. 증권사 앱은 평균 단가를 기준으로 보여 주므로, 여러 번 샀다면{" "}
+                <Link href="/average-price-calculator" className="font-semibold text-slate-900 underline underline-offset-2">평단가 계산기</Link>로
+                평균 단가를 먼저 구하세요.
+              </p>
+
+              <h3 className="mt-6 text-lg font-bold text-slate-900">2. 수수료와 세금을 반영했나요?</h3>
+              <p>
+                이 계산기는 가격 차이만 계산합니다. 증권사 앱은 회사와 설정에 따라 매수 수수료를 매입 금액에 넣거나,
+                팔 때 낼 수수료와 세금을 미리 빼고 보여 주기도 합니다. 정확한 반영 방식은 이용 중인 증권사 안내에서
+                확인하세요.
+              </p>
+              <p>
+                차이가 어느 정도인지 보기 위해 위 기본 예시({won(b.buy)}원에 {won(b.quantity)}주 매수, {won(b.current)}원)에
+                매수·매도 수수료를 각각 <strong>{f.assumedFeeRatePercent}%</strong>로 <em>가정</em>해 보겠습니다. 매수 수수료{" "}
+                {f.buyFee}원과 매도 수수료 {f.sellFee}원을 빼면 손익은 {f.netProfit}원, 수수료를 포함한 매입 금액 대비 수익률은
+                약 {f.netRate}%입니다. 이 가정값은 설명용이며 실제 수수료율은 증권사·계좌마다 다릅니다. 매도 시 내는 세금은
+                이 예시에 넣지 않았습니다. 시장별 세금은{" "}
+                <Link href="/stock-transaction-tax-calculator" className="font-semibold text-slate-900 underline underline-offset-2">증권거래세 계산기</Link>에서
+                따로 계산할 수 있습니다.
+              </p>
+
+              <h3 className="mt-6 text-lg font-bold text-slate-900">3. 같은 시점의 가격인가요?</h3>
+              <p>
+                증권사 앱은 시세가 바뀔 때마다 수익률을 다시 계산합니다. 이 계산기는 입력한 가격으로만 계산하므로,
+                앱과 비교할 때는 같은 시점의 현재가를 넣어야 합니다.
+              </p>
+            </Article>
+
+            <Article title="이 계산기가 하지 않는 것">
+              <p>
+                수수료·세금·환율, 배당금, 보유 기간은 반영하지 않습니다. 해외주식의 원화 기준 수익은{" "}
+                <Link href="/us-stocks/exchange-profit" className="font-semibold text-slate-900 underline underline-offset-2">환율 반영 수익 계산기</Link>,
+                배당을 포함한 수익은{" "}
+                <Link href="/dividend-calculator" className="font-semibold text-slate-900 underline underline-offset-2">배당 수익 계산기</Link>에서
+                확인하세요. 가격 기준 공식이므로 ETF·코인처럼 사고파는 가격이 있는 자산에도 같은 방식으로 쓸 수 있습니다.
               </p>
             </Article>
           </SectionCard>
 
-                <GuideLinks slugs={["profit-calculator-guide"]} />
+          <GuideLinks slugs={["profit-calculator-guide"]} />
 
-          {/* FAQ */}
           <FaqSection title="자주 묻는 질문 (FAQ)">
             {FAQ_ITEMS.map((faq) => (
               <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
             ))}
           </FaqSection>
 
-          {/* 관련 계산기 */}
           <RelatedCalculators
               links={[
                 {
@@ -112,31 +165,14 @@ export default function ProfitCalculatorPage() {
                   desc: "손실 제한을 위한 손절 기준 가격 계산",
                 },
                 {
-                  href: "/dividend-calculator",
-                  title: "배당 수익 계산기",
-                  desc: "배당금 기준 실제 수익률 확인",
+                  href: "/target-price-calculator",
+                  title: "주식 목표가 계산기",
+                  desc: "목표 수익률에 맞는 매도 가격 계산",
                 },
               ]}
           />
 
           <Disclaimer />
-
-          <SeoContent
-              title="주식 수익률 계산기"
-              intro="주식 수익률 계산기는 매수가와 현재가를 기준으로 투자 수익 또는 손실을 계산하는 도구입니다. 주식, ETF, 코인 등 다양한 자산에 적용할 수 있으며 현재 투자 성과를 퍼센트와 금액으로 즉시 확인할 수 있습니다."
-              body="목표 수익률에 도달했는지 점검하거나, 손실 구간에서 손절 또는 추가 매수 여부를 판단할 때도 활용됩니다. 매수 이후의 의사결정을 더 객관적으로 만드는 기준이 됩니다."
-              formula="수익률 = (현재가 − 매수가) ÷ 매수가 × 100 | 손익금 = (현재가 − 매수가) × 보유 수량"
-              formulaNote="수수료와 세금은 포함되지 않습니다. 실제 손익은 거래 비용에 따라 달라집니다."
-              whenToUse="현재 보유 주식의 수익률을 빠르게 확인하고 싶을 때, 또는 입력한 가격에서의 예상 수익률과 손익을 확인하고 손절 기준을 점검할 때 유용합니다. 현재가 칸에 목표 가격을 넣으면 그 가격에 도달했을 때의 예상 수익률과 손익을 확인할 수 있습니다. 물타기 이후 평단가를 기준으로 새 수익률을 계산할 때도 사용합니다."
-              example="예시: 삼성전자 70,000원에 100주 매수 → 현재가 80,000원일 때 수익률 +14.29%, 수익금 1,000,000원. 같은 조건에서 현재가 63,000원이면 수익률 −10%, 손실금 700,000원."
-              caution="이 계산기는 단순 수익률 계산 도구입니다. 거래 수수료, 세금, 환율은 반영되지 않으며 실제 투자 결과와 다를 수 있습니다."
-              relatedLinks={[
-                  { href: "/average-price-calculator", label: "평단가 계산기" },
-                  { href: "/stop-loss-calculator", label: "손절가 계산기" },
-                  { href: "/target-price-calculator", label: "목표가 계산기" },
-                  { href: "/risk-reward-calculator", label: "손익비 계산기" },
-              ]}
-          />
 
           <InternalLinks currentPath="/profit-calculator" />
         </div>
