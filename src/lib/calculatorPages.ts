@@ -1,6 +1,19 @@
 import { withParticle } from "@/lib/korean";
 import { OVERSEAS_STOCK_TAX, US_DIVIDEND_WITHHOLDING } from "@/lib/taxRates";
+import {
+    CRYPTO_AVERAGE_BASIC,
+    CRYPTO_ENTRY_BASIC,
+    CRYPTO_LEVERAGE_BASIC,
+    CRYPTO_LIQUIDATION_BASIC,
+    CRYPTO_PROFIT_BASIC,
+    US_DIVIDEND_BASIC,
+    US_EXCHANGE_BASIC,
+} from "@/data/stockCalculatorExamples";
 import type { Metadata } from "next";
+
+/* 본문 사례의 숫자는 src/data/stockCalculatorExamples.ts 에서만 가져온다.
+   tests/calculatorPageExamples.test.ts 가 같은 입력을 실제 계산기에 넣어 결과를 대조한다. */
+const num = (v: string) => Number(v).toLocaleString("ko-KR");
 
 export type RelatedLink = {
     href: string;
@@ -33,9 +46,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "compound-interest-calculator": {
         slug: "compound-interest-calculator",
         metadata: {
-            title: "복리 계산기 | 투자금 복리 계산",
+            title: "복리 계산기 | 월 적립 월복리 최종 금액 계산",
             description:
-                "초기 투자금, 매월 추가 투자금, 예상 수익률, 투자 기간을 기준으로 최종 금액과 복리 수익을 계산하는 복리 계산기입니다.",
+                "초기 투자금, 월 추가 투자금, 연 수익률(%), 투자 기간(년)을 넣으면 매월 말 납입·월복리 기준 최종 자산과 총 투자금, 총 수익을 계산합니다. 원화·달러 입력을 지원하며 세금·수수료·물가 상승은 반영하지 않습니다.",
             keywords: [
                 "복리 계산기",
                 "복리 투자 계산기",
@@ -44,9 +57,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "compound interest calculator",
             ],
             openGraph: {
-                title: "복리 계산기 | 투자금 복리 계산",
+                title: "복리 계산기 | 월 적립 월복리 최종 금액 계산",
                 description:
-                    "초기 투자금과 추가 투자금을 기준으로 복리 수익과 예상 최종 금액을 계산해보세요.",
+                    "초기 투자금, 월 추가 투자금, 연 수익률, 투자 기간으로 월복리 기준 최종 자산과 총 수익을 계산합니다.",
                 type: "website",
             },
         },
@@ -101,9 +114,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "overseas-stock-tax-calculator": {
         slug: "overseas-stock-tax-calculator",
         metadata: {
-            title: "해외주식 세금 계산기 | 양도세 계산",
+            title: "해외주식 세금 계산기 | 양도소득세·세후 수익 계산",
             description:
-                `해외주식 매매 수익에 대한 양도소득세와 세후 수익을 계산하는 해외주식 세금 계산기입니다. 기본공제 ${withParticle(OVERSEAS_STOCK_TAX.basicDeductionDisplay, "과/와")} 세율 ${withParticle(OVERSEAS_STOCK_TAX.rateDisplay, "을/를")} 반영해 예상 세금을 확인할 수 있습니다.`,
+                `원화로 환산한 총 매수 금액, 총 매도 금액, 기본공제를 넣으면 양도차익에서 기본공제 ${withParticle(OVERSEAS_STOCK_TAX.basicDeductionDisplay, "을/를")} 뺀 과세 대상 금액과 ${OVERSEAS_STOCK_TAX.rateDisplay} 세율의 예상 양도소득세, 세후 손익을 계산합니다. 거래 1건 기준이며 필요경비·연간 손익 통산은 반영하지 않습니다.`,
             keywords: [
                 "해외주식 세금 계산기",
                 "해외주식 양도세 계산기",
@@ -112,9 +125,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "미국주식 세금",
             ],
             openGraph: {
-                title: "해외주식 세금 계산기 | 양도세 계산",
+                title: "해외주식 세금 계산기 | 양도소득세·세후 수익 계산",
                 description:
-                    "해외주식 투자 수익에서 실제로 얼마가 남는지 계산해보세요. 기본공제와 세율을 반영해 예상 양도세와 세후 수익을 확인할 수 있습니다.",
+                    `원화 환산 매수·매도 금액과 기본공제로 ${OVERSEAS_STOCK_TAX.rateDisplay} 세율의 예상 양도소득세와 세후 손익을 계산합니다.`,
                 type: "website",
             },
         },
@@ -169,9 +182,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "crypto-liquidation-calculator": {
         slug: "crypto-liquidation-calculator",
         metadata: {
-            title: "코인 청산가 계산기 | 롱·숏 청산가",
+            title: "코인 청산가 계산기 | 롱·숏 격리마진 청산가 계산",
             description:
-                "비트코인, 이더리움 등 암호화폐 선물 거래에서 레버리지와 진입가를 기준으로 예상 청산 가격을 계산하는 코인 청산가 계산기입니다.",
+                "진입 가격, 레버리지, 포지션 방향(롱·숏), 유지증거금률(%)을 넣으면 격리마진 기준 근사 청산가와 파산 가격, 진입가 대비 변동 폭을 계산합니다. 교차마진 잔고, 종료 수수료, 펀딩비, 위험한도 등급은 반영하지 않으므로 주문 전 거래소 예상 청산가로 확인하세요.",
             keywords: [
                 "코인 청산가 계산기",
                 "비트코인 청산가",
@@ -180,9 +193,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "crypto liquidation calculator",
             ],
             openGraph: {
-                title: "코인 청산가 계산기 | 롱·숏 청산가",
+                title: "코인 청산가 계산기 | 롱·숏 격리마진 청산가 계산",
                 description:
-                    "암호화폐 선물 거래에서 레버리지와 포지션 방향에 따라 예상 청산 가격을 빠르게 계산하세요.",
+                    "진입가, 레버리지, 포지션 방향, 유지증거금률로 격리마진 기준 근사 청산가와 파산 가격을 계산합니다.",
                 type: "website",
             },
         },
@@ -203,7 +216,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
 
         exampleTitle: "코인 청산가 계산 예시",
         exampleBody:
-            "예를 들어 비트코인을 70,000 USDT에 10배 레버리지, 유지증거금률 0.5%로 롱 진입하면 근사 청산가는 63,350 USDT입니다. 이는 진입가보다 약 9.5% 낮은 값입니다. 실제 주문에서는 거래소 화면의 예상 청산가와 마크 가격을 다시 확인하고, 청산가에 도달하기 전 실행할 손절 기준을 별도로 정해야 합니다.",
+            `예를 들어 비트코인을 ${num(CRYPTO_LIQUIDATION_BASIC.inputs.entryPrice)} USDT에 ${CRYPTO_LIQUIDATION_BASIC.inputs.leverage}배 레버리지, 유지증거금률 ${CRYPTO_LIQUIDATION_BASIC.inputs.maintenanceMarginRate}%로 롱 진입하면 근사 청산가는 ${CRYPTO_LIQUIDATION_BASIC.expected["격리마진 근사 청산가"]} USDT로, 진입가보다 ${CRYPTO_LIQUIDATION_BASIC.expected["진입가 대비 변동 폭"]}% 낮은 값입니다. 유지증거금을 고려하지 않은 이론상 파산 가격은 ${CRYPTO_LIQUIDATION_BASIC.expected["파산 가격(이론값)"]} USDT(진입가 × (1 − 1/10))이고, 청산가는 그보다 유지증거금률만큼 진입가에 가깝습니다. 실제 주문에서는 거래소 화면의 예상 청산가와 마크 가격을 다시 확인하고, 청산가에 도달하기 전 실행할 손절 기준을 별도로 정해야 합니다.`,
 
         faqs: [
             {
@@ -259,9 +272,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "crypto-profit-calculator": {
         slug: "crypto-profit-calculator",
         metadata: {
-            title: "코인 수익 계산기 | 수익률·순수익",
+            title: "코인 수익 계산기 | 현물 매수·매도 순손익·수익률 계산",
             description:
-                "매수 가격, 매도 가격, 보유 수량, 거래 수수료를 기준으로 코인 실제 수익과 수익률을 계산하는 코인 수익 계산기입니다.",
+                "매수 가격, 매도 가격, 수량, 매수·매도 수수료율(%)을 넣으면 수수료 포함 총 매수 금액, 수수료 차감 총 매도 금액, 총 수수료, 순손익과 수익률(수수료 포함 매수 금액 기준)을 계산합니다. 현물 기준이며 레버리지·펀딩비·세금·환율은 반영하지 않습니다.",
             keywords: [
                 "코인 수익 계산기",
                 "비트코인 수익 계산기",
@@ -270,9 +283,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "crypto profit calculator",
             ],
             openGraph: {
-                title: "코인 수익 계산기 | 수익률·순수익",
+                title: "코인 수익 계산기 | 현물 매수·매도 순손익·수익률 계산",
                 description:
-                    "암호화폐 매수·매도 가격과 수수료를 반영해 실제 순수익과 수익률을 계산하세요.",
+                    "매수·매도 가격, 수량, 수수료율로 현물 거래의 순손익과 수익률을 계산합니다.",
                 type: "website",
             },
         },
@@ -293,7 +306,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
 
         exampleTitle: "코인 수익 계산 예시",
         exampleBody:
-            "예를 들어 비트코인을 50,000 USDT에 매수하고 60,000 USDT에 매도했다고 가정해보겠습니다. 단순 계산으로는 약 20% 수익이 발생한 것처럼 보이지만, 실제로는 매수와 매도 시 각각 수수료가 발생합니다. 수수료를 포함하면 순수익은 다소 줄어들게 되며, 거래 횟수가 많을수록 누적 수수료의 영향이 커집니다.",
+            `예를 들어 비트코인 ${num(CRYPTO_PROFIT_BASIC.inputs.quantity)}개를 ${num(CRYPTO_PROFIT_BASIC.inputs.buyPrice)} USDT에 매수하고 ${num(CRYPTO_PROFIT_BASIC.inputs.sellPrice)} USDT에 매도하면 수수료 반영 전 손익은 ${CRYPTO_PROFIT_BASIC.expected["수수료 반영 전 손익"]} USDT(20%)입니다. 매수·매도 수수료율을 각 ${CRYPTO_PROFIT_BASIC.inputs.buyFeeRate}%로 넣으면 총 매수 금액은 수수료를 포함해 ${CRYPTO_PROFIT_BASIC.expected["총 매수 금액(수수료 포함)"]} USDT, 총 매도 금액은 수수료를 뺀 ${CRYPTO_PROFIT_BASIC.expected["총 매도 금액(수수료 차감)"]} USDT가 되어 총 수수료 ${CRYPTO_PROFIT_BASIC.expected["총 수수료"]} USDT, 실제 순손익 ${CRYPTO_PROFIT_BASIC.expected["실제 순손익"]} USDT, 수익률 ${CRYPTO_PROFIT_BASIC.expected["수익률"]}%로 계산됩니다. 수수료율 ${CRYPTO_PROFIT_BASIC.inputs.buyFeeRate}%는 설명을 위한 가정값이며 거래소·등급마다 다릅니다. 거래 횟수가 많을수록 누적 수수료의 영향이 커집니다.`,
 
         faqs: [
             {
@@ -339,9 +352,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "crypto-average-calculator": {
         slug: "crypto-average-calculator",
         metadata: {
-            title: "코인 물타기 계산기 | 평균 단가 계산",
+            title: "코인 물타기·불타기 계산기 | 평균 단가·평가 손익 계산",
             description:
-                "암호화폐 추가 매수 시 평균 매입 단가가 어떻게 달라지는지 계산하는 코인 물타기 계산기입니다. 비트코인, 이더리움 등 코인의 평균 단가를 쉽게 확인할 수 있습니다.",
+                "기존 보유와 추가 매수의 가격·수량을 최대 10회까지 넣으면 새 평균 단가, 총 보유 수량(소수점 수량 지원), 총 매수 금액을 계산하고, 현재가를 넣으면 평가 손익과 수익률도 보여줍니다. KRW·USDT는 단위 표시 선택이며 수수료는 반영하지 않습니다.",
             keywords: [
                 "코인 물타기 계산기",
                 "코인 불타기 계산기",
@@ -351,9 +364,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "crypto average calculator",
             ],
             openGraph: {
-                title: "코인 물타기 계산기 | 평균 단가 계산",
+                title: "코인 물타기·불타기 계산기 | 평균 단가·평가 손익 계산",
                 description:
-                    "추가 매수 후 코인 평균 단가가 어떻게 바뀌는지 계산해보세요. 물타기 전략 판단에 도움이 됩니다.",
+                    "여러 번 매수한 코인의 새 평균 단가와 현재가 기준 평가 손익을 계산합니다.",
                 type: "website",
             },
         },
@@ -374,7 +387,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
 
         exampleTitle: "코인 물타기 계산 예시",
         exampleBody:
-            "예를 들어 비트코인을 70,000 USDT에 0.2개 매수한 뒤, 가격이 60,000 USDT로 하락했을 때 0.1개를 추가 매수했다고 가정해보겠습니다. 이 경우 평균 단가는 단순히 두 가격의 평균이 아니라, 각 매수 금액과 수량 비중을 함께 반영해 계산해야 합니다. 이 계산기에서는 추가 매수를 여러 번 입력할 수 있고, 하락 매수(물타기)뿐 아니라 상승 매수(불타기)도 같은 방식으로 새 평균 단가와 손익분기점을 확인할 수 있습니다. 현재가를 입력하면 평가손익과 수익률도 함께 계산됩니다.",
+            `예를 들어 비트코인을 ${num(CRYPTO_AVERAGE_BASIC.rows[0].price)} USDT에 ${CRYPTO_AVERAGE_BASIC.rows[0].quantity}개 매수한 뒤, 가격이 ${num(CRYPTO_AVERAGE_BASIC.rows[1].price)} USDT로 하락했을 때 ${CRYPTO_AVERAGE_BASIC.rows[1].quantity}개를 추가 매수하면 총 매수 금액은 ${CRYPTO_AVERAGE_BASIC.expected.totalAmount} USDT, 총 보유 수량은 ${CRYPTO_AVERAGE_BASIC.expected.totalQuantity}개이고 새 평균 단가는 두 가격의 단순 평균(65,000)이 아니라 ${CRYPTO_AVERAGE_BASIC.expected.average} USDT입니다. 여기에 현재가 ${num(CRYPTO_AVERAGE_BASIC.current ?? "0")} USDT를 넣으면 평가 손익 ${CRYPTO_AVERAGE_BASIC.expected.profit} USDT, 수익률 ${CRYPTO_AVERAGE_BASIC.expected.rate}%로 표시됩니다. 추가 매수는 최대 10회까지 입력할 수 있고, 하락 매수(물타기)뿐 아니라 상승 매수(불타기)도 같은 방식으로 계산합니다. 수수료는 반영하지 않습니다.`,
 
         faqs: [
             {
@@ -425,9 +438,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "crypto-leverage-profit-calculator": {
         slug: "crypto-leverage-profit-calculator",
         metadata: {
-            title: "코인 레버리지 수익 계산기 | ROE 계산",
+            title: "코인 레버리지 수익 계산기 | 롱·숏 선물 순손익·ROE 계산",
             description:
-                "암호화폐 선물 거래에서 진입가, 종료가, 증거금, 레버리지를 기준으로 실제 수익과 ROE를 계산하는 코인 레버리지 수익 계산기입니다.",
+                "진입 가격, 종료 가격, 투입 증거금, 레버리지, 포지션 방향(롱·숏), 거래 수수료율(%)을 넣으면 포지션 규모, 가격 변동률, 수수료 반영 전 손익, 총 수수료, 실제 순손익과 증거금 대비 수익률(ROE)을 계산합니다. 펀딩비·청산 수수료는 반영하지 않으며, 청산가를 지난 종료 가격은 경고로 표시합니다.",
             keywords: [
                 "코인 레버리지 수익 계산기",
                 "비트코인 선물 수익 계산기",
@@ -436,9 +449,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "crypto leverage profit calculator",
             ],
             openGraph: {
-                title: "코인 레버리지 수익 계산기 | ROE 계산",
+                title: "코인 레버리지 수익 계산기 | 롱·숏 선물 순손익·ROE 계산",
                 description:
-                    "암호화폐 선물 거래에서 레버리지와 포지션 방향을 반영한 실제 수익과 ROE를 계산해보세요.",
+                    "진입·종료 가격, 증거금, 레버리지, 수수료율로 선물 포지션의 순손익과 ROE를 계산합니다.",
                 type: "website",
             },
         },
@@ -458,7 +471,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
             "포지션 규모는 증거금 × 레버리지로 계산하며, 실제 수익률은 총 수수료까지 반영해 계산하는 것이 정확합니다.",
         exampleTitle: "레버리지 수익 계산 예시",
         exampleBody:
-            "예를 들어 비트코인을 70,000 USDT에 진입하고 10배 레버리지를 사용했다고 가정해보겠습니다. 가격이 73,500 USDT로 약 5% 상승하면, 단순 가격 상승률은 5% 수준이지만 증거금 기준 수익률은 훨씬 크게 확대될 수 있습니다. 반대로 가격이 하락하면 손실도 같은 방식으로 빠르게 커지므로, 레버리지 수익 계산기는 청산가 계산기와 함께 사용하는 것이 가장 안전합니다.",
+            `예를 들어 증거금 ${num(CRYPTO_LEVERAGE_BASIC.inputs.margin)} USDT로 비트코인을 ${num(CRYPTO_LEVERAGE_BASIC.inputs.entryPrice)} USDT에 ${CRYPTO_LEVERAGE_BASIC.inputs.leverage}배 롱으로 진입하면 포지션 규모는 ${CRYPTO_LEVERAGE_BASIC.expected["포지션 규모"]} USDT입니다. 가격이 ${num(CRYPTO_LEVERAGE_BASIC.inputs.exitPrice)} USDT로 ${CRYPTO_LEVERAGE_BASIC.expected["가격 변동률"]}% 오르면 수수료 반영 전 손익은 ${CRYPTO_LEVERAGE_BASIC.expected["수수료 반영 전 손익"]} USDT이고, 거래 수수료율 ${CRYPTO_LEVERAGE_BASIC.inputs.feeRate}%를 넣으면 진입·종료 수수료 합계 ${CRYPTO_LEVERAGE_BASIC.expected["총 수수료"]} USDT를 뺀 실제 순손익은 ${CRYPTO_LEVERAGE_BASIC.expected["실제 순손익"]} USDT, 증거금 대비 수익률(ROE)은 ${CRYPTO_LEVERAGE_BASIC.expected["증거금 대비 수익률(ROE)"]}%입니다. 가격은 ${CRYPTO_LEVERAGE_BASIC.expected["가격 변동률"]}% 움직였지만 증거금 기준으로는 약 ${CRYPTO_LEVERAGE_BASIC.inputs.leverage}배로 확대된 것입니다. 수수료율 ${CRYPTO_LEVERAGE_BASIC.inputs.feeRate}%는 설명을 위한 가정값이며, 펀딩비는 포함하지 않습니다. 반대로 가격이 하락하면 손실도 같은 방식으로 빠르게 커지므로 청산가 계산기와 함께 사용하세요.`,
         faqs: [
             {
                 question: "ROE는 무엇인가요?",
@@ -502,9 +515,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "crypto-funding-fee-calculator": {
         slug: "crypto-funding-fee-calculator",
         metadata: {
-            title: "코인 펀딩비 계산기 | 예상 비용 계산",
+            title: "코인 펀딩비 계산기 | 롱·숏 지급·수령 펀딩비 계산",
             description:
-                "암호화폐 선물 거래에서 포지션 규모, 펀딩비율, 적용 횟수를 기준으로 예상 펀딩비를 계산하는 펀딩비 계산기입니다.",
+                "포지션 규모, 펀딩비율(%), 적용 횟수, 포지션 방향(롱·숏)을 넣으면 1회당·누적 펀딩비를 내 계좌 기준 순현금흐름(+는 수령, −는 지급)으로 계산합니다. 펀딩비율이 양수면 롱 지급·숏 수령으로 가정하며, 펀딩 주기는 거래소·상품마다 달라 횟수로 직접 입력합니다.",
             keywords: [
                 "펀딩비 계산기",
                 "funding fee calculator",
@@ -513,9 +526,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "선물 펀딩비 계산",
             ],
             openGraph: {
-                title: "코인 펀딩비 계산기 | 예상 비용 계산",
+                title: "코인 펀딩비 계산기 | 롱·숏 지급·수령 펀딩비 계산",
                 description:
-                    "암호화폐 선물 거래에서 예상 펀딩비를 계산하고 롱·숏 포지션별 지급/수령 구조를 확인하세요.",
+                    "포지션 규모, 펀딩비율, 적용 횟수, 포지션 방향으로 지급·수령 펀딩비를 계산합니다.",
                 type: "website",
             },
         },
@@ -531,7 +544,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
         formulaTitle: "펀딩비 계산 기본 개념",
         formula: "펀딩비 금액(크기) = 포지션 규모 × |펀딩비율| × 적용 횟수",
         formulaDescription:
-            "위 공식은 주고받는 금액의 크기입니다. 계산 결과는 내 계좌 기준 순현금흐름으로 표시하며, 양수(+)는 수령, 음수(−)는 지급입니다. 이 계산기는 펀딩비율이 양수면 롱이 지급하고 숏이 수령하며, 음수면 롱이 수령하고 숏이 지급한다고 가정합니다. 실제 지급 방향과 주기는 거래소·상품 규칙에 따라 다를 수 있으므로 거래 전에 해당 상품의 기준을 확인하세요.",
+            "위 공식은 주고받는 금액의 크기입니다. 계산 결과는 내 계좌 기준 순현금흐름으로 표시하며, 양수(+)는 수령, 음수(−)는 지급입니다. 이 계산기는 펀딩비율이 양수면 롱이 지급하고 숏이 수령하며, 음수면 롱이 수령하고 숏이 지급한다고 가정합니다. 펀딩 주기는 8시간인 상품이 흔하지만 1시간·4시간으로 운영되거나 시장 상황에 따라 바뀔 수 있으므로, 거래 전에 해당 상품의 최신 주기를 확인하고 보유 기간에 맞는 적용 횟수를 직접 넣으세요(예: 8시간 주기로 30일 보유 → 90회).",
 
         exampleTitle: "펀딩비 계산 예시",
         exampleBody:
@@ -581,9 +594,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "crypto-entry-calculator": {
         slug: "crypto-entry-calculator",
         metadata: {
-            title: "코인 진입 계산기 | 배율·주문금액 계산",
+            title: "코인 레버리지 진입 계산기 | 이론 배율·주문 명목가치 계산",
             description:
-                "진입가, 손절가, 투자 원금, 리스크 비율을 기준으로 손절폭, 이론 배율, 주문 명목가치, 익절가를 계산하는 코인 레버리지 진입 계산기입니다.",
+                "진입가, 손절가, 투자 원금, 리스크 비율(%), 손익비를 넣으면 손절폭, 이론 배율(100 ÷ 손절폭), 리스크 금액, 주문 명목가치, 익절가를 계산하고 손익비별 목표가 표와 10회 연속 익절·손절 시뮬레이션을 보여줍니다. 손절가가 진입가보다 낮은 롱 전용이며 수수료·펀딩비·슬리피지는 반영하지 않습니다.",
             keywords: [
                 "코인 진입 계산기",
                 "레버리지 진입 계산기",
@@ -592,9 +605,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "주문 명목가치 계산기",
             ],
             openGraph: {
-                title: "코인 진입 계산기 | 배율·주문금액 계산",
+                title: "코인 레버리지 진입 계산기 | 이론 배율·주문 명목가치 계산",
                 description:
-                    "손절폭을 기준으로 이론 배율, 주문 명목가치, 익절가를 빠르게 계산하세요.",
+                    "진입가·손절가·투자 원금·리스크 비율·손익비로 이론 배율, 주문 명목가치, 익절가를 계산합니다(롱 전용).",
                 type: "website",
             },
         },
@@ -614,7 +627,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
             "손절폭을 기준으로 이론 배율과 주문 금액을 계산하며, 투자 원금의 일정 비율을 리스크로 설정해 실제 거래소 주문 금액(명목가치)을 확인할 수 있습니다.",
         exampleTitle: "레버리지 진입 계산 예시",
         exampleBody:
-            "예를 들어 진입가가 10,000 USDT이고 손절가가 9,900 USDT라면 손절폭은 1%입니다. 이 경우 이론 배율은 100배가 되며, 투자 원금이 100 USDT이고 리스크 비율을 5%로 잡으면 리스크 금액은 5 USDT입니다. 최종 주문 명목가치는 100배 × 5 USDT로 계산되어 500 USDT가 됩니다. 다만 이론 배율이 높아질수록 작은 가격 변동으로도 청산이 발생할 수 있으므로 실제로는 더 낮은 배율을 사용하는 것이 일반적입니다.",
+            `예를 들어 진입가가 ${num(CRYPTO_ENTRY_BASIC.inputs.entryPrice)} USDT이고 손절가가 ${num(CRYPTO_ENTRY_BASIC.inputs.stopPrice)} USDT라면 손절폭은 ${CRYPTO_ENTRY_BASIC.expected["손절폭"]}%입니다. 이 경우 이론 배율은 ${CRYPTO_ENTRY_BASIC.expected["이론 배율"]}배가 되며, 투자 원금이 ${num(CRYPTO_ENTRY_BASIC.inputs.seed)} USDT이고 리스크 비율을 ${CRYPTO_ENTRY_BASIC.inputs.riskPercent}%로 잡으면 리스크 금액은 ${CRYPTO_ENTRY_BASIC.expected["리스크 금액"]} USDT입니다. 주문 명목가치는 ${CRYPTO_ENTRY_BASIC.expected["이론 배율"]}배 × ${CRYPTO_ENTRY_BASIC.expected["리스크 금액"]} USDT로 계산되어 ${CRYPTO_ENTRY_BASIC.expected["주문 명목가치"]} USDT가 되고, 손익비를 ${CRYPTO_ENTRY_BASIC.inputs.rewardRatio}로 넣으면 익절가는 진입가 + (진입가 − 손절가) × ${CRYPTO_ENTRY_BASIC.inputs.rewardRatio} = ${CRYPTO_ENTRY_BASIC.expected["익절가"]} USDT입니다. 수수료·펀딩비·슬리피지는 반영하지 않은 값입니다. 다만 이론 배율이 높아질수록 작은 가격 변동으로도 청산이 발생할 수 있으므로 실제로는 더 낮은 배율을 사용하는 것이 일반적입니다.`,
         faqs: [
             {
                 question: "왜 손절폭이 1%면 이론 배율이 100배가 되나요?",
@@ -624,7 +637,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
             {
                 question: "주문 명목가치는 실제 거래소에 넣는 금액인가요?",
                 answer:
-                    "네, 주문 명목가치는 실제 거래소 주문창에 입력하는 금액(USDT 또는 원화)이며, 이 금액을 기준으로 포지션이 체결됩니다.",
+                    "주문 명목가치는 이론 배율 × 리스크 금액으로 계산한 포지션 전체 크기(USDT 또는 원화)입니다. 거래소마다 주문창에 수량·증거금·명목가치 중 무엇을 입력하는지가 다르므로, 이용 중인 거래소의 주문 방식에 맞게 환산해 넣어야 합니다.",
             },
             {
                 question: "리스크 비율은 무엇인가요?",
@@ -663,9 +676,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "us-exchange-profit-calculator": {
         slug: "us-exchange-profit-calculator",
         metadata: {
-            title: "미국주식 환율 수익 계산기 | 원화 손익",
+            title: "미국주식 환율 반영 수익 계산기 | 원화 손익·환율 효과 계산",
             description:
-                "매수·매도 가격, 환율, 수량, 수수료를 기준으로 미국주식의 달러 기준 손익과 원화 기준 실제 수익을 계산하는 환율 반영 수익 계산기입니다.",
+                "매수·매도 가격(달러), 수량, 매수·매도 시점 환율, 원화 수수료를 넣으면 달러 기준 손익과 원화 기준 실제 손익·수익률을 계산하고, 환율 효과(매도 대금 × 환율 차이)와 수수료 합계를 따로 보여줍니다. 양도소득세 등 세금은 반영하지 않습니다.",
             keywords: [
                 "미국주식 환율 계산기",
                 "환율 반영 수익 계산기",
@@ -674,9 +687,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "us stock exchange profit calculator",
             ],
             openGraph: {
-                title: "미국주식 환율 수익 계산기 | 원화 손익",
+                title: "미국주식 환율 반영 수익 계산기 | 원화 손익·환율 효과 계산",
                 description:
-                    "미국주식 매매 시 환율과 수수료를 반영한 원화 기준 실제 수익을 계산해보세요.",
+                    "달러 매수·매도 가격, 수량, 두 시점 환율, 원화 수수료로 원화 기준 손익과 환율 효과를 계산합니다.",
                 type: "website",
             },
         },
@@ -696,7 +709,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
             "달러 기준 손익과 원화 기준 실제 수익은 다를 수 있으며, 환율 변동이 수익률에 직접 영향을 줍니다.",
         exampleTitle: "미국주식 환율 반영 수익 계산 예시",
         exampleBody:
-            "예를 들어 100달러에 10주를 매수하고 120달러에 매도했다고 가정해보겠습니다. 달러 기준으로는 200달러 수익이지만, 매수 환율이 1,350원이고 매도 환율이 1,380원이라면 원화 기준 실제 수익은 더 커질 수 있습니다. 반대로 매도 시 환율이 하락하면 달러 기준 수익이 나더라도 원화 기준 수익은 줄어들 수 있습니다.",
+            `예를 들어 ${num(US_EXCHANGE_BASIC.inputs.buyPriceUsd)}달러에 ${US_EXCHANGE_BASIC.inputs.quantity}주를 매수하고 ${num(US_EXCHANGE_BASIC.inputs.sellPriceUsd)}달러에 매도하면 달러 기준으로는 ${US_EXCHANGE_BASIC.expected["달러 기준 손익"]}달러 수익입니다. 매수 환율이 ${num(US_EXCHANGE_BASIC.inputs.buyExchangeRate)}원, 매도 환율이 ${num(US_EXCHANGE_BASIC.inputs.sellExchangeRate)}원이고 수수료가 없다면 원화 매수 금액 ${US_EXCHANGE_BASIC.expected["원화 매수 금액"]}원, 원화 매도 금액 ${US_EXCHANGE_BASIC.expected["원화 매도 금액"]}원으로 원화 기준 실제 손익은 ${US_EXCHANGE_BASIC.expected["원화 기준 실제 손익"]}원, 수익률 ${US_EXCHANGE_BASIC.expected["원화 기준 수익률"]}%입니다. 이 중 환율 효과는 매도 대금 ${US_EXCHANGE_BASIC.expected["총 매도 금액"]}달러 × 환율 차이 30원 = ${US_EXCHANGE_BASIC.expected["환율 효과 (수수료 제외)"]}원으로 따로 표시됩니다. 반대로 매도 시 환율이 하락하면 달러 기준 수익이 나더라도 원화 기준 수익은 줄어들 수 있습니다. 세금은 반영하지 않은 값입니다.`,
         faqs: [
             {
                 question: "달러 기준으로 수익이면 원화로도 무조건 수익인가요?",
@@ -740,9 +753,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "us-dividend-calculator": {
         slug: "us-dividend-calculator",
         metadata: {
-            title: "미국주식 배당 계산기 | 세후 배당금",
+            title: "미국주식 배당 계산기 | 원천징수 후 배당금·원화 환산 계산",
             description:
-                "보유 수량, 연간 주당 배당금, 평균 매수가, 환율, 원천징수세율을 기준으로 미국주식의 세전·세후 배당금과 배당수익률을 계산하는 계산기입니다.",
+                "보유 수량, 주당 연간 배당금(달러), 매수가, 환율, 원천징수세율(%)을 넣으면 연간 세전·세후 배당금(달러·원화), 월 환산 세후 배당금, 세전·세후 배당수익률을 계산합니다. 미국 현지 원천징수까지만 반영하며 국내 종합과세·외국납부세액공제는 계산하지 않습니다.",
             keywords: [
                 "미국주식 배당 계산기",
                 "미국주식 세후 배당금",
@@ -751,9 +764,9 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 "us dividend calculator",
             ],
             openGraph: {
-                title: "미국주식 배당 계산기 | 세후 배당금",
+                title: "미국주식 배당 계산기 | 원천징수 후 배당금·원화 환산 계산",
                 description:
-                    "미국주식 배당금을 세전·세후 기준으로 계산하고, 원화 기준 실수령 배당금과 배당수익률을 확인하세요.",
+                    "보유 수량, 주당 연간 배당금, 매수가, 환율, 원천징수세율로 세후 배당금(달러·원화)과 배당수익률을 계산합니다.",
                 type: "website",
             },
         },
@@ -773,7 +786,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
             "미국주식 배당은 보통 원천징수세가 차감되므로, 세전 배당금보다 실제 실수령 배당금이 더 적을 수 있습니다.",
         exampleTitle: "미국주식 배당 계산 예시",
         exampleBody:
-            `예를 들어 연간 주당 배당금이 2달러인 미국주식을 100주 보유하고 있다면 세전 배당금은 연 200달러입니다. 원천징수세율이 ${US_DIVIDEND_WITHHOLDING.rateDisplay}라면 세후 배당금은 ${200 * (1 - US_DIVIDEND_WITHHOLDING.rate)}달러가 됩니다. 여기에 환율 1,350원을 적용하면 연간 세후 배당금은 약 ${new Intl.NumberFormat("ko-KR").format(200 * (1 - US_DIVIDEND_WITHHOLDING.rate) * 1350)}원 수준으로 계산할 수 있습니다.`,
+            `예를 들어 연간 주당 배당금이 ${US_DIVIDEND_BASIC.inputs.annualDividendPerShareUsd}달러인 미국주식을 ${US_DIVIDEND_BASIC.inputs.shares}주 보유하고 있다면 세전 배당금은 연 ${US_DIVIDEND_BASIC.expected["연간 세전 배당금|USD"]}달러입니다. 원천징수세율을 ${US_DIVIDEND_WITHHOLDING.rateDisplay}로 넣으면 원천징수 세금 ${US_DIVIDEND_BASIC.expected["원천징수 세금"]}달러를 뺀 세후 배당금은 ${US_DIVIDEND_BASIC.expected["연간 세후 배당금|USD"]}달러가 됩니다. 환율 ${num(US_DIVIDEND_BASIC.inputs.exchangeRate)}원을 적용하면 연간 세후 배당금은 ${US_DIVIDEND_BASIC.expected["연간 세후 배당금|원"]}원, 월 환산 세후 배당금은 ${US_DIVIDEND_BASIC.expected["월 예상 세후 배당금"]}원입니다. 매수가가 ${US_DIVIDEND_BASIC.inputs.buyPriceUsd}달러이면 세전 배당수익률 ${US_DIVIDEND_BASIC.expected["세전 배당수익률"]}%, 세후 배당수익률 ${US_DIVIDEND_BASIC.expected["세후 배당수익률"]}%입니다. 세후는 미국 현지 원천징수까지만 반영한 값이며, 국내 종합과세 여부와 외국납부세액공제는 별도로 확인해야 합니다.`,
         faqs: [
             {
                 question: "세전 배당금과 세후 배당금은 왜 다른가요?",

@@ -16,8 +16,8 @@ import {
     RelatedCalculators,
     Disclaimer,
 } from "@/components/ui/Shared";
-import SeoContent from "@/components/seo/SeoContent";
 import InternalLinks from "@/components/seo/InternalLinks";
+import { OVERSEAS_TAX_BASIC } from "@/data/stockCalculatorExamples";
 
 const config = calculatorPages["overseas-stock-tax-calculator"];
 
@@ -34,7 +34,9 @@ function example(gain: number) {
     return { gain, taxable, tax, net: gain - tax };
 }
 const EX_A = example(5_000_000);
-const EX_B = example(6_000_000);
+/* 계산기 입력(매수·매도 금액·기본공제) 그대로의 사례. 기대값은 tests/calculatorPageExamples.test.ts 가 화면 결과와 대조한다. */
+const EX_B = OVERSEAS_TAX_BASIC;
+const wonStr = (v: string) => Number(v).toLocaleString("ko-KR");
 
 export const metadata: Metadata = withPageMetadata(config.metadata, "/overseas-stock-tax-calculator");
 
@@ -128,6 +130,13 @@ export default function OverseasStockTaxCalculatorPage() {
                             {withParticle(manwon(EX_A.taxable), "이/가")} 과세 대상이며, 세금은 {manwon(EX_A.tax)}입니다. 세후 수익은 {withParticle(manwon(EX_A.net), "이/가")} 됩니다.
                         </p>
                         <p>
+                            계산기에는 거래 금액을 그대로 넣습니다. 총 매수 금액 {wonStr(EX_B.inputs.buyAmount)}원, 총 매도 금액 {wonStr(EX_B.inputs.sellAmount)}원,
+                            기본공제 {wonStr(EX_B.inputs.deduction)}원이면 총 손익 {EX_B.expected["총 손익"]}원에서 기본공제를 뺀
+                            과세 대상 금액은 {EX_B.expected["과세 대상 금액"]}원, 예상 세금은 <strong>{EX_B.expected["입력값 기준 예상 세금"]}원</strong>,
+                            세후 손익은 {EX_B.expected["세후 손익"]}원입니다. 두 금액은 각 시점 환율을 반영한 원화 금액이며, 매매 수수료 등
+                            필요경비는 빼지 않은 거래 1건 기준 값입니다.
+                        </p>
+                        <p>
                             실제 신고 시에는 증권사 거래내역에 반영된 필요경비와 수수료 등에 따라
                             금액이 달라질 수 있습니다.
                         </p>
@@ -189,23 +198,6 @@ export default function OverseasStockTaxCalculatorPage() {
                 />
 
                 <Disclaimer />
-
-                <SeoContent
-                    title="해외주식 세금 계산기"
-                    intro={`해외주식에 투자할 때는 수익뿐 아니라 세금도 함께 고려해야 합니다. 양도소득세 기본공제 ${withParticle(DEDUCTION, "을/를")} 초과하는 수익에 대해 ${RATE}의 세율이 적용되므로, 수익 실현 전에 예상 세금을 미리 파악하는 것이 중요합니다.`}
-                    body="특히 연말 절세 전략을 세울 때, 올해 남은 기본공제 한도를 파악하거나 손실 종목을 활용한 손익 통산 계획을 세울 때 이 계산기가 유용합니다."
-                    formula={`세금 = (양도차익 − ${DEDUCTION} 기본공제) × ${RATE}`}
-                    formulaNote={`기본공제 ${withParticle(DEDUCTION, "은/는")} 연간 1회 적용됩니다. ${withParticle(OVERSEAS_STOCK_TAX.rateBreakdown, "을/를")} 합해 ${RATE}입니다. 값의 근거와 확인 범위는 위 '계산 기준과 출처'를 확인하세요. 세법 개정 시 변동될 수 있습니다.`}
-                    whenToUse="미국 주식, ETF 등 해외 자산 매도를 검토할 때, 또는 연말 절세를 위해 손익을 통산할 시기를 계획할 때 활용하면 좋습니다. 세후 실수익이 얼마인지 미리 파악하면 더 나은 투자 결정을 내릴 수 있습니다."
-                    example={`예시: 미국 주식을 매수 1,000만 원, 매도 1,600만 원에 처분 → 양도차익 ${manwon(EX_B.gain)}, 기본공제 ${DEDUCTION} 차감 후 과세 표준 ${manwon(EX_B.taxable)} × ${RATE} = 세금 ${manwon(EX_B.tax)}, 세후 수익 ${manwon(EX_B.net)}.`}
-                    caution="본 계산기는 참고용이며 실제 세금은 환율, 거래 수수료, 다른 해외 소득과의 합산 여부에 따라 달라질 수 있습니다. 정확한 세액은 세무사 또는 국세청에 문의하세요."
-                    relatedLinks={[
-                        { href: "/profit-calculator", label: "주식 수익률 계산기" },
-                        { href: "/dividend-calculator", label: "배당 수익 계산기" },
-                        { href: "/compound-interest-calculator", label: "복리 계산기" },
-                        { href: "/average-price-calculator", label: "평단가 계산기" },
-                    ]}
-                />
 
                 <InternalLinks currentPath="/overseas-stock-tax-calculator" />
             </div>

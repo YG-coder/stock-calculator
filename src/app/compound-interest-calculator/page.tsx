@@ -12,16 +12,14 @@ import {
     RelatedCalculators,
     Disclaimer,
 } from "@/components/ui/Shared";
-import SeoContent from "@/components/seo/SeoContent";
 import InternalLinks from "@/components/seo/InternalLinks";
 import GuideLinks from "@/components/seo/GuideLinks";
-import { calculateCompoundInterest } from "@/lib/compoundInterest";
+import { COMPOUND_BASIC, COMPOUND_TEN_YEARS } from "@/data/stockCalculatorExamples";
 
 const config = calculatorPages["compound-interest-calculator"];
-const EXAMPLE = calculateCompoundInterest({
-    initial: "5000000", monthly: "300000", rate: "8", years: "20",
-});
-const won = (value: number) => new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 }).format(value);
+const A = COMPOUND_TEN_YEARS;
+const B = COMPOUND_BASIC;
+const won = (v: string) => Number(v).toLocaleString("ko-KR");
 
 export const metadata: Metadata = withPageMetadata(config.metadata, "/compound-interest-calculator");
 
@@ -46,20 +44,12 @@ export default function CompoundInterestCalculatorPage() {
                 <CompoundInterestCalculator />
 
                 <SectionCard>
-                    <Article title="복리 계산기란?">
+                    <Article title="복리 계산 방법">
                         <p>
-                            <strong>복리 계산기</strong>는 초기 투자금과 매월 추가 납입금이
-                            일정 수익률로 복리 성장할 때 최종 예상 금액이 얼마인지 계산하는 도구입니다.
+                            단리와 달리 복리는 발생한 수익에 다시 수익이 붙는 구조라서, 시간이 지날수록 차이가 커집니다.
+                            이 계산기는 월복리와 매월 말 납입을 기준으로 계산합니다. 월 수익률은 입력한 연 수익률을 12로 나눈 값이며,
+                            기간은 투자 연수 × 12개월입니다.
                         </p>
-                        <p>
-                            단리와 달리 복리는 발생한 수익에 다시 수익이 붙는 구조입니다.
-                            시간이 지날수록 이 차이는 기하급수적으로 커지기 때문에,
-                            장기 투자자에게 복리 효과를 이해하는 것은 매우 중요합니다.
-                        </p>
-                    </Article>
-
-                    <Article title="복리 계산 공식">
-                        <p>이 계산기는 월복리와 매월 말 납입을 기준으로 계산합니다. 월 수익률은 입력한 연 수익률을 12로 나눈 값이며, 기간은 투자 연수 × 12개월입니다.</p>
                         <div className="my-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-6">
                             <div className="mx-auto max-w-3xl text-center font-mono font-bold text-slate-800">
                                 <div className="break-keep text-sm leading-relaxed sm:text-base md:text-lg">
@@ -72,9 +62,14 @@ export default function CompoundInterestCalculatorPage() {
                         </div>
                         <p>수익률이 0%이면 최종 금액은 초기 투자금 + 월 추가 투자금 × 투자 개월 수입니다.</p>
                         <p>
-                            예를 들어 1,000만 원을 초기 투자하고 매월 30만 원씩 10년간 연 7% 수익률로
-                            투자했다면, 단순히 원금 + 납입금인 4,600만 원이 아니라 복리 효과로
-                            훨씬 더 큰 금액이 됩니다.
+                            예를 들어 {won(A.inputs.initial)}원을 초기 투자하고 매월 {won(A.inputs.monthly)}원씩 {A.inputs.years}년간 연 {A.inputs.rate}%로
+                            투자하면 총 투자금은 {A.expected["총 투자금"]}원이지만, 최종 자산은 월복리 효과로 <strong>{A.expected["최종 자산"]}원</strong>이
+                            되어 총 수익은 {A.expected["총 수익"]}원입니다.
+                        </p>
+                        <p>
+                            기간을 늘리면 차이가 더 커집니다. 초기 {won(B.inputs.initial)}원, 매월 {won(B.inputs.monthly)}원, 연 {B.inputs.rate}%로 {B.inputs.years}년이면
+                            총 투자금 {B.expected["총 투자금"]}원에 대해 최종 자산 <strong>{B.expected["최종 자산"]}원</strong>, 총 수익 {B.expected["총 수익"]}원입니다.
+                            세금·수수료·물가 상승은 반영하지 않은 값이며, 수익률은 입력한 가정입니다.
                         </p>
                     </Article>
 
@@ -120,23 +115,6 @@ export default function CompoundInterestCalculatorPage() {
                 />
 
                 <Disclaimer />
-
-                <SeoContent
-                    title="복리 계산기"
-                    intro="복리 계산기는 초기 투자금과 매월 납입금이 일정 수익률로 성장했을 때 최종 금액이 얼마가 되는지 계산합니다. 장기 투자를 계획 중이라면 복리 효과를 반드시 이해하고 활용해야 합니다."
-                    body="특히 연금, ETF 적립식 투자, 장기 저축 상품 등을 고려할 때 이 계산기를 사용하면 목표 금액 달성에 필요한 납입금이나 투자 기간을 역산하는 데 도움이 됩니다."
-                    formula="최종 금액 = 초기 투자금 × (1 + 월 수익률)^기간(개월) + 월 납입금 × [(1 + 월 수익률)^기간(개월) − 1] / 월 수익률"
-                    formulaNote="월 수익률 = 연 수익률 ÷ 100 ÷ 12이며, 매월 말 납입과 월복리를 가정합니다. 연 수익률 8% 입력 시 실효 연 수익률은 약 8.30%입니다. 수익률 0%에서는 초기 투자금과 추가 납입금의 합계를 표시합니다. 세금과 수수료는 포함되지 않습니다."
-                    whenToUse="은퇴 자금 마련, 자녀 교육비 준비, 목돈 마련 등 장기 재무 목표를 세울 때 활용하면 좋습니다. 원하는 목표 금액을 역산하여 필요한 월 납입금이나 기간을 파악하는 데 유용합니다."
-                    example={`예시: 초기 투자금 500만 원, 매월 말 30만 원 납입, 연 수익률 8%, 투자 기간 20년 → 월복리 기준 총 투자금 ${won(EXAMPLE.principal)}원, 최종 금액 ${won(EXAMPLE.total)}원, 총 수익 ${won(EXAMPLE.profit)}원입니다.`}
-                    caution="이 계산기는 세금, 수수료, 인플레이션을 반영하지 않습니다. 실제 투자 결과는 시장 상황에 따라 다를 수 있으며, 참고용으로만 활용하세요."
-                    relatedLinks={[
-                        { href: "/dividend-calculator", label: "배당 수익 계산기" },
-                        { href: "/profit-calculator", label: "주식 수익률 계산기" },
-                        { href: "/position-size-calculator", label: "포지션 사이즈 계산기" },
-                        { href: "/risk-reward-calculator", label: "손익비 계산기" },
-                    ]}
-                />
 
                 <InternalLinks currentPath="/compound-interest-calculator" />
             </div>

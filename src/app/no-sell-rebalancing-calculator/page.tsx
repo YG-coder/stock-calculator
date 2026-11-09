@@ -4,11 +4,11 @@ import { Article, Disclaimer, FaqItem, FaqSection, PageHeader, RelatedCalculator
 import { buildMetadata } from "@/lib/metadata";
 
 const title = "무매도 리밸런싱 계산기";
-const description = "보유 자산을 팔지 않고 새 투자금만으로 목표 자산배분에 가까워지도록 자산별 추천 매수액을 계산합니다.";
+const description = "자산별 현재 평가금액과 목표 비중, 새 투자금을 넣으면 보유 자산을 팔지 않고 새 투자금만으로 목표 비중에 가까워지도록 자산별 추천 매수액과 비중 편차 감소를 계산합니다. 세금·수수료·주문 단위는 반영하지 않습니다.";
 const faqs = [
   { question: "무매도 리밸런싱이란 무엇인가요?", answer: "기존 자산을 매도하지 않고 배당금이나 새 투자금을 비중이 부족한 자산에 배분해 목표 비중에 가까워지는 방식입니다." },
   { question: "한 번에 목표 비중이 되지 않는 이유는 무엇인가요?", answer: "비중이 높은 자산을 팔지 않는 조건에서는 새 투자금만으로 모든 초과 비중을 즉시 해소할 수 없기 때문입니다." },
 ];
-export const metadata = buildMetadata({ title, description, path: "/no-sell-rebalancing-calculator", keywords: ["무매도 리밸런싱", "리밸런싱 계산기", "자산배분 계산기"] });
+export const metadata = buildMetadata({ title: `${title} | 새 투자금 자산별 매수액 계산`, description, path: "/no-sell-rebalancing-calculator", keywords: ["무매도 리밸런싱", "리밸런싱 계산기", "자산배분 계산기"] });
 
-export default function Page() { return <main className="min-h-screen bg-slate-50 pb-20"><CalculatorJsonLd title={title} description={description} path="/no-sell-rebalancing-calculator" faqs={faqs} /><PageHeader badge="자산배분" title={title} description={description} /><div className="mx-auto max-w-5xl px-6 py-12 md:px-8"><NoSellRebalancingCalculator /><SectionCard><Article title="새 투자금으로 비중을 조절하는 방법"><p>현재 총자산에 새 투자금을 더한 금액을 기준으로 자산별 목표금액을 구하고, 목표보다 부족한 자산에 우선 배분합니다. 매도와 양도소득 실현을 피하고 싶을 때 활용할 수 있습니다.</p></Article></SectionCard><FaqSection title="자주 묻는 질문 (FAQ)">{faqs.map((faq) => <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />)}</FaqSection><RelatedCalculators links={[{ href: "/portfolio-calculator", title: "포트폴리오 계산기", desc: "자산배분의 기대수익률과 위험 분석" }, { href: "/dca-calculator", title: "적립식 투자 시뮬레이션", desc: "장기 적립 결과의 확률 분포 확인" }]} /><Disclaimer /></div></main>; }
+export default function Page() { return <main className="min-h-screen bg-slate-50 pb-20"><CalculatorJsonLd title={title} description={description} path="/no-sell-rebalancing-calculator" faqs={faqs} /><PageHeader badge="자산배분" title={title} description={description} /><div className="mx-auto max-w-5xl px-6 py-12 md:px-8"><NoSellRebalancingCalculator /><SectionCard><Article title="새 투자금으로 비중을 조절하는 방법"><p>현재 총자산에 새 투자금을 더한 금액을 기준으로 자산별 목표금액을 구하고, 목표보다 부족한 자산에 우선 배분합니다. 보유 자산을 매도하지 않고 비중을 조정하고 싶을 때 활용할 수 있습니다. 매도 시 세금이 생기는지는 자산 종류와 계좌에 따라 다르므로 별도로 확인하세요.</p></Article></SectionCard><FaqSection title="자주 묻는 질문 (FAQ)">{faqs.map((faq) => <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />)}</FaqSection><RelatedCalculators links={[{ href: "/portfolio-calculator", title: "포트폴리오 계산기", desc: "자산배분의 기대수익률과 위험 분석" }, { href: "/dca-calculator", title: "적립식 투자 시뮬레이션", desc: "장기 적립 결과의 확률 분포 확인" }]} /><Disclaimer /></div></main>; }
