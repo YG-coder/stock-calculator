@@ -126,7 +126,7 @@ export default function OverseasStockTaxCalculatorPage() {
                             </div>
                         </div>
                         <p>
-                            예를 들어 미국 주식에서 {manwon(EX_A.gain)} 수익을 냈다면 기본공제 {withParticle(DEDUCTION, "을/를")} 뺀
+                            예를 들어 미국 주식에서 {manwon(EX_A.gain)} 수익을 냈다면 기본공제 {withParticle(DEDUCTION, "을/를")} 뺀{" "}
                             {withParticle(manwon(EX_A.taxable), "이/가")} 과세 대상이며, 세금은 {manwon(EX_A.tax)}입니다. 세후 수익은 {withParticle(manwon(EX_A.net), "이/가")} 됩니다.
                         </p>
                         <p>
