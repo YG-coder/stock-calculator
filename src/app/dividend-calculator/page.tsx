@@ -103,7 +103,7 @@ export default function DividendCalculatorPage() {
                             예를 들어 {EX.inputs.shares}주를 보유하고 주당 배당금이 {won(EX.inputs.dividendPerShare)}원이라면 세전 배당금은
                             <strong> {EX.expected["세전 총 배당금"]}원</strong>입니다. 세율을 국내 배당소득세 {DOMESTIC_DIVIDEND_TAX.rateDisplay}로
                             넣으면 세금 {EX.expected["세금"]}원을 뺀 세후 배당금은 <strong>{EX.expected["세후 총 배당금"]}원</strong>이고,
-                            평균 매수가가 {won(EX.inputs.buyPrice)}원(총 투자금 {EX.expected["총 투자금"]}원)이면 세전 배당수익률
+                            평균 매수가가 {won(EX.inputs.buyPrice)}원(총 투자금 {EX.expected["총 투자금"]}원)이면 세전 배당수익률{" "}
                             {EX.expected["세전 배당수익률"]}%, 세후 배당수익률 <strong>{EX.expected["세후 배당수익률"]}%</strong>입니다.
                             세율은 직접 입력하는 값이며 매수 수수료는 총 투자금에 넣지 않습니다.
                         </p>
