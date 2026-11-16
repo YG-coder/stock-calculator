@@ -19,7 +19,7 @@ export default function PrivacyPage() {
 
         <div className="mx-auto max-w-5xl px-6 py-12 md:px-8">
           <p className="mb-6 text-sm text-slate-500">
-            시행일: 2026년 8월 23일 · 최종 개정일: 2026년 10월 3일
+            시행일: 2026년 8월 23일 · 최종 개정일: 2026년 11월 16일
           </p>
 
           <SectionCard>
@@ -49,7 +49,41 @@ export default function PrivacyPage() {
               </p>
             </Article>
 
-            <Article title="4. 분석 도구">
+            <Article title="4. 광고 서비스 이용">
+              <p className="mt-2">
+                본 사이트에서 <strong>Google AdSense</strong>를 통해 광고를 게재하는 경우,
+                Google과 제3자 광고 사업자는 이용자의 브라우저에 쿠키를 설정하거나 읽고,
+                웹 비콘과 같은 기술을 사용할 수 있습니다. 방문 페이지의 주소나 IP 주소 등은
+                광고 제공과 효과 측정에 쓰일 수 있으며, 쿠키를 통해 본 사이트나 다른
+                사이트의 이전 방문 기록을 바탕으로 맞춤 광고가 표시될 수 있습니다.
+              </p>
+              <p className="mt-2">
+                이용자는{" "}
+                <a
+                    href="https://adssettings.google.com/"
+                    className="font-semibold text-slate-800 underline-offset-2 hover:underline"
+                >
+                  Google 광고 설정
+                </a>
+                에서 개인 맞춤 광고를 끌 수 있습니다. 참여 광고 사업자의 맞춤 광고는{" "}
+                <a
+                    href="https://optout.aboutads.info/"
+                    className="font-semibold text-slate-800 underline-offset-2 hover:underline"
+                >
+                  WebChoices
+                </a>
+                에서 제한할 수 있습니다. 자세한 내용은{" "}
+                <a
+                    href="https://policies.google.com/technologies/partner-sites?hl=ko"
+                    className="font-semibold text-slate-800 underline-offset-2 hover:underline"
+                >
+                  Google의 파트너 사이트 데이터 사용 안내
+                </a>
+                에서 확인할 수 있습니다.
+              </p>
+            </Article>
+
+            <Article title="5. 분석 도구">
               <p className="mt-2">
                 작성 시점 기준으로 본 사이트는 <strong>별도의 웹 분석 도구를 사용하지
                 않습니다.</strong> 검색엔진 소유 확인을 위한 Google 및 Naver의 확인용
@@ -59,7 +93,7 @@ export default function PrivacyPage() {
               </p>
             </Article>
 
-            <Article title="5. 외부 링크">
+            <Article title="6. 외부 링크">
               <p className="mt-2">
                 본 사이트는 참고용 정보 제공을 위해 외부 사이트 링크를 포함할 수
                 있습니다. 외부 사이트의 개인정보처리방침과 운영 방식은 본 사이트와
@@ -67,7 +101,7 @@ export default function PrivacyPage() {
               </p>
             </Article>
 
-            <Article title="6. 문의">
+            <Article title="7. 문의">
               <p className="mt-2">
                 개인정보 처리와 관련한 문의는 아래 이메일로 접수하실 수 있습니다.
               </p>
