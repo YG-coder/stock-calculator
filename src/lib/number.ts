@@ -40,20 +40,43 @@ export function formatPrice(value: number): string {
 }
 
 /**
- * 0~1 비율을 퍼센트 숫자 문자열로 바꾼다. 화면 입력(퍼센트 ÷ 100)으로 만든 비율을 다시 표시할 때 쓴다.
+ * 0~1 비율을 퍼센트 숫자 문자열로 바꾼다(요청 당시 입력 문자열이 없을 때의 대체 표기).
  *
- * 0.58 * 100 이 57.99999999999999 로 보이는 부동소수점 오차는 없애되, 입력 정밀도는 줄이지 않는다.
- * 소수 자릿수를 0부터 늘려 가며 "그 퍼센트 ÷ 100 이 원래 비율과 정확히 같아지는" 가장 짧은 표기를 고른다.
- * 그래서 99.99999% 가 100% 로, 0.00001% 가 0% 로 반올림되지 않고, 계산에 쓴 값과 표시가 일치한다.
- * 0.58 → "58", 0.575 → "57.5", 0.9999999 → "99.99999", 0.0000001 → "0.00001" (지수 표기 없음).
+ * 0.58 * 100 이 57.99999999999999 로 보이는 부동소수점 오차를 없앤다. 소수 자릿수를 0부터 늘려 가며
+ * "그 퍼센트 ÷ 100 이 원래 비율과 정확히 같아지는" 가장 짧은 표기를 고른다(toFixed 한계인 소수 100자리까지).
+ * 58 ÷ 100 → "58", 57.5 ÷ 100 → "57.5", 99.99999 ÷ 100 → "99.99999", 1e-23 → "0.000000000000000000001".
+ * 그 범위에서도 맞는 표기가 없으면 반올림해 0·100 으로 보이게 하지 않고 숫자의 기본 표기(지수 포함)를 쓴다.
  */
 export function formatPercentFromRatio(ratio: number): string {
   if (!Number.isFinite(ratio)) return "-";
   const percent = ratio * 100;
-  for (let digits = 0; digits <= 20; digits += 1) {
+  for (let digits = 0; digits <= 100; digits += 1) {
     const text = percent.toFixed(digits);
     if (Number(text) / 100 === ratio) return text;
   }
-  // 퍼센트 입력에서 나오지 않은 비율(왕복이 맞는 표기가 없음): 줄이지 않고 가장 긴 표기를 쓴다.
-  return percent.toFixed(20).replace(/\.?0+$/, "");
+  return String(percent);
+}
+
+/**
+ * 사용자가 입력한 퍼센트 문자열을 표시용으로 다듬는다. 값은 바꾸지 않는다(반올림 없음).
+ * 앞뒤 공백, 불필요한 앞쪽 0, 소수부 뒤쪽 0만 정리한다: " 058.50 " → "58.5", ".5" → "0.5", "80." → "80".
+ * 숫자·소수점으로만 된 양수 표기가 아니면 null.
+ */
+export function normalizePercentInput(text: string): string | null {
+  const trimmed = text.trim();
+  if (!/^(\d+\.?\d*|\.\d+)$/.test(trimmed)) return null;
+  const [rawInt, rawFraction = ""] = trimmed.split(".");
+  const integer = rawInt.replace(/^0+(?=\d)/, "") || "0";
+  const fraction = rawFraction.replace(/0+$/, "");
+  return fraction ? `${integer}.${fraction}` : integer;
+}
+
+/**
+ * 결과 라벨에 쓸 목표 퍼센트. 계산을 요청할 때 입력한 문자열이 그 결과의 비율과 정확히 같은 값이면
+ * 입력 문자열을 그대로(자릿수 제한 없이) 표시한다. 연결이 맞지 않으면 비율에서 표기를 만든다.
+ */
+export function percentLabelForRatio(requestedText: string, ratio: number): string {
+  const normalized = normalizePercentInput(requestedText);
+  if (normalized !== null && Number(normalized) / 100 === ratio) return normalized;
+  return formatPercentFromRatio(ratio);
 }
