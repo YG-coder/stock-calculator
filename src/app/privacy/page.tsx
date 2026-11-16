@@ -19,7 +19,7 @@ export default function PrivacyPage() {
 
         <div className="mx-auto max-w-5xl px-6 py-12 md:px-8">
           <p className="mb-6 text-sm text-slate-500">
-            시행일: 2026년 8월 23일 · 최종 개정일: 2026년 11월 16일
+            최초 시행일: 2026년 4월 7일 · 최종 개정일: 2026년 11월 16일
           </p>
 
           <SectionCard>
