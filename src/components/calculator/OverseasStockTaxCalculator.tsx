@@ -129,7 +129,7 @@ export default function OverseasStockTaxCalculator() {
                     />
                     <ResultDetail
                         label="실효 세율"
-                        value={formatNumber(result.effectiveRate)}
+                        value={result.effectiveRate.toFixed(2)}
                         unit="%"
                     />
                 </div>

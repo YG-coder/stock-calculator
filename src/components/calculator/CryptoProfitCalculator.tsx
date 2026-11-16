@@ -160,7 +160,7 @@ export default function CryptoProfitCalculator() {
 
             <ResultCard
                 title="코인 수익 계산 결과"
-                emptyMessage="매수 가격, 매도 가격, 수량을 입력하면 예상 수익이 계산됩니다."
+                emptyMessage="매수 가격, 매도 가격, 수량, 매수·매도 수수료율을 입력하면 예상 수익이 계산됩니다."
                 isValid={result.valid}
             >
                 <CommaBreaks>

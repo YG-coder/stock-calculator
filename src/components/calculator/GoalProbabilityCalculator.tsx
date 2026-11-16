@@ -1,5 +1,6 @@
 "use client";
 import { requiredNumber } from "@/lib/uiInput";
+import { formatPercentFromRatio } from "@/lib/number";
 
 import { useCallback, useMemo, useState } from "react";
 import { AdvancedPanel, CalculatorCard, CalculatorLayout, InputEffectNote, InputField, PercentileNote, ResultCard, ResultDetail, ResultHighlight, ResultNote, SelectField, simulationIssueText } from "@/components/ui/Shared";
@@ -59,7 +60,7 @@ export default function GoalProbabilityCalculator() {
     {result?.goal ? <>
       <CalculatorCard title="목표달성확률 결과" description={`${result.meta.pathsRun.toLocaleString("ko-KR")}개 시나리오 · ${result.meta.months / 12}년 · 결과 재현 번호 ${result.meta.seed}`}>
         <ResultHighlight label="현재 월 투자금의 목표 달성 시나리오 비율" value={pct(result.goal.successProbability)} />
-        {required !== undefined ? <div className="grid gap-4 sm:grid-cols-2"><ResultHighlight label={`${(result.input.goal?.targetProbability ?? 0) * 100}% 시나리오 목표에 필요한 월 투자금`} value={won(required)} unit="원" tone="positive" /><ResultHighlight label="현재 대비 월 조정액" value={won(required - executedMonthly)} unit="원" tone={required > executedMonthly ? "negative" : "positive"} /></div> : null}
+        {required !== undefined ? <div className="grid gap-4 sm:grid-cols-2"><ResultHighlight label={`${formatPercentFromRatio(result.input.goal?.targetProbability ?? 0)}% 시나리오 목표에 필요한 월 투자금`} value={won(required)} unit="원" tone="positive" /><ResultHighlight label="현재 대비 월 조정액" value={won(required - executedMonthly)} unit="원" tone={required > executedMonthly ? "negative" : "positive"} /></div> : null}
         <div className="grid gap-4 sm:grid-cols-2"><ResultDetail label="목표 금액" value={won(result.input.goal?.targetAmount ?? 0)} unit="원" /><ResultDetail label="중간 결과 (최종 자산 중앙값)" value={won(result.terminal.p50)} unit="원" /><ResultDetail label="역산 방식" value={inversion?.method === "linear-exact" ? "선형 정확 역산" : "미지원"} /><ResultDetail label="표시 기준" value={result.input.reportBasis === "real" ? "현재 가치" : "미래 금액"} /></div>
         <ResultNote><PercentileNote /><p>“80% 시나리오”는 미래 성공을 80% 보장한다는 뜻이 아니라, 입력한 가정과 결과 재현 번호로 만든 경로 중 목표를 넘은 비율입니다.</p></ResultNote>
       </CalculatorCard>

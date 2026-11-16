@@ -197,7 +197,7 @@ export default function CryptoLiquidationCalculator() {
 
             <ResultCard
                 title="예상 청산 결과"
-                emptyMessage="진입 가격과 레버리지를 입력하면 청산 가격이 계산됩니다."
+                emptyMessage="진입 가격, 레버리지, 유지 증거금률을 입력하면 청산 가격이 계산됩니다."
                 isValid={result.valid}
             >
                 <CommaBreaks>

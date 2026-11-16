@@ -238,7 +238,7 @@ export default function CryptoEntryCalculator() {
 
             <ResultCard
                 title="100배 진입 계산 결과"
-                emptyMessage="진입가, 손절가, 투자 원금, 리스크 비율을 입력하면 결과가 계산됩니다."
+                emptyMessage="진입가, 손절가, 투자 원금, 리스크 비율, 손익비를 입력하면 결과가 계산됩니다."
                 isValid={result.valid}
             >
                 <CommaBreaks>

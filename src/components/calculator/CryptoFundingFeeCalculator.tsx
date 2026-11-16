@@ -128,7 +128,7 @@ export default function CryptoFundingFeeCalculator() {
 
             <ResultCard
                 title="펀딩비 계산 결과"
-                emptyMessage="포지션 규모와 펀딩비율을 입력하면 예상 펀딩비가 계산됩니다."
+                emptyMessage="포지션 규모, 펀딩비율, 적용 횟수를 입력하면 예상 펀딩비가 계산됩니다."
                 isValid={result.valid}
             >
                 <CommaBreaks>

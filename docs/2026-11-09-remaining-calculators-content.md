@@ -6,9 +6,9 @@
 
 | 구분 | 페이지 | 변경일 | 운영 반영일 |
 |---|---|---|---|
-| SeoContent 사용 페이지(8) | `/target-price-calculator` `/stop-loss-calculator` `/break-even-calculator` `/risk-reward-calculator` `/position-size-calculator` `/dividend-calculator` `/compound-interest-calculator` `/overseas-stock-tax-calculator` | 2026-11-09 | 미배포 |
-| 설정(calculatorPages.ts) 페이지(8) | `/crypto/profit` `/crypto/leverage-profit` `/crypto/funding-fee` `/crypto/entry` `/crypto/liquidation` `/crypto/average` `/us-stocks/exchange-profit` `/us-stocks/dividend` | 2026-11-09 | 미배포 |
-| 시뮬레이션·세금 페이지(7) | `/dca-calculator` `/goal-probability-calculator` `/fire-calculator` `/sequence-risk-calculator` `/no-sell-rebalancing-calculator` `/portfolio-calculator` `/stock-transaction-tax-calculator` | 2026-11-09 | 미배포 |
+| SeoContent 사용 페이지(8) | `/target-price-calculator` `/stop-loss-calculator` `/break-even-calculator` `/risk-reward-calculator` `/position-size-calculator` `/dividend-calculator` `/compound-interest-calculator` `/overseas-stock-tax-calculator` | 2026-11-09 | 2026-11-09 21:24 KST |
+| 설정(calculatorPages.ts) 페이지(8) | `/crypto/profit` `/crypto/leverage-profit` `/crypto/funding-fee` `/crypto/entry` `/crypto/liquidation` `/crypto/average` `/us-stocks/exchange-profit` `/us-stocks/dividend` | 2026-11-09 | 2026-11-09 21:24 KST |
+| 시뮬레이션·세금 페이지(7) | `/dca-calculator` `/goal-probability-calculator` `/fire-calculator` `/sequence-risk-calculator` `/no-sell-rebalancing-calculator` `/portfolio-calculator` `/stock-transaction-tax-calculator` | 2026-11-09 | 2026-11-09 21:24 KST |
 
 수정 전(`26ccd7a`)·후 대체 빌드의 HTML 46개에서 제목·메타·JSON-LD·본문 텍스트를 추출해 대조했다. 바뀐 페이지는 위 23개뿐이며, 제외한 수익률·평단가 페이지와 허브·가이드·홈 등 23개는 동일하다. 23개 모두 canonical·robots(index, follow)·og:image는 변경 전과 같다.
 
@@ -76,7 +76,15 @@
 ## 운영 배포 및 확인
 
 - 커밋: 이 문서와 코드·테스트를 한 커밋에 넣는다. 생성 파일(`.next`, 스크린샷)과 다른 작업의 변경은 포함하지 않는다.
-- 푸시·운영 배포·운영 화면 확인: **미실시**(별도 지시 시 진행). 운영 반영일은 배포 후 갱신한다.
+- 위 기록은 커밋 시점 상태다. 이후 푸시·운영 배포가 이뤄졌다(2026-11-16 갱신).
+
+| 반영 내용 | 운영 배포 완료 시각 | 배포 기록 |
+|---|---|---|
+| 23개 계산기 정리 `a54e7f4` | 2026-11-09 21:24 KST | [Vercel Production](https://vercel.com/yg-coders-projects/stock-calculator/EmwDFoRnsmNo7HSMeHmgC8VJh5a1) |
+| 후속 띄어쓰기 수정 포함 `6b58e09` | 2026-11-10 14:45 KST | [Vercel Production](https://vercel.com/yg-coders-projects/stock-calculator/EMKCuePC9pEzkWoA8ZFQRCeNdCWt) |
+
+- 확인 범위: 배포 시각·Vercel Production 성공 기록·운영 계산기 25개 정상 응답은 2026-11-16 사용자가 전달한 별도 AI 검토 결과다. 이 문서를 갱신한 Claude(AI)는 Vercel 화면과 운영 사이트를 직접 확인하지 않았고, 로컬 main과 origin/main이 `6b58e09`로 같다는 것만 저장소에서 확인했다.
+- 성과 비교의 기준일은 23개 페이지 운영 반영일인 2026-11-09로 둔다. 사람 검수와 검색 노출 변화는 확인된 것이 없다.
 
 ## 성과 측정 기준(배포 후)
 
@@ -199,3 +207,17 @@
 - 제목: 미국주식 환율 수익 계산기 | 원화 손익 → **미국주식 환율 반영 수익 계산기 | 원화 손익·환율 효과 계산**
 - 설명(전): 매수·매도 가격, 환율, 수량, 수수료를 기준으로 미국주식의 달러 기준 손익과 원화 기준 실제 수익을 계산하는 환율 반영 수익 계산기입니다.
 - 설명(후): 매수·매도 가격(달러), 수량, 매수·매도 시점 환율, 원화 수수료를 넣으면 달러 기준 손익과 원화 기준 실제 손익·수익률을 계산하고, 환율 효과(매도 대금 × 환율 차이)와 수수료 합계를 따로 보여줍니다. 양도소득세 등 세금은 반영하지 않습니다.
+
+## 보류 항목 후속 처리 — 2026-11-16
+
+위 ‘보류’ 가운데 사용자 화면에 바로 드러나는 세 가지를 고쳤다. 계산 로직은 바꾸지 않았다. 작업 주체는 Claude(AI)이며 사람 검수가 아니다.
+
+| 항목 | 수정 전 | 수정 후 |
+|---|---|---|
+| 목표달성확률 결과 라벨 | `targetProbability × 100`을 그대로 표시 — 58 입력 시 “57.99999999999999% 시나리오…”, 56 입력 시 “56.00000000000001%” | `formatPercentFromRatio`(소수 넷째 자리 반올림, 뒤쪽 0 생략)로 “58%”, “56%” |
+| 해외주식 세금 실효 세율 | 정수로 반올림 — 사례(세금 77만 ÷ 총 손익 600만)가 “13%” | 소수 둘째 자리 “12.83%”. 실효 세율은 세금 ÷ 총 손익이며 과세 대상 금액에 적용하는 22%와 다른 값이다 |
+| 결과 대기 안내의 필수 입력 누락 | 청산가(유지 증거금률), 레버리지 수익(거래 수수료율), 코인 수익(매수·매도 수수료율), 펀딩비(적용 횟수), 진입(손익비)이 안내에 없어 안내대로 넣어도 결과가 나오지 않음 | 다섯 계산기 안내에 필수 입력을 모두 적음 |
+
+- 테스트(`tests/calculatorPageExamples.test.ts`): 다섯 계산기에서 사례 입력 중 하나라도 비우면 결과가 나오지 않고 모두 넣으면 나오는지, 안내 문구가 입력 칸을 모두 언급하는지 확인한다. 해외주식 사례에 실효 세율 12.83을 추가했다. 비율 변환 함수는 0.58·0.56·0.07·0.29·0.57 등으로 확인한다.
+- 남은 보류: ‘처음 사용하시나요?’ 도움말의 입력 안내, 코인 수익 “실제 순손익”·펀딩비 “누적 펀딩비”의 같은 값 중복 표시, 허브 카드·관련 계산기 이름, og:title 불일치, 세법 서술 재확인.
+

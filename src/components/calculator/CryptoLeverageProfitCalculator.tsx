@@ -131,7 +131,7 @@ export default function CryptoLeverageProfitCalculator() {
 
             <ResultCard
                 title="레버리지 수익 계산 결과"
-                emptyMessage="진입가, 종료가, 증거금, 레버리지를 입력하면 예상 수익이 계산됩니다."
+                emptyMessage="진입가, 종료가, 증거금, 레버리지, 거래 수수료율을 입력하면 예상 수익이 계산됩니다."
                 isValid={result.valid}
             >
                 <CommaBreaks>

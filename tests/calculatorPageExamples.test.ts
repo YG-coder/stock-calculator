@@ -233,3 +233,51 @@ describe("페이지 렌더링 — 제목·설명·사례 노출·중복 블록 �
     });
   }
 });
+
+describe("결과 대기 안내가 필수 입력을 모두 알려 준다 (회귀: 안내대로 넣어도 계산되지 않음)", () => {
+  // 안내 문구에 나와야 하는 낱말 — 이번에 빠져 있던 필수 입력 포함
+  const cases: [keyof typeof CALCULATOR_EXAMPLES, string[]][] = [
+    ["CRYPTO_LIQUIDATION_BASIC", ["진입 가격", "레버리지", "유지 증거금률"]],
+    ["CRYPTO_LEVERAGE_BASIC", ["진입가", "종료가", "증거금", "레버리지", "수수료율"]],
+    ["CRYPTO_PROFIT_BASIC", ["매수 가격", "매도 가격", "수량", "매수·매도 수수료율"]],
+    ["CRYPTO_FUNDING_BASIC", ["포지션 규모", "펀딩비율", "적용 횟수"]],
+    ["CRYPTO_ENTRY_BASIC", ["진입가", "손절가", "투자 원금", "리스크 비율", "손익비"]],
+  ];
+  const card = (h: H) => h.nodes().find((n) => fname(n) === "ResultCard")!.props as { isValid: boolean; emptyMessage: string };
+  for (const [name, words] of cases) {
+    it(name, () => {
+      const inputs = CALCULATOR_EXAMPLES[name].inputs;
+      // 입력 칸 수와 안내 항목 수가 같아야 빠진 항목이 없다(매수·매도 수수료율은 한 항목으로 두 칸).
+      const fieldCount = Object.keys(inputs).length - (name === "CRYPTO_PROFIT_BASIC" ? 1 : 0);
+      expect(words).toHaveLength(fieldCount);
+      const empty = uiHarness(COMPONENTS[name]);
+      for (const word of words) expect(card(empty).emptyMessage).toContain(word);
+      // 사례 입력 중 하나라도 비우면 결과가 나오지 않고, 모두 넣으면 나온다.
+      for (const skipped of Object.keys(inputs)) {
+        const h = uiHarness(COMPONENTS[name]);
+        for (const [id, value] of Object.entries(inputs)) if (id !== skipped) h.change(id, value);
+        expect(card(h).isValid, `${skipped} 없이`).toBe(false);
+      }
+      const full = uiHarness(COMPONENTS[name]);
+      for (const [id, value] of Object.entries(inputs)) full.change(id, value);
+      expect(card(full).isValid).toBe(true);
+    });
+  }
+});
+
+describe("비율 표시 (회귀: 58 → 57.99999999999999%)", () => {
+  it("목표 시나리오 비율 라벨용 퍼센트 변환", async () => {
+    const { formatPercentFromRatio } = await import("@/lib/number");
+    for (const [ratio, text] of [[0.58, "58"], [0.56, "56"], [0.07, "7"], [0.29, "29"], [0.57, "57"], [0.8, "80"], [0.575, "57.5"], [0.999, "99.9"], [0, "0"]] as const) {
+      expect(formatPercentFromRatio(ratio)).toBe(text);
+    }
+    // 고치기 전 표시식이 실제로 깨졌던 값
+    expect(String(0.58 * 100)).toBe("57.99999999999999");
+  });
+  it("목표달성확률 화면이 변환 함수를 쓴다", async () => {
+    const { readFileSync } = await import("node:fs");
+    const source = readFileSync("src/components/calculator/GoalProbabilityCalculator.tsx", "utf8");
+    expect(source).toContain("formatPercentFromRatio(result.input.goal?.targetProbability ?? 0)");
+    expect(source).not.toMatch(/targetProbability \?\? 0\) \* 100\}%/);
+  });
+});

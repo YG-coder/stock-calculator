@@ -38,3 +38,12 @@ export function formatPrice(value: number): string {
       : { minimumFractionDigits: 0, maximumFractionDigits: 2 };
   return new Intl.NumberFormat("ko-KR", options).format(value);
 }
+
+/**
+ * 0~1 비율을 퍼센트 숫자 문자열로 바꾼다. 0.58 * 100 이 57.99999999999999 로 표시되는
+ * 부동소수점 오차를 없애고(소수 넷째 자리 반올림), 뒤쪽 0은 붙이지 않는다. 0.58 → "58", 0.575 → "57.5".
+ */
+export function formatPercentFromRatio(ratio: number): string {
+  if (!Number.isFinite(ratio)) return "-";
+  return String(Number((ratio * 100).toFixed(4)));
+}
