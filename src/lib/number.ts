@@ -40,10 +40,20 @@ export function formatPrice(value: number): string {
 }
 
 /**
- * 0~1 비율을 퍼센트 숫자 문자열로 바꾼다. 0.58 * 100 이 57.99999999999999 로 표시되는
- * 부동소수점 오차를 없애고(소수 넷째 자리 반올림), 뒤쪽 0은 붙이지 않는다. 0.58 → "58", 0.575 → "57.5".
+ * 0~1 비율을 퍼센트 숫자 문자열로 바꾼다. 화면 입력(퍼센트 ÷ 100)으로 만든 비율을 다시 표시할 때 쓴다.
+ *
+ * 0.58 * 100 이 57.99999999999999 로 보이는 부동소수점 오차는 없애되, 입력 정밀도는 줄이지 않는다.
+ * 소수 자릿수를 0부터 늘려 가며 "그 퍼센트 ÷ 100 이 원래 비율과 정확히 같아지는" 가장 짧은 표기를 고른다.
+ * 그래서 99.99999% 가 100% 로, 0.00001% 가 0% 로 반올림되지 않고, 계산에 쓴 값과 표시가 일치한다.
+ * 0.58 → "58", 0.575 → "57.5", 0.9999999 → "99.99999", 0.0000001 → "0.00001" (지수 표기 없음).
  */
 export function formatPercentFromRatio(ratio: number): string {
   if (!Number.isFinite(ratio)) return "-";
-  return String(Number((ratio * 100).toFixed(4)));
+  const percent = ratio * 100;
+  for (let digits = 0; digits <= 20; digits += 1) {
+    const text = percent.toFixed(digits);
+    if (Number(text) / 100 === ratio) return text;
+  }
+  // 퍼센트 입력에서 나오지 않은 비율(왕복이 맞는 표기가 없음): 줄이지 않고 가장 긴 표기를 쓴다.
+  return percent.toFixed(20).replace(/\.?0+$/, "");
 }

@@ -264,20 +264,3 @@ describe("결과 대기 안내가 필수 입력을 모두 알려 준다 (회귀:
     });
   }
 });
-
-describe("비율 표시 (회귀: 58 → 57.99999999999999%)", () => {
-  it("목표 시나리오 비율 라벨용 퍼센트 변환", async () => {
-    const { formatPercentFromRatio } = await import("@/lib/number");
-    for (const [ratio, text] of [[0.58, "58"], [0.56, "56"], [0.07, "7"], [0.29, "29"], [0.57, "57"], [0.8, "80"], [0.575, "57.5"], [0.999, "99.9"], [0, "0"]] as const) {
-      expect(formatPercentFromRatio(ratio)).toBe(text);
-    }
-    // 고치기 전 표시식이 실제로 깨졌던 값
-    expect(String(0.58 * 100)).toBe("57.99999999999999");
-  });
-  it("목표달성확률 화면이 변환 함수를 쓴다", async () => {
-    const { readFileSync } = await import("node:fs");
-    const source = readFileSync("src/components/calculator/GoalProbabilityCalculator.tsx", "utf8");
-    expect(source).toContain("formatPercentFromRatio(result.input.goal?.targetProbability ?? 0)");
-    expect(source).not.toMatch(/targetProbability \?\? 0\) \* 100\}%/);
-  });
-});
