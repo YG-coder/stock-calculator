@@ -199,11 +199,6 @@ export default function CryptoProfitCalculator() {
                             value={formatNumber(result.grossProfit)}
                             unit={moneyUnit}
                         />
-                        <ResultDetail
-                            label="실제 순손익"
-                            value={formatNumber(result.netProfit)}
-                            unit={moneyUnit}
-                        />
                     </CommaBreaks>
                 </div>
             </ResultCard>

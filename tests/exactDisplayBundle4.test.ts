@@ -28,6 +28,8 @@ const value = (h: H, label: string) => items(h).find(([l]) => l === label)?.[1];
 const isValid = (h: H) => Boolean(h.nodes().find((n) => fname(n) === "ResultCard")?.props.isValid);
 const tones = (h: H) => h.nodes().filter((n) => fname(n) === "ResultHighlight").map((n) => n.props.tone);
 const text = (h: H) => visibleCopy(h.html().replace(/<wbr\s*\/?>/gi, "")).replace(/\s+/g, " ");
+/** 렌더링된 화면 텍스트에서 문구가 나오는 횟수 */
+const count = (haystack: string, needle: string) => haystack.split(needle).length - 1;
 const fill = (h: H, fields: Record<string, string>) => {
   for (const [id, v] of Object.entries(fields)) if (v !== "") h.change(id, v);
   return h;
@@ -151,6 +153,23 @@ describe("코인 수익 — 매수·매도 수수료와 순손익", () => {
       ["총 수수료", "1,156,987,222,765,821.73", "USDT"],
     ]);
   });
+  it("'실제 순손익'은 결과 카드에 한 번만 나오고 검산 항목은 남는다 (회귀: 하단 중복 행)", () => {
+    // 100 → 120 USDT, 10개, 수수료 0.5%/0.5%: 매수 수수료 5, 매도 수수료 6 → 반영 전 200, 수수료 11, 순손익 189
+    const h = profit("100", "120", "10", "0.5", "0.5");
+    expect(items(h)).toEqual([
+      ["실제 순손익", "189", "USDT"],
+      ["총 매수 금액(수수료 포함)", "1,005", "USDT"],
+      ["총 매도 금액(수수료 차감)", "1,194", "USDT"],
+      ["총 수수료", "11", "USDT"],
+      ["수익률", "18.81", "%"],
+      ["수수료 반영 전 손익", "200", "USDT"],
+    ]);
+    expect(tones(h)).toEqual(["positive"]);
+    const card = text(h);
+    expect(count(card, "실제 순손익")).toBe(1);
+    expect(count(card, "수수료 반영 전 손익")).toBe(1);
+    expect(count(card, "총 수수료")).toBe(1);
+  });
   it("순손익 0은 기본 색, 수수료 빈칸은 미입력", () => {
     const h = profit("100", "100", "1", "0", "0");
     expect([value(h, "실제 순손익"), tones(h)]).toEqual(["0", ["default"]]);
@@ -196,11 +215,29 @@ describe("펀딩비 — 지급·수취 부호와 큰 금액", () => {
   it("C-2: 2,190,159,001,826,661,387 × 0.0050%(롱) → 회당 −109,507,950,091,333.07", () => {
     const h = funding("2190159001826661387", "0.0050", "1");
     expect(items(h)).toEqual([
+      // 총액(누적)의 큰 금액 정밀도는 상단 '총 예상 펀딩비'에서 검증한다. 같은 값을 다시 보여 주던 '누적 펀딩비' 행은 없다.
       ["총 예상 펀딩비 (지급)", "-109,507,950,091,333.07", "USDT"],
       ["1회당 펀딩비", "-109,507,950,091,333.07", "USDT"],
-      ["누적 펀딩비", "-109,507,950,091,333.07", "USDT"],
     ]);
     expect(calculateFundingFee({ positionSize: "2190159001826661387", fundingRate: "0.0050", fundingCount: "1", positionType: "long" }).netOneTime).toBe(-109507950091333.06935);
+  });
+  it("총액은 결과 카드에 한 번만 나오고 1회 금액·지급/수령 방향을 따로 읽을 수 있다 (회귀: '누적 펀딩비' 중복)", () => {
+    // 포지션 10,000 USDT × 0.1% = 1회 10 USDT, 3회 30 USDT. 롱은 지급(−), 숏은 수령(+).
+    const long = funding("10000", "0.1", "3");
+    expect(items(long)).toEqual([["총 예상 펀딩비 (지급)", "-30", "USDT"], ["1회당 펀딩비", "-10", "USDT"]]);
+    expect(tones(long)).toEqual(["negative"]);
+    const short = funding("10000", "0.1", "3", "short");
+    expect(items(short)).toEqual([["총 예상 펀딩비 (수령)", "+30", "USDT"], ["1회당 펀딩비", "+10", "USDT"]]);
+    expect(tones(short)).toEqual(["positive"]);
+    for (const h of [long, short]) {
+      const card = text(h);
+      expect(card).not.toContain("누적 펀딩비");
+      expect(count(card, "총 예상 펀딩비")).toBe(1);
+      expect(count(card, "1회당 펀딩비")).toBe(1);
+      expect(count(card, "30 USDT") + count(card, "30USDT")).toBe(1); // 총액 숫자도 한 번
+    }
+    // 적용 횟수 1: 1회 금액과 총액이 같아도 두 항목을 모두 보여 준다
+    expect(items(funding("10000", "0.1", "1"))).toEqual([["총 예상 펀딩비 (지급)", "-10", "USDT"], ["1회당 펀딩비", "-10", "USDT"]]);
   });
   it("요율 빈칸·0·음수와 아주 작은 수령은 기존 규칙(+0, 수령)", () => {
     expect(isValid(funding("10000", "", "3"))).toBe(false);

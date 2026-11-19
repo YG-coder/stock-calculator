@@ -147,11 +147,6 @@ export default function CryptoFundingFeeCalculator() {
                             value={signed(result.netOneTime)}
                             unit={moneyUnit}
                         />
-                        <ResultDetail
-                            label="누적 펀딩비"
-                            value={signed(result.netTotal)}
-                            unit={moneyUnit}
-                        />
                     </CommaBreaks>
                 </div>
 

@@ -278,7 +278,7 @@ export const CRYPTO_LEVERAGE_BASIC: CalculatorExample = {
 /** 코인 펀딩비: 포지션 10,000 USDT, 펀딩비율 +0.01%, 3회, 롱(기본) → 1회 −1, 누적 −3(지급) */
 export const CRYPTO_FUNDING_BASIC: CalculatorExample = {
     inputs: { positionSize: "10000", fundingRate: "0.01", fundingCount: "3" },
-    expected: { "총 예상 펀딩비 (지급)": "-3", "1회당 펀딩비": "-1", "누적 펀딩비": "-3" },
+    expected: { "총 예상 펀딩비 (지급)": "-3", "1회당 펀딩비": "-1" },
 };
 
 /** 코인 레버리지 진입: 진입 10,000·손절 9,900 USDT, 원금 100, 리스크 5%, 손익비 1.5 */
