@@ -140,6 +140,21 @@ describe("복리 — 비정상 숫자 처리", () => {
         expect(r.overflow).toBe(false);
     });
 
+    // 12개월 동안 매월 기초 잔액에 월 이자를 붙인 뒤 100만 원을 납입해
+    // Decimal(85자리)로 독립 산출한 이자. 최종 자산보다 작은 자릿수까지 확인한다.
+    it.each([
+        ["0", "0.00000000000001", 5.50000000000000015e-10],
+        ["0", "0.000001", 0.055000000152777778],
+        ["1000000", "0.000001", 0.065000000198611112],
+    ] as const)("초기 %s원, 연 %s%%의 원금과 반올림 전 이자를 보존한다", (initial, rate, interest) => {
+        const r = calculateCompoundInterest({ initial, monthly: "1000000", rate, years: "1" });
+        const principal = Number(initial) + 12_000_000;
+        expect(r.overflow).toBe(false);
+        expect(r.principal).toBe(principal);
+        expect(r.total).toBe(principal + interest);
+        expect(Math.abs(r.profit - interest)).toBeLessThan(interest * 1e-12);
+    });
+
     it("페이지 예시 조건 (500만, 월 30만, 8%, 20년) 결과를 유지한다", () => {
         const r = calculateCompoundInterest({ initial: "5000000", monthly: "300000", rate: "8", years: "20" });
         expect(Math.round(r.total)).toBe(201_340_139);

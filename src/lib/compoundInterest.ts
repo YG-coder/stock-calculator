@@ -14,6 +14,20 @@ export type CompoundInterestResult = {
     profit: number;
 };
 
+/** 금리가 작을 때 매월 말 1원씩 납입해서 얻는 이자. */
+function smallRateDepositInterest(rate: number, months: number): number {
+    // 작은 금리에서는 납입 원금을 빼면 이자가 소실된다. 이항 전개의 이자 항
+    // C(months, 2)·rate + C(months, 3)·rate² + … 를 직접 더한다.
+    let term = months * ((months - 1) * rate / 2);
+    let sum = term;
+    for (let k = 3; ; k++) {
+        term *= (months - k + 1) * rate / k;
+        const next = sum + term;
+        if (next === sum) return sum;
+        sum = next;
+    }
+}
+
 /**
  * 월복리 적립 계산. 월 수익률 = 연 수익률 ÷ 12, 매월 말 납입.
  *
@@ -45,16 +59,22 @@ export function calculateCompoundInterest({
         return { valid: false, overflow: false, total: 0, principal: 0, profit: 0 };
     }
 
-    const n = 12;
-    const growth = Math.pow(1 + r / n, n * t);
-    // 원금·납입액이 0 인 항은 계산하지 않는다. 0 × Infinity = NaN 을 막기 위함.
-    const total =
-        r === 0
-            ? P + PMT * n * t
-            : (P > 0 ? P * growth : 0) + (PMT > 0 ? PMT * ((growth - 1) / (r / n)) : 0);
-
-    const principal = P + PMT * n * t;
-    const profit = total - principal;
+    const months = 12 * t;
+    const monthlyRate = r / 12;
+    const principal = P + (PMT > 0 ? PMT * months : 0);
+    let total = principal;
+    let profit = 0;
+    if (monthlyRate > 0) {
+        const growthMinusOne = Math.expm1(months * Math.log1p(monthlyRate));
+        if (monthlyRate * Math.max(1, months) < 0.01) {
+            profit = P * growthMinusOne + PMT * smallRateDepositInterest(monthlyRate, months);
+            total = principal + profit;
+        } else {
+            const depositFactor = months === 1 ? 1 : growthMinusOne / monthlyRate;
+            total = (P > 0 ? P * (1 + growthMinusOne) : 0) + (PMT > 0 ? PMT * depositFactor : 0);
+            profit = total - principal;
+        }
+    }
 
     if (!Number.isFinite(total) || !Number.isFinite(profit)) {
         return { valid: true, overflow: true, total: 0, principal, profit: 0 };
