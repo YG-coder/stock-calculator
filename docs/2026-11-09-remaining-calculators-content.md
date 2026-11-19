@@ -582,7 +582,7 @@ Chrome에서 [운영 복리 계산기](https://주식계산기.kr/compound-inter
 
 이미 운영 중인 기능을 확인한 기록이다. 새 코드 변경이나 배포는 없다. 운영 화면을 확인한 것은 **Codex(AI)**이고, 전달받은 결과를 이 문서에 옮겨 적은 작성자는 **Claude(AI)**다. 둘 다 사람 검수가 아니다. Claude(AI)는 운영 화면을 직접 다시 확인하지 않았다.
 
-확인 대상은 [운영 FIRE 계산기](https://주식계산기.kr/fire-calculator)가 Web Worker를 쓸 수 없을 때의 동작이다. 이 경우 계산은 메인 스레드에서 대체 실행되고 경로 수는 2,000개로 낮아진다(`docs/montecarlo-engine.md` §9).
+확인 대상은 [운영 FIRE 계산기](https://주식계산기.kr/fire-calculator)가 Web Worker를 쓸 수 없을 때의 동작이다. 이 경우 메인 스레드에서 계산하며, 요청한 경로 수가 2,000개를 넘을 때만 2,000개로 줄인다(`docs/montecarlo-engine.md` §9).
 
 | 항목 | Codex(AI)가 운영 화면에서 확인한 내용 |
 |---|---|
