@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { createElement, type ReactElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { uiHarness, visibleCopy } from "./uiHarness";
 import CryptoAverageCalculator from "@/components/calculator/CryptoAverageCalculator";
 import CryptoEntryCalculator from "@/components/calculator/CryptoEntryCalculator";
@@ -8,6 +10,7 @@ import CryptoLeverageProfitCalculator from "@/components/calculator/CryptoLevera
 import CryptoFundingFeeCalculator from "@/components/calculator/CryptoFundingFeeCalculator";
 import { calculateLeverageProfit } from "@/lib/cryptoLeverageProfit";
 import { calculateFundingFee } from "@/lib/fundingFee";
+import { ResultCard, ResultDetail, ResultHighlight } from "@/components/ui/Shared";
 
 // 기대값은 독립 기준(Python Fraction, 앱 코드 미사용)으로 계산해 고정했다.
 // 표시 규칙은 기존 그대로다.
@@ -28,8 +31,19 @@ const value = (h: H, label: string) => items(h).find(([l]) => l === label)?.[1];
 const isValid = (h: H) => Boolean(h.nodes().find((n) => fname(n) === "ResultCard")?.props.isValid);
 const tones = (h: H) => h.nodes().filter((n) => fname(n) === "ResultHighlight").map((n) => n.props.tone);
 const text = (h: H) => visibleCopy(h.html().replace(/<wbr\s*\/?>/gi, "")).replace(/\s+/g, " ");
-/** 렌더링된 화면 텍스트에서 문구가 나오는 횟수 */
+/** 텍스트에서 문구가 나오는 횟수 */
 const count = (haystack: string, needle: string) => haystack.split(needle).length - 1;
+/**
+ * 결과 카드(ResultCard) 하나만 실제로 렌더링한 표시 텍스트. 중복 표시 검사는 이 범위에서만 한다.
+ * text(h) 는 입력 영역·도움말을 포함한 계산기 전체라서, 카드 밖 문구에 같은 낱말이 있으면 횟수가 달라진다.
+ * 화면에 결과 카드가 정확히 하나인지도 함께 확인한다.
+ */
+const cardText = (h: H) => {
+  const cards = h.nodes().filter((n) => fname(n) === "ResultCard");
+  expect(cards).toHaveLength(1);
+  const html = renderToStaticMarkup(cards[0] as unknown as ReactElement);
+  return visibleCopy(html.replace(/<wbr\s*\/?>/gi, "")).replace(/\s+/g, " ");
+};
 const fill = (h: H, fields: Record<string, string>) => {
   for (const [id, v] of Object.entries(fields)) if (v !== "") h.change(id, v);
   return h;
@@ -165,10 +179,11 @@ describe("코인 수익 — 매수·매도 수수료와 순손익", () => {
       ["수수료 반영 전 손익", "200", "USDT"],
     ]);
     expect(tones(h)).toEqual(["positive"]);
-    const card = text(h);
+    const card = cardText(h);
     expect(count(card, "실제 순손익")).toBe(1);
     expect(count(card, "수수료 반영 전 손익")).toBe(1);
     expect(count(card, "총 수수료")).toBe(1);
+    expect(card).toContain("189"); // 카드에 실제 결과가 그려진 상태에서 센다
   });
   it("순손익 0은 기본 색, 수수료 빈칸은 미입력", () => {
     const h = profit("100", "100", "1", "0", "0");
@@ -230,7 +245,7 @@ describe("펀딩비 — 지급·수취 부호와 큰 금액", () => {
     expect(items(short)).toEqual([["총 예상 펀딩비 (수령)", "+30", "USDT"], ["1회당 펀딩비", "+10", "USDT"]]);
     expect(tones(short)).toEqual(["positive"]);
     for (const h of [long, short]) {
-      const card = text(h);
+      const card = cardText(h);
       expect(card).not.toContain("누적 펀딩비");
       expect(count(card, "총 예상 펀딩비")).toBe(1);
       expect(count(card, "1회당 펀딩비")).toBe(1);
@@ -245,5 +260,34 @@ describe("펀딩비 — 지급·수취 부호와 큰 금액", () => {
     const up = funding("0.0001", "-0.0001", "1");
     expect([items(up)[0], tones(up)]).toEqual([["총 예상 펀딩비 (수령)", "+0", "USDT"], ["positive"]]);
     expect(items(funding("100", "0.005", "1", "short"))[0]).toEqual(["총 예상 펀딩비 (수령)", "+0.01", "USDT"]);
+  });
+});
+
+
+describe("중복 라벨 검사의 범위 — 결과 카드 안만 센다", () => {
+  // 테스트용 화면. 실제 계산기와 같은 ResultCard·ResultHighlight·ResultDetail 로 만든다.
+  const highlight = createElement(ResultHighlight, { key: "h", label: "실제 순손익", value: "189", unit: "USDT" });
+  const duplicateRow = createElement(ResultDetail, { key: "d", label: "실제 순손익", value: "189", unit: "USDT" });
+  const help = createElement("p", { key: "p" }, "실제 순손익은 수수료를 모두 뺀 금액입니다.");
+  const screen = (outside: ReactElement[], inside: ReactElement[]) =>
+    function TestScreen() {
+      return createElement("div", null, ...outside, createElement(ResultCard, { key: "c", title: "결과", isValid: true }, ...inside));
+    };
+
+  it("같은 라벨이 카드 밖 도움말에만 추가되면 카드 안 횟수는 그대로 1이다", () => {
+    const h = uiHarness(screen([help], [highlight]));
+    expect(count(text(h), "실제 순손익")).toBe(2); // 화면 전체로 세면 2
+    expect(count(cardText(h), "실제 순손익")).toBe(1); // 결과 카드 안은 1
+  });
+  it("카드 안에 같은 라벨의 행이 추가되면 2로 잡힌다", () => {
+    const h = uiHarness(screen([], [highlight, duplicateRow]));
+    expect(count(cardText(h), "실제 순손익")).toBe(2);
+    expect(count(cardText(h), "189")).toBe(2);
+  });
+  it("결과가 없는 카드는 안내 문구만 세고, 카드가 하나가 아니면 검사 자체가 실패한다", () => {
+    const empty = uiHarness(() => createElement("div", null, help, createElement(ResultCard, { title: "결과", isValid: false, emptyMessage: "값을 입력하세요." }, highlight)));
+    expect(count(cardText(empty), "실제 순손익")).toBe(0);
+    const two = uiHarness(() => createElement("div", null, createElement(ResultCard, { key: "a", title: "A" }, highlight), createElement(ResultCard, { key: "b", title: "B" }, duplicateRow)));
+    expect(() => cardText(two)).toThrow();
   });
 });
