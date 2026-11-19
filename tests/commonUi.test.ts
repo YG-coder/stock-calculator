@@ -47,6 +47,18 @@ it("rebalancing requires an explicit contribution including zero", () => {
  view.change("rebalancing-contribution","0"); expect(view.html()).toContain("추천 매수</th>");
  view.change("rebalancing-contribution",""); expect(view.html()).not.toContain("추천 매수</th>");
 });
+it("무매도 리밸런싱 표에 표시된 추천 매수액을 더하면 입력한 예산과 같다", () => {
+ const view = uiHarness(Rebalance);
+ ["10000", "10000", "0"].forEach((value, i) => view.change(`asset-value-${i}`, value));
+ ["50", "50", "0"].forEach((value, i) => view.change(`asset-weight-${i}`, value));
+ view.change("rebalancing-contribution", "10001.00");
+ const cells = [...view.html().matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/g)]
+   .map(match => visibleCopy(match[1]).replace(/[\s,]/g, ""));
+ const buys = cells.filter((_, i) => i % 3 === 0).map(Number);
+ expect(buys).toEqual([5001, 5000, 0]);
+ expect(buys.reduce((sum, value) => sum + value, 0)).toBe(10001);
+ expect(cells.filter((_, i) => i % 3 === 1).map(Number)).toEqual([15001, 15000, 0]);
+});
 it("portfolio holds unknown assumptions, permits explicit zero and ignores zero-weight assets", () => {
  const view=uiHarness(Portfolio);
  [100,0,0].forEach((v,i)=>view.change(`portfolio-weight-${i}`,String(v)));

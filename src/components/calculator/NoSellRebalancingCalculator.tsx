@@ -1,29 +1,30 @@
 "use client";
-import { requiredNumber } from "@/lib/uiInput";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { CalculatorCard, CalculatorLayout, InputField, ResultCard, ResultDetail, ResultHighlight, ResultNote } from "@/components/ui/Shared";
-import { allocateWithoutSelling, type RebalancingAsset, totalWeightDeviation } from "@/lib/noSellRebalancing";
+import { allocateWithoutSelling, formatBudget, totalWeightDeviation } from "@/lib/noSellRebalancing";
 
-type AssetInput = { name: string; currentValue: string; targetWeight: string };
-const won = (value: number) => new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 }).format(value);
+type AssetInput = { name: string; currentValue: string; targetPercent: string };
 const initialAssets: AssetInput[] = [
-  { name: "국내주식", currentValue: "", targetWeight: "" },
-  { name: "해외주식", currentValue: "", targetWeight: "" },
-  { name: "채권·현금", currentValue: "", targetWeight: "" },
+  { name: "국내주식", currentValue: "", targetPercent: "" },
+  { name: "해외주식", currentValue: "", targetPercent: "" },
+  { name: "채권·현금", currentValue: "", targetPercent: "" },
 ];
+
+function calculateAllocation(assets: AssetInput[], contribution: string) {
+  try {
+    return allocateWithoutSelling(assets, contribution);
+  } catch {
+    return null;
+  }
+}
 
 export default function NoSellRebalancingCalculator() {
   const [assets, setAssets] = useState(initialAssets);
   const [contribution, setContribution] = useState("");
-  const parsed = useMemo(() => assets.map<RebalancingAsset>((asset) => ({ name: asset.name, currentValue: Number(asset.currentValue), targetWeight: Number(asset.targetWeight) / 100 })), [assets]);
-  const weightSum = parsed.reduce((sum, asset) => sum + asset.targetWeight, 0);
-  const complete = contribution.trim() !== "" && assets.every(a => a.currentValue.trim() !== "" && a.targetWeight.trim() !== "");
-  const result = useMemo(() => {
-    if (!complete) return null;
-    try { return allocateWithoutSelling(parsed, requiredNumber(contribution)); } catch { return null; }
-  }, [parsed, contribution, complete]);
-  const hasInput = contribution !== "" || assets.some((asset) => asset.currentValue !== "" || asset.targetWeight !== "");
+  const weightSum = assets.reduce((sum, asset) => sum + Number(asset.targetPercent), 0);
+  const result = calculateAllocation(assets, contribution);
+  const hasInput = contribution !== "" || assets.some((asset) => asset.currentValue !== "" || asset.targetPercent !== "");
   const update = (index: number, key: keyof AssetInput, value: string) => setAssets((items) => items.map((item, itemIndex) => itemIndex === index ? { ...item, [key]: value } : item));
   const beforeDeviation = result?.reduce((sum, row) => sum + Math.abs(row.currentWeight - row.targetWeight), 0) ?? 0;
   const afterDeviation = result ? totalWeightDeviation(result) : 0;
@@ -33,15 +34,15 @@ export default function NoSellRebalancingCalculator() {
       <div className="space-y-5">{assets.map((asset, index) => <div key={index} className="grid gap-3 border-b border-slate-100 pb-5 last:border-0 sm:grid-cols-3">
         <InputField id={`asset-name-${index}`} label="자산명" value={asset.name} onChange={(event) => update(index, "name", event.target.value)} placeholder={index === 0 ? "예: 국내주식" : index === 1 ? "예: 해외주식" : "예: 채권·현금"} />
         <InputField id={`asset-value-${index}`} label="현재 평가금액" type="number" value={asset.currentValue} onChange={(event) => update(index, "currentValue", event.target.value)} unit="원" placeholder={`예: ${[50000000, 30000000, 20000000][index]}`} />
-        <InputField id={`asset-weight-${index}`} label="목표 비중" type="number" value={asset.targetWeight} onChange={(event) => update(index, "targetWeight", event.target.value)} unit="%" placeholder={`예: ${[40, 40, 20][index]}`} />
+        <InputField id={`asset-weight-${index}`} label="목표 비중" type="number" value={asset.targetPercent} onChange={(event) => update(index, "targetPercent", event.target.value)} unit="%" placeholder={`예: ${[40, 40, 20][index]}`} />
       </div>)}</div>
-      <div className="grid gap-4 sm:grid-cols-2"><InputField id="rebalancing-contribution" label="새 투자금" type="number" value={contribution} onChange={(event) => setContribution(event.target.value)} unit="원" placeholder="예: 10000000" /><ResultDetail label="목표 비중 합계" value={(weightSum * 100).toFixed(1)} unit="%" /></div>
+      <div className="grid gap-4 sm:grid-cols-2"><InputField id="rebalancing-contribution" label="새 투자금" type="number" value={contribution} onChange={(event) => setContribution(event.target.value)} unit="원" placeholder="예: 10000000" /><ResultDetail label="목표 비중 합계" value={weightSum.toFixed(1)} unit="%" /></div>
       {hasInput && !result ? <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">모든 평가금액·목표 비중·새 투자금을 입력해 주세요. 없으면 0을 직접 입력하고 목표 비중 합계는 100%로 맞춰 주세요.</div> : null}
     </CalculatorCard>
     {result ? <>
-      <CalculatorCard title="추천 매수 배분"><div className="grid gap-4 sm:grid-cols-2"><ResultHighlight label="새 투자금" value={won(requiredNumber(contribution))} unit="원" /><ResultHighlight label="비중 편차 감소" value={((beforeDeviation - afterDeviation) * 100).toFixed(2)} unit="%p" tone="positive" /></div>
-        <div className="overflow-x-auto"><table className="w-full min-w-[520px] text-sm"><thead><tr className="border-b text-slate-500"><th className="p-2 text-left" scope="col">자산</th><th className="p-2 text-right" scope="col">추천 매수</th><th className="p-2 text-right" scope="col">매수 후 금액</th><th className="p-2 text-right" scope="col">목표 / 매수 후</th></tr></thead><tbody>{result.map((row) => <tr key={row.name} className="border-b border-slate-100"><th className="p-2 text-left font-medium" scope="row">{row.name}</th><td className="p-2 text-right font-semibold text-red-600 tabular-nums">+{won(row.buyAmount)}</td><td className="p-2 text-right tabular-nums">{won(row.finalValue)}</td><td className="p-2 text-right tabular-nums">{(row.targetWeight * 100).toFixed(1)}% / {(row.finalWeight * 100).toFixed(1)}%</td></tr>)}</tbody></table></div>
-        <p className="text-xs leading-relaxed text-slate-500">목표보다 부족한 자산의 부족액에 비례해 우선 배분합니다. 투자금이 충분해 부족분을 모두 채우고 남으면 목표 비중대로 배분합니다.</p>
+      <CalculatorCard title="추천 매수 배분"><div className="grid gap-4 sm:grid-cols-2"><ResultHighlight label="새 투자금" value={formatBudget(contribution)} unit="원" /><ResultHighlight label="비중 편차 감소" value={((beforeDeviation - afterDeviation) * 100).toFixed(2)} unit="%p" tone="positive" /></div>
+        <div className="overflow-x-auto"><table className="w-full min-w-[520px] text-sm"><thead><tr className="border-b text-slate-500"><th className="p-2 text-left" scope="col">자산</th><th className="p-2 text-right" scope="col">추천 매수</th><th className="p-2 text-right" scope="col">매수 후 금액</th><th className="p-2 text-right" scope="col">목표 / 매수 후</th></tr></thead><tbody>{result.map((row) => <tr key={row.name} className="border-b border-slate-100"><th className="p-2 text-left font-medium" scope="row">{row.name}</th><td className="p-2 text-right font-semibold text-red-600 tabular-nums">+{row.buyAmountText}</td><td className="p-2 text-right tabular-nums">{row.finalValueText}</td><td className="p-2 text-right tabular-nums">{(row.targetWeight * 100).toFixed(1)}% / {(row.finalWeight * 100).toFixed(1)}%</td></tr>)}</tbody></table></div>
+        <p className="text-xs leading-relaxed text-slate-500">목표보다 부족한 자산에 부족액 비율대로 배분합니다. 원 단위로 나누고 남은 금액은 소수점 아래 몫이 큰 자산부터 1원씩 더합니다. 몫이 같으면 표의 위쪽 자산이 우선입니다. 소수 원을 입력하면 새 투자금의 소수 자릿수까지 배분합니다.</p>
       <ResultNote><p>새 투자금만으로는 목표 비중에 한 번에 도달하지 못할 수 있습니다. 비중이 이미 넘친 자산을 팔지 않기 때문이며, 여러 번에 걸쳐 반복하면 점점 가까워집니다.</p><p>세금과 거래비용은 반영하지 않았습니다.</p></ResultNote></CalculatorCard>
       <CalculatorCard title="주의사항"><p className="text-sm leading-relaxed text-slate-600">세금·수수료·최소 주문금액·주식 수량 단위는 반영하지 않습니다. 실제 주문 전 거래 가능 단위에 맞게 금액을 조정하세요.</p></CalculatorCard>
     </> : <ResultCard title="추천 매수 배분" isValid={false} emptyMessage="보유 자산과 목표 비중을 입력하면 결과가 표시됩니다." />}
