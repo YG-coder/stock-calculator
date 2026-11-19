@@ -165,7 +165,7 @@ export const CALCULATORS: CalculatorItem[] = [
   {
     href: "/us-stocks/exchange-profit",
     label: "환율 수익",
-    title: "환율 반영 수익 계산기",
+    title: "미국주식 환율 반영 수익 계산기",
     desc: "환율까지 반영한 실제 수익 확인",
     badge: "환율 분석",
     kind: "calculator",
