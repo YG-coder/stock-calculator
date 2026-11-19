@@ -5,6 +5,20 @@ export const SITE_NAME = SITE.name;
 export const BASE_URL = SITE.url;
 export const OG_IMAGE = "/og-image.png";
 
+const SITE_NAME_SUFFIX = ` | ${SITE_NAME}`;
+
+/**
+ * 공유 제목(og:title·twitter:title) 끝에 사이트명을 정확히 한 번 붙인다.
+ * 이미 붙어 있으면(여러 번 붙어 있어도) 한 번만 남기고, 제목 본문 안의 " | " 는 건드리지 않는다.
+ */
+export function withSiteNameSuffix(title: string): string {
+    let body = title.trim();
+    while (body.endsWith(SITE_NAME_SUFFIX)) {
+        body = body.slice(0, -SITE_NAME_SUFFIX.length).trimEnd();
+    }
+    return body && body !== SITE_NAME ? `${body}${SITE_NAME_SUFFIX}` : SITE_NAME;
+}
+
 type BuildMetadataParams = {
     title: string;
     description: string;
@@ -38,7 +52,7 @@ export function buildMetadata({
         },
 
         openGraph: {
-            title: `${title} | ${SITE_NAME}`,
+            title: withSiteNameSuffix(title),
             description,
             url,
             siteName: SITE_NAME,
@@ -56,7 +70,7 @@ export function buildMetadata({
 
         twitter: {
             card: "summary_large_image",
-            title: `${title} | ${SITE_NAME}`,
+            title: withSiteNameSuffix(title),
             description,
             images: [OG_IMAGE],
         },
@@ -74,11 +88,15 @@ export function buildMetadata({
  *
  * 이 래퍼가 없으면 Next.js 가 정의되지 않은 필드를 루트 레이아웃에서 상속하므로
  * canonical 이 홈(/)으로, twitter 카드가 홈 문구로 지정된다.
+ *
+ * shareTitleSiteName: true 이면 공유 제목(og:title·twitter:title) 끝에 사이트명을 한 번 붙인다.
+ * 계산기 상세 페이지가 buildMetadata 를 쓰는 페이지와 같은 형식이 되도록 쓰는 옵션이며,
+ * 검색용 <title>·공유 이미지 대체 텍스트·canonical 은 바꾸지 않는다. 홈·허브는 이 옵션을 쓰지 않는다.
  */
 export function withPageMetadata(
     meta: Metadata,
     path: string,
-    options: { imageAlt?: string } = {}
+    options: { imageAlt?: string; shareTitleSiteName?: boolean } = {}
 ): Metadata {
     const normalizedPath =
         !path || path === "/" ? "/" : path.startsWith("/") ? path : `/${path}`;
@@ -92,6 +110,9 @@ export function withPageMetadata(
     const baseTitle = typeof meta.title === "string" ? meta.title : undefined;
     const ogTitle = og?.title ?? baseTitle;
     const ogDescription = og?.description ?? meta.description ?? undefined;
+    // 페이지가 공유 제목을 따로 지정했으면(og.title) 그 문구에 사이트명을 붙인다.
+    const shareTitle =
+        options.shareTitleSiteName && ogTitle ? withSiteNameSuffix(ogTitle) : ogTitle;
 
     return {
         ...meta,
@@ -104,7 +125,7 @@ export function withPageMetadata(
             type: "website",
             locale: "ko_KR",
             siteName: SITE_NAME,
-            title: ogTitle,
+            title: shareTitle,
             description: ogDescription,
             url,
             images: [
@@ -118,7 +139,7 @@ export function withPageMetadata(
         },
         twitter: {
             card: "summary_large_image",
-            title: ogTitle,
+            title: shareTitle,
             description: ogDescription,
             images: [OG_IMAGE],
         },

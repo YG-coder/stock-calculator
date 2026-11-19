@@ -49,6 +49,31 @@ export function inspectHtml(html, config, expected) {
   for (const [tag, , body] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) if (attr(tag, 'type') === 'application/ld+json') { visit(JSON.parse(body)); jsonLdCount++; }
   return { canonical, og, images, twitter, cards, jsonLdCount, type: types[0], imageEntries };
 }
+/**
+ * 공유 제목 검사. og:title·twitter:title 이 각각 정확히 하나이고,
+ * 둘 다 " | 사이트명" 으로 끝나며 사이트명 접미사가 중복되지 않아야 한다.
+ */
+export function inspectShareTitles(html, siteName, expected) {
+  const found = { 'og:title': [], 'twitter:title': [] };
+  for (const [tag] of html.matchAll(/<meta\b[^>]*>/gi)) {
+    const key = attr(tag, 'property') ?? attr(tag, 'name');
+    if (key in found) found[key].push(attr(tag, 'content'));
+  }
+  const suffix = ` | ${siteName}`;
+  for (const [key, values] of Object.entries(found)) {
+    assert.equal(values.length, 1, `${expected}: ${key} count`);
+    const value = values[0] ?? '';
+    assert(value.endsWith(suffix), `${expected}: ${key} must end with "${suffix}" — ${value}`);
+    const body = value.slice(0, -suffix.length);
+    assert(body.trim().length > 0, `${expected}: ${key} has no page title — ${value}`);
+    assert(!body.includes(siteName), `${expected}: ${key} repeats the site name — ${value}`);
+  }
+  return { ogTitle: found['og:title'][0], twitterTitle: found['twitter:title'][0] };
+}
+/** src/lib/constants.ts 원문에서 계산기 상세 경로(kind: "calculator")를 읽는다. 허브는 제외한다. */
+export function calculatorDetailPaths(constantsSource) {
+  return [...constantsSource.matchAll(/\{\s*href:\s*"([^"]+)"[^}]*?kind:\s*"(\w+)"/g)].filter(m => m[2] === 'calculator').map(m => m[1]);
+}
 export function inspectRobots(text, config) {
   const values = (key) => [...text.matchAll(new RegExp(`^${key}: (.+)$`, 'gmi'))].map(m => m[1].trim());
   const maps = values('Sitemap'); assert(maps.length, 'robots Sitemap missing');

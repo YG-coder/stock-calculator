@@ -7,7 +7,7 @@ import { calculatorPages } from "@/lib/calculatorPages";
 import { withPageMetadata } from "@/lib/metadata";
 const config = calculatorPages["crypto-average-calculator"];
 
-export const metadata: Metadata = withPageMetadata(config.metadata, "/crypto/average");
+export const metadata: Metadata = withPageMetadata(config.metadata, "/crypto/average", { shareTitleSiteName: true });
 
 export default function CryptoAveragePage() {
     return (

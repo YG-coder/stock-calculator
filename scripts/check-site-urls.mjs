@@ -6,7 +6,7 @@ const ts = createRequire(import.meta.url)('typescript');
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { domainToUnicode } from 'node:url';
-import { assertImageSize, inspectHtml, inspectRobots, isIndexableHtml, siteUrl, xmlText } from './site-url-checks.mjs';
+import { assertImageSize, calculatorDetailPaths, inspectHtml, inspectRobots, inspectShareTitles, isIndexableHtml, siteUrl, xmlText } from './site-url-checks.mjs';
 const config = JSON.parse(readFileSync('src/lib/site.config.json', 'utf8'));
 assert.equal(config.url, new URL(config.url).origin); assert(/^[\x00-\x7f]+$/.test(config.url), 'ASCII origin required');
 assert.equal(new URL(config.displayUrl).origin, config.url); assert.equal(new URL(config.url).hostname, new URL(config.displayUrl).hostname);
@@ -33,6 +33,13 @@ for (const [relative, file] of output.html) {
   inspectCopy(html,expected,config.copyIdentifierAllowlist ?? []);
   [...checked.images,...checked.twitter].forEach(value=>images.add(value)); imageEntries.push(...checked.imageEntries.map(e => ({ ...e, page: expected })));
   indexablePages++;
+}
+// 계산기 상세 페이지의 공유 제목: og:title·twitter:title 이 각각 하나이고 " | 사이트명" 이 한 번만 붙어야 한다.
+const calculatorPaths = calculatorDetailPaths(readFileSync('src/lib/constants.ts', 'utf8'));
+assert(calculatorPaths.length, 'no calculator detail paths found in src/lib/constants.ts');
+for (const path of calculatorPaths) {
+  const file = output.file(`${path.slice(1)}.html`); assert(existsSync(file), `calculator HTML missing: ${path}`);
+  inspectShareTitles(readFileSync(file, 'utf8'), config.name, path);
 }
 inspectRobots(readFileSync(output.file('robots.txt.body'), 'utf8'), config);
 const assetFile = (value) => {
@@ -64,4 +71,4 @@ function scan(dir) {
   }
 }
 scan('src');
-console.log(`[site URLs] ${urls.length} sitemap pages / ${indexablePages} indexable pages: canonical/origin, og:type, OG/Twitter images, large cards, robots, JSON-LD, image assets and declared image sizes on ${sizedPages.size} pages verified`);
+console.log(`[site URLs] ${urls.length} sitemap pages / ${indexablePages} indexable pages: canonical/origin, og:type, OG/Twitter images, large cards, robots, JSON-LD, image assets and declared image sizes on ${sizedPages.size} pages verified; share titles end with the site name once on ${calculatorPaths.length} calculator pages`);

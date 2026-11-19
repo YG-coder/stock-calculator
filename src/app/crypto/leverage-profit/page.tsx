@@ -7,7 +7,7 @@ import { calculatorPages } from "@/lib/calculatorPages";
 import { withPageMetadata } from "@/lib/metadata";
 const config = calculatorPages["crypto-leverage-profit-calculator"];
 
-export const metadata: Metadata = withPageMetadata(config.metadata, "/crypto/leverage-profit");
+export const metadata: Metadata = withPageMetadata(config.metadata, "/crypto/leverage-profit", { shareTitleSiteName: true });
 
 export default function CryptoLeverageProfitPage() {
     return (

@@ -7,7 +7,7 @@ import { calculatorPages } from "@/lib/calculatorPages";
 import { withPageMetadata } from "@/lib/metadata";
 const config = calculatorPages["crypto-liquidation-calculator"];
 
-export const metadata: Metadata = withPageMetadata(config.metadata, "/crypto/liquidation");
+export const metadata: Metadata = withPageMetadata(config.metadata, "/crypto/liquidation", { shareTitleSiteName: true });
 
 export default function CryptoLiquidationPage() {
     return (

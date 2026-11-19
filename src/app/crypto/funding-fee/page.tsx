@@ -7,7 +7,7 @@ import { calculatorPages } from "@/lib/calculatorPages";
 import { withPageMetadata } from "@/lib/metadata";
 const config = calculatorPages["crypto-funding-fee-calculator"];
 
-export const metadata: Metadata = withPageMetadata(config.metadata, "/crypto/funding-fee");
+export const metadata: Metadata = withPageMetadata(config.metadata, "/crypto/funding-fee", { shareTitleSiteName: true });
 
 export default function CryptoFundingFeePage() {
     return (

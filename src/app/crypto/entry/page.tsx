@@ -7,7 +7,7 @@ import { calculatorPages } from "@/lib/calculatorPages";
 import { withPageMetadata } from "@/lib/metadata";
 const config = calculatorPages["crypto-entry-calculator"];
 
-export const metadata: Metadata = withPageMetadata(config.metadata, "/crypto/entry");
+export const metadata: Metadata = withPageMetadata(config.metadata, "/crypto/entry", { shareTitleSiteName: true });
 
 export default function CryptoEntryPage() {
     return (

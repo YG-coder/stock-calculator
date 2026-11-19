@@ -9,7 +9,7 @@ import { calculatorPages } from "@/lib/calculatorPages";
 import { withPageMetadata } from "@/lib/metadata";
 const config = calculatorPages["us-dividend-calculator"];
 
-export const metadata: Metadata = withPageMetadata(config.metadata, "/us-stocks/dividend");
+export const metadata: Metadata = withPageMetadata(config.metadata, "/us-stocks/dividend", { shareTitleSiteName: true });
 
 export default function USDividendPage() {
     return (

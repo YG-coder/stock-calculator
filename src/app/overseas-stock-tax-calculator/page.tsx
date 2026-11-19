@@ -38,7 +38,7 @@ const EX_A = example(5_000_000);
 const EX_B = OVERSEAS_TAX_BASIC;
 const wonStr = (v: string) => Number(v).toLocaleString("ko-KR");
 
-export const metadata: Metadata = withPageMetadata(config.metadata, "/overseas-stock-tax-calculator");
+export const metadata: Metadata = withPageMetadata(config.metadata, "/overseas-stock-tax-calculator", { shareTitleSiteName: true });
 
 const FAQ_ITEMS = [
   { question: "해외주식 양도소득세는 얼마인가요?", answer: `기본공제 ${withParticle(DEDUCTION, "을/를")} 초과한 양도차익에 대해 ${RATE}의 세율이 적용됩니다. 예를 들어 수익이 ${manwon(EX_A.gain)}이면 ${manwon(EX_A.taxable)}에 대해 ${RATE}인 ${manwon(EX_A.tax)}의 세금이 발생합니다. (${OVERSEAS_STOCK_TAX.rateBreakdown}, ${TAX_BASIS_YEAR}년 기준)` },
