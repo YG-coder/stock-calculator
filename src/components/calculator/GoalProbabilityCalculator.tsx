@@ -1,4 +1,5 @@
 "use client";
+import { SIMULATION_VOLATILITY_HELP } from "@/lib/calculatorHelp";
 import { requiredNumber } from "@/lib/uiInput";
 import { normalizePercentInput, percentLabelForRatio } from "@/lib/number";
 
@@ -43,7 +44,7 @@ export default function GoalProbabilityCalculator() {
         <InputField id="goal-initial" label="현재 투자금" type="number" value={fields.initialBalance} onChange={(e) => set("initialBalance", e.target.value)} unit="원" placeholder="예: 10000000" />
         <InputField id="goal-monthly" label="현재 월 투자금" type="number" value={fields.monthlyAmount} onChange={(e) => set("monthlyAmount", e.target.value)} unit="원" placeholder="예: 500000" />
         <InputField id="goal-return" label="연평균 수익률 (CAGR)" type="number" value={fields.expectedReturn} onChange={(e) => set("expectedReturn", e.target.value)} unit="%" placeholder="예: 7" hint="이 투자가 1년에 평균 몇 %씩 불어난다고 가정할지 정합니다." help="예를 들어 7을 넣으면 ‘매년 7%씩 복리로 불어난다고 치고’ 계산합니다. 매년 정확히 7%가 난다는 뜻이 아니라 긴 기간의 평균이 7%라는 가정입니다.\n\n이 값을 올리면 예상 결과가 전체적으로 커집니다. 실제 수익률은 알 수 없으므로 값을 바꿔가며 결과가 얼마나 달라지는지 보는 용도로 쓰는 편이 낫습니다." />
-        <InputField id="goal-volatility" label="수익률이 흔들리는 정도 (변동성)" type="number" value={fields.volatility} onChange={(e) => set("volatility", e.target.value)} unit="%" placeholder="예: 15" hint="수익률이 해마다 얼마나 출렁이는지 정합니다. 이 값이 이 계산기의 핵심입니다." help="0을 넣으면 매년 똑같은 수익률이 나서 일반 복리 계산기와 결과가 같아집니다. 15를 넣으면 어떤 해는 크게 오르고 어떤 해는 떨어지는 상황을 만들어 계산합니다. 그래서 결과가 하나의 숫자가 아니라 범위로 나옵니다.\n\n이 값을 올리면 결과의 폭이 넓어집니다. 좋은 쪽 결과도 커지지만 나쁜 쪽은 더 나빠지고 목표를 넘지 못할 가능성도 함께 커집니다." />
+        <InputField id="goal-volatility" label="수익률이 흔들리는 정도 (변동성)" type="number" value={fields.volatility} onChange={(e) => set("volatility", e.target.value)} unit="%" placeholder="예: 15" hint="수익률이 해마다 얼마나 출렁이는지 정합니다. 이 값이 이 계산기의 핵심입니다." help={SIMULATION_VOLATILITY_HELP} />
         <InputField id="goal-inflation" label="연 물가상승률" type="number" value={fields.inflation} onChange={(e) => set("inflation", e.target.value)} unit="%" placeholder="예: 2" hint="물가가 매년 얼마나 오른다고 볼지 정합니다." help="20년 뒤의 1억 원은 지금의 1억 원과 가치가 다릅니다. 이 값을 넣으면 결과를 지금 돈으로 치면 얼마인지로 바꿔 보여줍니다.\n\n한국은행의 중기 물가안정목표는 연 2%입니다. 실제 상승률은 시기에 따라 이보다 높을 수 있으니 값을 올려서도 확인해 보세요. 이 값을 올리면 물가를 반영한 결과가 작아집니다." />
         
         

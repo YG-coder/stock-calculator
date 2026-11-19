@@ -5,6 +5,9 @@ export type CalculatorHelpCopy = {
   example: string;
 };
 
+export const SIMULATION_VOLATILITY_HELP =
+  "변동성을 0%로 두면 모든 시나리오에 같은 수익률이 적용돼 최종 자산도 같습니다. 변동성을 높이면 시나리오마다 수익률이 달라져 최종 자산의 범위가 넓어질 수 있습니다.";
+
 export const CALCULATOR_HELP_BY_PATH: Readonly<Record<string, CalculatorHelpCopy>> = {
   "/average-price-calculator": {
     what: "같은 종목을 여러 가격에 추가 매수했을 때 전체 매수 단가가 얼마가 되는지 계산합니다.",
@@ -31,9 +34,9 @@ export const CALCULATOR_HELP_BY_PATH: Readonly<Record<string, CalculatorHelpCopy
     example: "100주, 주당 배당금 1,000원, 평균 매수가 50,000원",
   },
   "/overseas-stock-tax-calculator": {
-    what: "해외주식을 팔아 얻은 연간 손익을 합산해 예상 양도소득세를 계산합니다.",
-    input: "해당 연도의 총 매수 금액, 총 매도 금액과 적용할 기본공제를 원화로 입력하세요.",
-    read: "총 매도 금액에서 총 매수 금액을 뺀 손익에 기본공제를 적용해 예상 세액을 보여줍니다.",
+    what: "입력한 해외주식 매수 금액과 매도 금액의 차이에서 기본공제를 뺀 뒤 예상 양도소득세를 계산합니다.",
+    input: "매도한 주식의 매수 금액과 매도 금액을 각각 거래 당시 환율로 원화 환산해 입력하세요. 기본공제는 이번 계산에 적용할 금액을 넣으세요.",
+    read: "결과는 입력한 거래 기준입니다. 연간 손익을 확인하려면 다른 증권사 계좌를 포함해 같은 해에 매도한 해외주식의 이익과 손실을 직접 합산하세요.",
     example: "총 매수 금액 1,000만 원, 총 매도 금액 1,500만 원, 기본공제 250만 원",
   },
   "/position-size-calculator": {

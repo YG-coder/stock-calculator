@@ -42,6 +42,11 @@ export type CalculatorPageConfig = {
     related?: RelatedLink[];
 };
 
+export const DOMESTIC_STOCK_TAX_FAQ = {
+    question: "국내주식도 같은 방식으로 계산하나요?",
+    answer: "국내 상장주식은 소액주주가 장내에서 팔면 양도소득세가 부과되지 않습니다. 같은 주식을 장외에서 팔면 과세 대상이며, 대주주는 장내에서 팔아도 과세 대상입니다. 비상장주식은 원칙적으로 과세됩니다. 다만 2018년 1월 1일 이후 소액주주가 K-OTC에서 중소·중견기업 주식을 양도한 경우에는 과세 대상에서 제외됩니다.",
+};
+
 export const calculatorPages: Record<string, CalculatorPageConfig> = {
     "compound-interest-calculator": {
         slug: "compound-interest-calculator",
@@ -139,7 +144,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
         articleIntro:
             "해외주식 매매 시 발생하는 양도차익에 대해 예상 세금과 실제 세후 수익을 계산하는 도구입니다.",
         articleBody:
-            `해외주식은 국내주식과 달리 양도소득세 계산이 중요합니다. 기본공제 ${withParticle(OVERSEAS_STOCK_TAX.basicDeductionDisplay, "을/를")} 반영한 뒤 과세 대상 수익에 ${OVERSEAS_STOCK_TAX.rateDisplay} 세율을 적용하면 실제로 얼마가 남는지 확인할 수 있습니다.`,
+            "입력한 매수 금액과 매도 금액의 차이에서 기본공제를 뺀 뒤 예상 양도소득세와 세후 손익을 계산합니다.",
         formulaTitle: "해외주식 세금 계산 기본 개념",
         formula: `과세 대상 수익 = 총 수익 - 기본공제 / 세금 = 과세 대상 수익 × ${OVERSEAS_STOCK_TAX.rateDisplay}`,
         formulaDescription:
@@ -155,11 +160,7 @@ export const calculatorPages: Record<string, CalculatorPageConfig> = {
                 answer:
                     "네, 환율 변동 손익도 과세 대상 양도차익에 포함됩니다. 매수 금액과 매도 금액을 각각 그 시점 환율로 환산한 실제 원화 금액으로 입력하면 환율 변동 효과가 자동으로 반영되므로, 별도로 환차익을 더할 필요는 없습니다.",
             },
-            {
-                question: "국내주식도 같은 방식으로 계산하나요?",
-                answer:
-                    "아니요. 일반 개인투자자의 국내주식 매매차익은 보통 과세되지 않으며, 해외주식과 세금 구조가 다릅니다.",
-            },
+            DOMESTIC_STOCK_TAX_FAQ,
         ],
         related: [
             {

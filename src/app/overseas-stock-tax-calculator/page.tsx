@@ -4,7 +4,7 @@ import Link from "next/link";
 import SourceNote from "@/components/ui/SourceNote";
 import { OVERSEAS_STOCK_TAX, TAX_BASIS_YEAR, TAX_REVIEWED_AT } from "@/lib/taxRates";
 import OverseasStockTaxCalculator from "@/components/calculator/OverseasStockTaxCalculator";
-import { calculatorPages } from "@/lib/calculatorPages";
+import { calculatorPages, DOMESTIC_STOCK_TAX_FAQ } from "@/lib/calculatorPages";
 import { withPageMetadata } from "@/lib/metadata";
 import CalculatorJsonLd from "@/components/seo/CalculatorJsonLd";
 import {
@@ -43,7 +43,7 @@ export const metadata: Metadata = withPageMetadata(config.metadata, "/overseas-s
 const FAQ_ITEMS = [
   { question: "해외주식 양도소득세는 얼마인가요?", answer: `기본공제 ${withParticle(DEDUCTION, "을/를")} 초과한 양도차익에 대해 ${RATE}의 세율이 적용됩니다. 예를 들어 수익이 ${manwon(EX_A.gain)}이면 ${manwon(EX_A.taxable)}에 대해 ${RATE}인 ${manwon(EX_A.tax)}의 세금이 발생합니다. (${OVERSEAS_STOCK_TAX.rateBreakdown}, ${TAX_BASIS_YEAR}년 기준)` },
   { question: "환차익도 과세 대상인가요?", answer: "네, 해외주식 매매 시 환율 변동으로 발생한 손익도 과세 대상 양도차익에 포함됩니다. 이 계산기는 매수 금액과 매도 금액을 각각 그 시점 환율로 환산한 실제 원화 금액으로 입력받으므로, 환율 변동 효과는 두 금액의 차이에 자동으로 반영됩니다. 따라서 별도로 환차익을 더해 입력할 필요는 없습니다." },
-  { question: "국내주식도 같은 방식으로 계산하나요?", answer: "아니요. 일반 개인투자자의 국내주식 매매차익은 현재 비과세입니다. 해외주식은 양도소득세 대상이므로 세금 구조가 다릅니다." },
+  DOMESTIC_STOCK_TAX_FAQ,
   { question: "손익 통산은 어떻게 하나요?", answer: "같은 해에 여러 해외주식 종목에서 수익과 손실이 모두 발생했다면, 이를 합산한 순수익에 기본공제를 적용합니다. 예를 들어 A종목 +700만, B종목 -200만이면 합산 수익은 500만 원이 됩니다." },
 ];
 
@@ -105,8 +105,8 @@ export default function OverseasStockTaxCalculatorPage() {
                             양도차익에 대한 예상 세금과 세후 실수익을 계산하는 도구입니다.
                         </p>
                         <p>
-                            국내 주식과 달리, 해외 주식은 연간 {DEDUCTION}의 기본공제를 초과하는 양도차익에
-                            대해 {RATE}의 세율이 적용됩니다. 따라서 수익이 클수록 세금 계산이 중요해집니다.
+                            이 계산기는 해외주식 매매차익에서 입력한 기본공제를 뺀 금액이 양수일 때
+                            {RATE}의 세율로 예상 세액을 계산합니다.
                         </p>
                     </Article>
 
@@ -176,6 +176,11 @@ export default function OverseasStockTaxCalculatorPage() {
               <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
             ))}
                 </FaqSection>
+                <p className="text-sm text-slate-600">
+                    국내주식 과세 범위는 국세청의{" "}
+                    <a className="underline" href="https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=8800&mi=12274">주식 양도소득세 세액계산요령</a>과{" "}
+                    <a className="underline" href="https://s.nts.go.kr/nts/na/ntt/selectNttInfo.do?nttSn=1353905">2026년 상반기 양도분 예정신고 안내</a>에서 확인할 수 있습니다.
+                </p>
 
                 <RelatedCalculators
                     links={[
