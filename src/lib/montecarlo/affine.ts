@@ -18,6 +18,9 @@
  *   들어가면 깨진다. 엔진이 clamped 를 감지하면 A/B 를 아예 만들지 않는다.
  */
 
+import { compare, div, floor, fromBigInt, fromInt, mul, parseNumberExact } from "@/lib/exactDecimal";
+import { normalizePercentInput } from "@/lib/number";
+
 export interface RequiredContributions {
   /** B_j > 0 인 경로들의 필요 납입액. 오름차순 정렬. */
   sorted: Float64Array;
@@ -79,22 +82,62 @@ export function countLessOrEqual(sorted: Float64Array, value: number): number {
 }
 
 /**
+ * 목표 달성에 필요한 **최소 성공 경로 수**. 목표가 어떤 형태로 왔는지에 따라 두 함수로 나눈다.
+ *
+ * 부동소수 한 가지 식으로는 둘 다 맞출 수 없다.
+ *  - ceil(p·n): 0.56 × 10000 = 5600.000000000001 → 5,601 (56% 에 한 경로를 더 요구)
+ *  - k / n ≥ p 를 화면 입력에 적용: 56.7 ÷ 100 = 0.5670000000000001 인데 5670 ÷ 10000 = 0.567 → 5,671
+ *  - ÷ 100 뒤에 십진 목표를 복원: 56.7 과 56.70000000000001 은 서로 다른 입력인데 ÷ 100 하면 같은 숫자가 되어
+ *    구분할 수 없다(뒤의 목표에 5,670개만 요구하게 된다).
+ * 일정한 오차를 빼거나 자릿수를 정해 반올림하는 방식은 가까운 두 목표를 합치므로 쓰지 않는다.
+ *
+ * 1) requiredSuccessCountForPercent — 사용자가 입력한 **퍼센트 문자열**이 있을 때.
+ *    k = ceil(퍼센트 × n ÷ 100) 을 문자열에서 읽은 정확한 유리수(BigInt)로 계산한다. 자릿수 손실이 없다.
+ *    n 은 실제 실행한 경로 수다(Worker 10,000경로든 대체 실행 2,000경로든 같은 규칙).
+ * 2) requiredSuccessCount — 숫자 비율을 직접 받을 때(내부 호출: 민감도 표의 0.5·0.7·0.8·0.9 등).
+ *    엔진과 probabilityForContribution 이 성공확률을 (성공 수 ÷ 경로 수)로 보고하므로, 같은 식으로
+ *    "k 개 성공 시 보고되는 확률이 p 이상인가"를 k / n ≥ p 로 판정한다. 엔진이 보고한 비율(예: 1 ÷ 300)을
+ *    그대로 목표로 넣으면 그 성공 수(1)가 나온다.
+ * 목표가 100% 를 넘으면 n 보다 큰 값을 돌려준다(도달 불가).
+ */
+export function requiredSuccessCountForPercent(percentText: string, n: number): number | null {
+  const normalized = normalizePercentInput(percentText);
+  const percent = normalized === null ? null : parseNumberExact(normalized);
+  if (percent === null) return null;
+  const exact = div(mul(percent, fromInt(n)), fromInt(100));
+  const whole = floor(exact);
+  const isInteger = compare(fromBigInt(whole), exact) === 0;
+  return Number(whole) + (isInteger ? 0 : 1);
+}
+
+export function requiredSuccessCount(p: number, n: number): number {
+  let k = Math.ceil(p * n);
+  while (k > 0 && (k - 1) / n >= p) k -= 1;
+  while (k <= n && k / n < p) k += 1;
+  return k;
+}
+
+/**
  * 목표 확률 p 를 만족하는 **최소** 월 납입액.
  *
- * 고정 경로가 없을 때는 계약 문서와 같은 식이 된다: 인덱스 ceil(p·N) − 1.
+ * 고정 경로가 없을 때는 필요 성공 수 번째로 작은 필요 납입액이다(대개 인덱스 ceil(p·N) − 1).
  * 고정 경로가 있으면 그만큼 필요한 순위가 줄어든다.
- *   필요 성공 수 k = ceil(p·N) − fixedSuccesses
+ *   필요 성공 수 k = (퍼센트 문자열이 있으면 requiredSuccessCountForPercent, 없으면 requiredSuccessCount) − fixedSuccesses
+ *
+ * @param percentText 사용자가 입력한 목표 퍼센트 문자열. 있으면 p 대신 이 값으로 필요 성공 수를 정한다.
  *   k ≤ 0            → 납입 없이도 목표 확률 달성 (0 반환)
  *   k > sorted.length → 어떤 납입액으로도 도달 불가 (null 반환)
  */
 export function requiredForProbability(
   rc: RequiredContributions,
-  p: number
+  p: number,
+  percentText?: string
 ): number | null {
   const n = rc.totalPaths;
   if (n === 0) return null;
   if (p <= 0) return 0;
-  const need = Math.ceil(p * n) - rc.fixedSuccesses;
+  const fromText = percentText === undefined ? null : requiredSuccessCountForPercent(percentText, n);
+  const need = (fromText ?? requiredSuccessCount(p, n)) - rc.fixedSuccesses;
   if (need <= 0) return 0;
   if (need > rc.sorted.length) return null;
   const c = rc.sorted[need - 1];

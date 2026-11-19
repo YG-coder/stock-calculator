@@ -5,6 +5,8 @@ import {
   countLessOrEqual,
   probabilityForContribution,
   requiredForProbability,
+  requiredSuccessCount,
+  requiredSuccessCountForPercent,
 } from "@/lib/montecarlo/affine";
 import { quantileSorted } from "@/lib/montecarlo/stats";
 import type { SimulationInput } from "@/lib/montecarlo/types";
@@ -206,5 +208,89 @@ describe("아핀 유틸 — 단위 테스트", () => {
     // c_j = 0..9 오름차순
     expect(requiredForProbability(rc, 0.9)).toBe(8); // 10번째 중 9번째 값
     expect(requiredForProbability(rc, 0.1)).toBe(0);
+  });
+
+  it("비율을 직접 넘기는 경로: 필요 성공 수는 k / n ≥ p 인 가장 작은 k 다 — 부동소수점 올림 오차 없이", () => {
+    // 고치기 전 식이 실제로 틀렸던 값
+    expect(Math.ceil(0.56 * 10_000)).toBe(5_601);
+    expect(requiredSuccessCount(0.56, 10_000)).toBe(5_600);
+    expect(requiredSuccessCount(56.00001 / 100, 10_000)).toBe(5_601);
+    expect(requiredSuccessCount(0.9, 10)).toBe(9);
+    expect(requiredSuccessCount(0.1, 10)).toBe(1);
+    expect(requiredSuccessCount(1, 10)).toBe(10);
+    expect(requiredSuccessCount(1.01, 10)).toBe(11); // 도달 불가
+    // 모든 경계: 정확히 k/n 이면 k 개, 그보다 조금이라도 높으면 k+1 개
+    for (const n of [10, 100, 1_000, 10_000]) {
+      for (let k = 1; k <= n; k++) {
+        expect(requiredSuccessCount(k / n, n)).toBe(k);
+        if (k < n) expect(requiredSuccessCount(k / n + 1e-9, n)).toBe(k + 1);
+        expect(requiredSuccessCount(k / n - 1e-9, n)).toBe(k);
+      }
+    }
+  });
+
+  it("비율 직접 경로: 엔진이 보고하는 비율(k ÷ n)을 목표로 넣으면 k 개다 (회귀: 1 ÷ 300 → 2)", () => {
+    expect(requiredSuccessCount(1 / 300, 300)).toBe(1);
+    for (const n of [3, 7, 300, 2_000, 9_999]) for (let k = 1; k <= n; k++) expect(requiredSuccessCount(k / n, n), `${k}/${n}`).toBe(k);
+  });
+
+  it("퍼센트 문자열 경로: 문자열 → 필요 성공 수 (회귀: 56.7 → 5,671, 56.70000000000001 → 5,670)", () => {
+    const fromText = (text: string, n: number) => requiredSuccessCountForPercent(text, n);
+    expect(fromText("56.7", 10_000)).toBe(5_670);
+    expect(fromText("56.70001", 10_000)).toBe(5_671);
+    expect(fromText("56.70000000000001", 10_000)).toBe(5_671);
+    expect(fromText("56", 10_000)).toBe(5_600);
+    expect(fromText("56.00001", 10_000)).toBe(5_601);
+    // 배정밀도보다 긴 입력도 자릿수 손실 없이 판정한다
+    expect(fromText("56.7000000000000000000000000001", 10_000)).toBe(5_671);
+    expect(fromText("56.6999999999999999999999999999", 10_000)).toBe(5_670);
+    expect(fromText("0.000000000000000000001", 10_000)).toBe(1);
+
+    // 0.01% 간격의 모든 목표(0.01% ~ 99.99%). 문자열과 기대 성공 수는 정수 i 에서 따로 만든다(부동소수 연산 없음).
+    const text2 = (i: number) => `${Math.floor(i / 100)}.${String(i % 100).padStart(2, "0")}`;
+    for (let i = 1; i <= 9_999; i++) {
+      const text = text2(i);
+      // 10,000경로: i/100 % × 10,000 ÷ 100 = i 개
+      expect(fromText(text, 10_000), `${text}% / 10,000`).toBe(i);
+      // 조금이라도 높은 목표는 한 경로 더 필요하다 — 두 목표가 합쳐지지 않는다
+      expect(fromText(`${text}001`, 10_000), `${text}001% / 10,000`).toBe(i + 1);
+      expect(fromText(`${text}000000000000001`, 10_000), `${text}000000000000001% / 10,000`).toBe(i + 1);
+      // 2,000경로(대체 실행): ceil(i / 5), 1,000경로: ceil(i / 10), 300경로: ceil(3i / 100) — 정수 나눗셈으로 산출
+      expect(fromText(text, 2_000), `${text}% / 2,000`).toBe(Math.floor((i + 4) / 5));
+      expect(fromText(text, 1_000), `${text}% / 1,000`).toBe(Math.floor((i + 9) / 10));
+      expect(fromText(text, 300), `${text}% / 300`).toBe(Math.floor((3 * i + 99) / 100));
+    }
+    // 표기만 다른 입력은 같은 값이고, 퍼센트 표기가 아니면 null
+    expect(fromText("56.70", 10_000)).toBe(5_670);
+    expect(fromText("056.7", 10_000)).toBe(5_670);
+    expect(fromText("100", 10)).toBe(10);
+    expect(fromText("100.1", 10)).toBe(11); // 도달 불가
+    for (const bad of ["", "-5", "1e-5", "abc"]) expect(fromText(bad, 10_000)).toBeNull();
+  });
+
+  it("requiredForProbability 는 퍼센트 문자열이 있으면 그 값으로 순위를 정한다", () => {
+    const n = 10_000;
+    const a = new Float64Array(n);
+    const b = new Float64Array(n).fill(1);
+    for (let i = 0; i < n; i++) a[i] = -(i + 1); // 필요 납입액 1..10,000 → k 번째 값이 k
+    const rc = buildRequiredContributions(a, b, 0);
+    const ratio = 56.7 / 100; // 두 입력 모두 이 비율이 된다
+    expect(Number("56.70000000000001") / 100).toBe(ratio);
+    expect(requiredForProbability(rc, ratio, "56.7")).toBe(5_670);
+    expect(requiredForProbability(rc, ratio, "56.70000000000001")).toBe(5_671);
+    expect(requiredForProbability(rc, 0.56)).toBe(5_600); // 문자열 없이 비율만
+    expect(requiredForProbability(rc, 5_670 / n)).toBe(5_670);
+  });
+
+  it("고정 성공 경로·납입 없이 달성·도달 불가 처리는 그대로다", () => {
+    // 10경로 중 고정 성공 3, 고정 실패 2, 가변 5 (필요 납입 1..5)
+    const a = Float64Array.from([10, 10, 10, -5, -5, -1, -2, -3, -4, -5]);
+    const b = Float64Array.from([0, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
+    const rc = buildRequiredContributions(a, b, 0);
+    expect(rc.fixedSuccesses).toBe(3);
+    expect(requiredForProbability(rc, 0.3)).toBe(0); // 고정 성공만으로 달성
+    expect(requiredForProbability(rc, 0.4)).toBe(1);
+    expect(requiredForProbability(rc, 0.8)).toBe(5);
+    expect(requiredForProbability(rc, 0.9)).toBeNull(); // 고정 실패 2개 때문에 80% 가 한계
   });
 });

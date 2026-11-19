@@ -1,8 +1,8 @@
 # MonteCarloEngine — 모형과 구현 문서
 
 - **문서 성격**: **현재 기준 문서.** 코드가 바뀌면 이 문서를 갱신한다.
-- **최종 갱신**: 2026-10-13 (엔진 1.1.0 — `recordMonths` 추가 반영)
-- **엔진 버전**: `1.1.0` — `ENGINE_VERSION` (`src/lib/montecarlo/types.ts`)
+- **최종 갱신**: 2026-11-19 (엔진 1.2.0 — 목표 확률 역산의 필요 성공 경로 수 계산 정정, `goal.targetProbabilityPercentText` 추가)
+- **엔진 버전**: `1.2.0` — `ENGINE_VERSION` (`src/lib/montecarlo/types.ts`)
 - **적용 범위**: 공개 계산기 4종이 이 엔진을 쓴다 — `/dca-calculator`, `/goal-probability-calculator`, `/fire-calculator`, `/sequence-risk-calculator`. `/dev/montecarlo` 는 개발 전용 검증 화면이다.
 - **선행 설계 문서(과거 기록)**: `2026-08-21-montecarlo-engine-contract.md`, `2026-08-22-montecarlo-implementation-plan.md`, `2026-08-22-portfolio-assumptions-design.md`, `2026-08-22-types-contract-final.md`
 
@@ -79,6 +79,7 @@ tests/montecarlo/*.test.ts         8파일 110테스트
 | `reportBasis` | — | `"nominal"` / `"real"` | 화면 권장 기본은 `real` |
 | `goal.targetAmount` | 원 | 목표 금액 | `reportBasis` 와 **같은 기준**으로 해석 |
 | `goal.targetProbability` | 0~1 | 목표 확률 | 주어지면 역산 수행 |
+| `goal.targetProbabilityPercentText` | 문자열 | 사용자가 입력한 목표 퍼센트(예: `"56.7"`) | 선택. 있으면 필요 성공 경로 수를 `ceil(퍼센트 × 실제 경로 수 ÷ 100)`으로 십진 유리수 계산. `Number(문자열) ÷ 100`이 `targetProbability`와 다르거나 `targetProbability` 없이 문자열만 오면 거부. 1.2.0 에서 추가 |
 | `recordMonths` | 개월 | 연 단위 그리드 외에 추가로 기록할 시점 | 선택. `0 ~ months` 범위 정수만 허용(벗어나면 거부). 1.1.0 에서 추가 |
 
 **입력 범위를 벗어나면 조용히 클램프하지 않고 거부한다.** 기존 계산기 감사에서 지적된
@@ -507,6 +508,20 @@ NaN·Infinity, 잘못된 구간·일시금 월, 소진 이후 처리 — 전부 
 
 2026-10-13 에 선택 필드 `SimulationInput.recordMonths`(추가 기록 시점)가 더해져 `ENGINE_VERSION` 이
 `1.1.0` 이 되었다. 역시 선택 필드라 기존 호출부와 기존 결과에 영향이 없다(§3).
+
+2026-11-19 에 목표 확률 역산의 **필요 성공 경로 수** 계산을 고치고 `ENGINE_VERSION` 을 `1.2.0` 으로 올렸다.
+이 변경은 같은 시드에서도 역산 금액(`inversion.requiredMonthlyAmount`)을 바꿀 수 있다.
+
+- 이전: `ceil(p·N)`. `0.56 × 10000 = 5600.000000000001` 이라 56% 목표에 5,601개를 요구했다
+  (10,000경로·재현 번호 1 사례에서 623,052원 제시, 실제 최소는 623,006원).
+- 숫자 비율만 받은 경우: `k / N ≥ p` 인 가장 작은 k. 엔진이 성공확률을 (성공 수 ÷ 경로 수)로 보고하는 식과 같다.
+- 선택 필드 `goal.targetProbabilityPercentText`(입력한 퍼센트 문자열)가 있으면 `ceil(퍼센트 × N ÷ 100)` 을
+  십진 유리수로 계산한다. 화면은 퍼센트를 100 으로 나눠 넘기는데, `56.7 ÷ 100 = 0.5670000000000001` 은
+  `5670 ÷ 10000 = 0.567` 과 다른 숫자이고, `56.7` 과 `56.70000000000001` 은 ÷ 100 하면 같은 숫자가 된다.
+  숫자만으로는 두 경우를 모두 맞출 수 없어 문자열을 엔진까지 전달한다. N 은 실제 실행한 경로 수다
+  (Worker 미지원 대체 실행의 2,000경로에도 같은 규칙).
+- 성공확률(`successProbability`)·밴드·최종 분포는 바뀌지 않는다. 목표달성확률 화면은 문자열을 넘기고,
+  민감도 표(50·70·80·90%)는 숫자 비율 경로를 쓴다.
 
 ---
 

@@ -1,6 +1,6 @@
 "use client";
 import { requiredNumber } from "@/lib/uiInput";
-import { percentLabelForRatio } from "@/lib/number";
+import { normalizePercentInput, percentLabelForRatio } from "@/lib/number";
 
 import { useCallback, useMemo, useState } from "react";
 import { AdvancedPanel, CalculatorCard, CalculatorLayout, InputEffectNote, InputField, PercentileNote, ResultCard, ResultDetail, ResultHighlight, ResultNote, SelectField, simulationIssueText } from "@/components/ui/Shared";
@@ -19,10 +19,10 @@ export default function GoalProbabilityCalculator() {
   const set = useCallback(<K extends keyof Fields>(key: K, value: Fields[K]) => { reset(); setFields((prev) => ({ ...prev, [key]: value })); }, [reset]);
   const values = useMemo<GoalProbabilityValues>(() => ({
     seed: Number(fields.seed), paths: Number(fields.paths), years: requiredNumber(fields.years), initialBalance: requiredNumber(fields.initialBalance), monthlyAmount: requiredNumber(fields.monthlyAmount), expectedReturnPercent: requiredNumber(fields.expectedReturn), volatilityPercent: requiredNumber(fields.volatility), inflationPercent: requiredNumber(fields.inflation), timing: "end", inflationIndexed: false, reportBasis: fields.reportBasis, targetAmount: requiredNumber(fields.targetAmount), targetProbabilityPercent: requiredNumber(fields.targetProbability),
+    // 입력한 퍼센트 문자열을 엔진까지 그대로 넘긴다. ÷ 100 한 숫자만으로는 56.7 과 56.70000000000001 을 구분할 수 없다.
+    targetProbabilityPercentText: normalizePercentInput(fields.targetProbability) ?? undefined,
   }), [fields]);
-  // 계산을 요청할 때 입력한 목표 퍼센트. 결과 라벨은 이 문자열을 그 결과의 비율과 대조한 뒤 그대로 표시한다.
-  const [requestedProbability, setRequestedProbability] = useState("");
-  const start = useCallback(() => { setRequestedProbability(fields.targetProbability); run(buildGoalProbabilityInput(values)); }, [fields.targetProbability, run, values]);
+  const start = useCallback(() => run(buildGoalProbabilityInput(values)), [run, values]);
   const inversion = result?.goal?.inversion;
   const required = inversion?.requiredMonthlyAmount;
   const executedMonthly = result?.input.cashFlow.monthlyAmount ?? 0;
@@ -62,7 +62,7 @@ export default function GoalProbabilityCalculator() {
     {result?.goal ? <>
       <CalculatorCard title="목표달성확률 결과" description={`${result.meta.pathsRun.toLocaleString("ko-KR")}개 시나리오 · ${result.meta.months / 12}년 · 결과 재현 번호 ${result.meta.seed}`}>
         <ResultHighlight label="현재 월 투자금의 목표 달성 시나리오 비율" value={pct(result.goal.successProbability)} />
-        {required !== undefined ? <div className="grid gap-4 sm:grid-cols-2"><ResultHighlight label={`${percentLabelForRatio(requestedProbability, result.input.goal?.targetProbability ?? 0)}% 시나리오 목표에 필요한 월 투자금`} value={won(required)} unit="원" tone="positive" /><ResultHighlight label="현재 대비 월 조정액" value={won(required - executedMonthly)} unit="원" tone={required > executedMonthly ? "negative" : "positive"} /></div> : null}
+        {required !== undefined ? <div className="grid gap-4 sm:grid-cols-2"><ResultHighlight label={`${percentLabelForRatio(result.input.goal?.targetProbabilityPercentText ?? "", result.input.goal?.targetProbability ?? 0)}% 시나리오 목표에 필요한 월 투자금`} value={won(required)} unit="원" tone="positive" /><ResultHighlight label="현재 대비 월 조정액" value={won(required - executedMonthly)} unit="원" tone={required > executedMonthly ? "negative" : "positive"} /></div> : null}
         <div className="grid gap-4 sm:grid-cols-2"><ResultDetail label="목표 금액" value={won(result.input.goal?.targetAmount ?? 0)} unit="원" /><ResultDetail label="중간 결과 (최종 자산 중앙값)" value={won(result.terminal.p50)} unit="원" /><ResultDetail label="역산 방식" value={inversion?.method === "linear-exact" ? "선형 정확 역산" : "미지원"} /><ResultDetail label="표시 기준" value={result.input.reportBasis === "real" ? "현재 가치" : "미래 금액"} /></div>
         <ResultNote><PercentileNote /><p>“80% 시나리오”는 미래 성공을 80% 보장한다는 뜻이 아니라, 입력한 가정과 결과 재현 번호로 만든 경로 중 목표를 넘은 비율입니다.</p></ResultNote>
       </CalculatorCard>

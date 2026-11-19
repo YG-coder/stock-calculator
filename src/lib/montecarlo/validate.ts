@@ -8,6 +8,7 @@
 
 import type { SimulationInput, ValidationIssue } from "./types";
 import { SIGMA_TABLE_U_MAX, maxVolatilityFor } from "./returns";
+import { normalizePercentInput } from "@/lib/number";
 
 export const LIMITS = {
   paths: { min: 1, max: 50_000 },
@@ -216,9 +217,20 @@ export function validateInput(input: SimulationInput): ValidationIssue[] {
       } else if (goal.targetProbability <= 0 || goal.targetProbability >= 1) {
         bad("goal.targetProbability", "목표 확률은 0과 1 사이여야 합니다.");
       }
+      if (goal.targetProbabilityPercentText !== undefined) {
+        const text = typeof goal.targetProbabilityPercentText === "string" ? normalizePercentInput(goal.targetProbabilityPercentText) : null;
+        if (text === null) {
+          bad("goal.targetProbabilityPercentText", "목표 퍼센트는 숫자와 소수점으로 된 값이어야 합니다.");
+        } else if (Number(text) / 100 !== goal.targetProbability) {
+          bad("goal.targetProbabilityPercentText", "목표 퍼센트 문자열이 목표 확률과 일치하지 않습니다.");
+        }
+      }
       if (input.cashFlow?.phases?.length) {
         bad("goal.targetProbability", "다단계 현금흐름의 필요 납입액 역산은 아직 지원하지 않습니다. 단일 현금흐름을 사용하세요.");
       }
+    } else if (goal.targetProbabilityPercentText !== undefined) {
+      // 문자열만 오면 역산이 조용히 생략된다. 문자열은 목표 확률 숫자와 함께만 받는다.
+      bad("goal.targetProbabilityPercentText", "목표 비율을 확인할 수 없습니다. 목표 비율을 다시 입력해 주세요.");
     }
   }
 

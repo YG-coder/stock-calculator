@@ -7,15 +7,16 @@
  * - docs/2026-08-22-types-contract-final.md       (이름 확정본)
  * - docs/2026-08-22-portfolio-assumptions-design.md (입력 계층)
  *
- * 이 파일에서 계약 문서 대비 "추가"된 것은 아래 4가지뿐이며, 모두 가산적이라
+ * 이 파일에서 계약 문서 대비 "추가"된 것은 아래 5가지뿐이며, 모두 가산적이라
  * 기존 계약을 깨지 않는다.
  *   1) RunMeta.warnings    — 결과에 동봉하는 경고 목록
  *   2) ValidationIssue     — 입력 거부 사유의 구조화
  *   3) ProgressFn / RunOptions / SimulationRunner 진입점 시그니처
  *   4) SimulationInput.recordMonths — 연 단위 그리드 밖의 추가 기록 시점(1.1.0)
+ *   5) GoalSpec.targetProbabilityPercentText — 입력한 목표 퍼센트 문자열(1.2.0)
  */
 
-export const ENGINE_VERSION = "1.1.0";
+export const ENGINE_VERSION = "1.2.0";
 
 /* ============================================================
    입력
@@ -113,6 +114,15 @@ export interface GoalSpec {
   targetAmount?: number;
   /** 목표 확률(0~1). 주어지면 역산을 수행한다. */
   targetProbability?: number;
+  /**
+   * 사용자가 입력한 목표 퍼센트 문자열(예: "56.7"). 계약 문서 대비 추가된 필드(1.2.0).
+   * 있으면 역산에 필요한 성공 경로 수를 이 문자열과 실제 실행 경로 수로 정확히 계산한다
+   * (ceil(퍼센트 × 경로 수 ÷ 100), 십진 유리수). 56.7 과 56.70000000000001 은 ÷ 100 하면 같은
+   * targetProbability 가 되므로 숫자만으로는 구분할 수 없다. Number(문자열) ÷ 100 이 targetProbability 와
+   * 같아야 하며 다르면 입력을 거부한다. targetProbability 없이 이 문자열만 넘겨도 거부한다.
+   * 없으면 targetProbability 를 (성공 수 ÷ 경로 수)와 직접 비교한다.
+   */
+  targetProbabilityPercentText?: string;
 }
 
 /* ============================================================

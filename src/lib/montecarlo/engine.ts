@@ -242,7 +242,8 @@ export function createRunner(input: SimulationInput): SimulationRunner {
           ? targetReal * Math.pow(1 + inflationRate, months / 12)
           : targetReal;
       const rc = buildRequiredContributions(affine.A, affine.B, targetNominal);
-      const required = requiredForProbability(rc, goal.targetProbability);
+      // 입력한 퍼센트 문자열이 있으면 그 값과 실제 실행 경로 수로 필요 성공 수를 정한다.
+      const required = requiredForProbability(rc, goal.targetProbability, goal.targetProbabilityPercentText);
       if (required !== null) {
         goalResult.inversion = {
           requiredMonthlyAmount: required,

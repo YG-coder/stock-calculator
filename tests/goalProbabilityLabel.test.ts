@@ -61,6 +61,24 @@ describe("목표달성확률 결과 라벨 = 계산을 요청할 때 입력한 �
   });
 });
 
+describe("목표달성확률 결과 화면의 최소 월 투자금 (회귀: 56% 에 623,052원, 56.7% 에 627,394원, 56.70000000000001% 에 627,298원 제시)", () => {
+  // 목표 1억, 초기 1,000만, 월 50만, 10년, 7%/15%/물가 2%, 현재가치·월말 고정 납입(화면 기본값), 10,000경로, 재현 번호 1
+  for (const [input, amount] of [["56", "623,006"], ["56.00001", "623,052"], ["56.7", "627,298"], ["56.70001", "627,394"], ["56.70000000000001", "627,394"]] as const) {
+    it(`목표 ${input}% → 화면에 ${amount}원`, () => {
+      hookState.current = idle();
+      const h = uiHarness(GoalProbabilityCalculator);
+      const inputs: Record<string, string> = {
+        "goal-target": "100000000", "goal-probability": input, "goal-years": "10", "goal-initial": "10000000",
+        "goal-monthly": "500000", "goal-return": "7", "goal-volatility": "15", "goal-inflation": "2", "goal-paths": "10000", "goal-seed": "1",
+      };
+      for (const [id, value] of Object.entries(inputs)) h.change(id, value);
+      clickRun(h);
+      const text = visibleCopy(h.html()).replace(/\s+/g, " ");
+      expect(text).toContain(`${input}% 시나리오 목표에 필요한 월 투자금 ${amount} `);
+    });
+  }
+});
+
 describe("퍼센트 표기 함수", () => {
   it("normalizePercentInput 은 값을 바꾸지 않고 표기만 정리한다", () => {
     for (const [input, text] of [[" 058.50 ", "58.5"], [".5", "0.5"], ["80.", "80"], ["0", "0"], ["000", "0"], [TINY, TINY], [LONG, LONG]] as const) expect(normalizePercentInput(input)).toBe(text);
