@@ -230,7 +230,7 @@ export const CALCULATORS: CalculatorItem[] = [
   {
     href: "/crypto/average",
     label: "코인 물타기",
-    title: "코인 물타기 계산기",
+    title: "코인 물타기·불타기 계산기",
     desc: "평균 단가 및 총 매수 금액 계산",
     badge: "평균 단가",
     kind: "calculator",
