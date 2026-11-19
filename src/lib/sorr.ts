@@ -59,7 +59,22 @@ export interface SorrSimulationValues {
   expectedReturnPercent: number; volatilityPercent: number; inflationPercent: number;
 }
 
+/**
+ * 월 생활비 입력 검사. 생활비는 자산에서 꺼내 쓰는 금액이라 엔진에는 부호를 뒤집어(음수 현금흐름) 넘긴다.
+ * 음수 생활비를 그대로 넘기면 매달 입금으로 계산되므로 엔진에 전달하기 전에 막는다.
+ * 공통 엔진은 적립(양수)·인출(음수)을 모두 받으므로 이 조건은 순서 위험 계산기에만 둔다.
+ * 빈칸·숫자가 아닌 값은 여기서 판정하지 않는다(엔진 입력 검증이 안내한다). 명시적 0은 허용한다.
+ */
+export const SORR_NEGATIVE_WITHDRAWAL_MESSAGE =
+  "월 생활비는 0원 이상이어야 합니다. 생활비는 자산에서 꺼내 쓰는 금액이라 음수를 넣으면 입금으로 계산됩니다.";
+
+export function sorrWithdrawalIssue(monthlyWithdrawal: number): string | null {
+  return monthlyWithdrawal < 0 ? SORR_NEGATIVE_WITHDRAWAL_MESSAGE : null;
+}
+
 export function buildSorrSimulationInput(values: SorrSimulationValues): SimulationInput {
+  // 화면이 먼저 막지만, 다른 호출 경로에서도 음수 생활비가 입금으로 바뀌지 않게 한다.
+  if (values.monthlyWithdrawal < 0) throw new Error(SORR_NEGATIVE_WITHDRAWAL_MESSAGE);
   return {
     seed: values.seed, paths: values.paths, months: Math.round(values.years * 12), initialBalance: values.initialAssets,
     cashFlow: { monthlyAmount: -values.monthlyWithdrawal, timing: "start", inflationIndexed: true },
