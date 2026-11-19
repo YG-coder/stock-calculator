@@ -5,13 +5,25 @@ import { CALCULATORS } from "@/lib/constants";
 import { buildMetadata, SITE_NAME, withPageMetadata, withSiteNameSuffix } from "@/lib/metadata";
 import { calculatorDetailPaths, inspectShareTitles } from "../scripts/site-url-checks.mjs";
 
-// 계산기 상세 페이지의 공유 제목(og:title·twitter:title)은 페이지별 제목 뒤에 " | 사이트명" 이 정확히 한 번 붙는다.
+// 계산기 상세 페이지의 공유 제목(og:title·twitter:title)은 끝에 " | 사이트명" 접미사가 정확히 한 번 붙는다.
+// 규칙은 ‘끝의 접미사’만 본다: 접미사를 한 번 떼어 낸 본문이 비어 있거나 같은 접미사로 또 끝나면 안 된다.
+// 본문 중간의 사이트명과 " | " 구분자는 허용하고, 공유 제목 문구는 검색 제목과 달라도 된다.
 // 검색용 <title>, 공유 이미지 대체 텍스트, canonical 은 이 규칙의 대상이 아니다.
 const SUFFIX = ` | ${SITE_NAME}`;
 type Share = { title?: unknown; images?: { alt?: string }[] };
 const og = (meta: Metadata) => meta.openGraph as Share;
 const twitter = (meta: Metadata) => meta.twitter as Share;
-const count = (text: string, part: string) => text.split(part).length - 1;
+/** 끝의 접미사 규칙: 접미사로 끝나고, 한 번 떼어 낸 본문이 비어 있지 않으며 같은 접미사로 또 끝나지 않는다. */
+function expectSuffixOnce(shareTitle: unknown, label: string) {
+  const value = String(shareTitle);
+  expect(value.endsWith(SUFFIX), `${label}: 접미사로 끝나야 한다 — ${value}`).toBe(true);
+  const body = value.slice(0, -SUFFIX.length);
+  expect(body.trim(), `${label}: 제목 본문이 비어 있다 — ${value}`).not.toBe("");
+  expect(body.trimEnd().endsWith(SUFFIX), `${label}: 접미사가 연속으로 붙었다 — ${value}`).toBe(false);
+}
+const shareHtml = (ogTitle: string, twitterTitle = ogTitle) => `<meta property="og:title" content="${ogTitle}"/><meta name="twitter:title" content="${twitterTitle}"/>`;
+/** 메타데이터 생성 결과를 공유 태그 HTML 로 옮긴다(빌드 산출물 검사에 넣기 위한 테스트용). */
+const shareHtmlOf = (meta: Metadata) => shareHtml(String(og(meta).title), String(twitter(meta).title));
 
 describe("withSiteNameSuffix — 사이트명 접미사는 한 번만", () => {
   it("접미사가 없으면 붙인다", () => {
@@ -37,6 +49,29 @@ describe("withPageMetadata — shareTitleSiteName 옵션", () => {
     const out = withPageMetadata(meta, "/example", { shareTitleSiteName: true });
     expect(og(out).title).toBe(`공유 전용 제목 | 부제${SUFFIX}`);
     expect(twitter(out).title).toBe(`공유 전용 제목 | 부제${SUFFIX}`);
+  });
+  it("검색 제목과 다른 공유 제목: 두 공유 태그는 공유용 문구를 쓰고 검색 제목은 그대로다", () => {
+    const out = withPageMetadata({ title: "검색용 제목", description: "설명", openGraph: { title: "공유용 제목 | 부제" } }, "/example", { shareTitleSiteName: true });
+    expect(og(out).title).toBe("공유용 제목 | 부제 | 주식계산기.kr");
+    expect(twitter(out).title).toBe("공유용 제목 | 부제 | 주식계산기.kr");
+    expect(out.title).toBe("검색용 제목");
+    expectSuffixOnce(og(out).title, "og:title");
+    expectSuffixOnce(twitter(out).title, "twitter:title");
+    // 같은 결과가 빌드 산출물 검사도 통과한다
+    expect(inspectShareTitles(shareHtmlOf(out), SITE_NAME, "/example")).toEqual({ ogTitle: "공유용 제목 | 부제 | 주식계산기.kr", twitterTitle: "공유용 제목 | 부제 | 주식계산기.kr" });
+  });
+  it("본문에 사이트명이나 부제가 있는 공유 제목도 접미사는 끝에 한 번만 붙고 양쪽 검사를 통과한다", () => {
+    for (const [body, expected] of [
+      ["주식계산기.kr 사용법", "주식계산기.kr 사용법 | 주식계산기.kr"],
+      ["수익률 계산기 | 사용 예시", "수익률 계산기 | 사용 예시 | 주식계산기.kr"],
+    ]) {
+      const out = withPageMetadata({ title: "검색용 제목", openGraph: { title: body } }, "/example", { shareTitleSiteName: true });
+      expect(og(out).title).toBe(expected);
+      expect(twitter(out).title).toBe(expected);
+      expectSuffixOnce(og(out).title, "og:title");
+      expectSuffixOnce(twitter(out).title, "twitter:title");
+      expect(inspectShareTitles(shareHtmlOf(out), SITE_NAME, "/example").ogTitle).toBe(expected);
+    }
   });
   it("공유 제목을 지정하지 않았으면 페이지 제목에 접미사를 붙인다", () => {
     const out = withPageMetadata({ title: "검색 제목 | 부제", description: "설명" }, "/example", { shareTitleSiteName: true });
@@ -90,16 +125,12 @@ describe("계산기 상세 페이지 — og:title·twitter:title", () => {
     expect(DETAIL_PATHS).toHaveLength(25);
   });
   for (const path of DETAIL_PATHS) {
-    it(`${path}: 두 공유 제목이 같고 사이트명이 끝에 한 번만 붙는다`, async () => {
+    // 문구 선택(검색 제목과 같은지, 본문에 사이트명이 있는지)은 여기서 묻지 않는다. 끝의 접미사 규칙만 태그별로 본다.
+    it(`${path}: og:title·twitter:title 각각 끝에 접미사가 한 번만 붙는다`, async () => {
       const meta = await pageMetadata(path);
-      const title = String(meta.title);
-      const share = String(og(meta).title);
-      expect(String(twitter(meta).title)).toBe(share);
-      expect(share.endsWith(SUFFIX)).toBe(true);
-      expect(count(share, SITE_NAME)).toBe(1);
-      // 페이지별 제목은 그대로 남는다(검색용 제목에는 사이트명을 직접 넣지 않는다 — 레이아웃의 제목 템플릿이 붙인다).
-      expect(share).toBe(`${title}${SUFFIX}`);
-      expect(title).not.toContain(SITE_NAME);
+      expectSuffixOnce(og(meta).title, `${path} og:title`);
+      expectSuffixOnce(twitter(meta).title, `${path} twitter:title`);
+      inspectShareTitles(shareHtmlOf(meta), SITE_NAME, path);
     });
   }
   it("대표 페이지의 최종 공유 제목", async () => {
@@ -121,7 +152,7 @@ describe("계산기 상세 페이지 — og:title·twitter:title", () => {
 });
 
 describe("빌드 산출물 검사(inspectShareTitles) — 접미사가 빠지거나 중복되면 실패", () => {
-  const html = (ogTitle: string, twitterTitle = ogTitle) => `<meta property="og:title" content="${ogTitle}"/><meta name="twitter:title" content="${twitterTitle}"/>`;
+  const html = shareHtml;
   const good = "코인 수익 계산기 | 현물 매수·매도 순손익·수익률 계산 | 주식계산기.kr";
   it("정상 제목은 통과한다", () => {
     expect(inspectShareTitles(html(good), SITE_NAME, "/x")).toEqual({ ogTitle: good, twitterTitle: good });
@@ -131,15 +162,32 @@ describe("빌드 산출물 검사(inspectShareTitles) — 접미사가 빠지거
     expect(() => inspectShareTitles(html(missing, good), SITE_NAME, "/x")).toThrow(/og:title must end/);
     expect(() => inspectShareTitles(html(good, missing), SITE_NAME, "/x")).toThrow(/twitter:title must end/);
   });
-  it("접미사가 중복되면 실패한다", () => {
-    expect(() => inspectShareTitles(html(`${good} | 주식계산기.kr`), SITE_NAME, "/x")).toThrow(/repeats the site name/);
+  it("접미사가 연속으로 중복되면 실패한다(og·twitter 각각)", () => {
+    const twice = "수익률 계산기 | 주식계산기.kr | 주식계산기.kr";
+    expect(() => inspectShareTitles(html(twice), SITE_NAME, "/x")).toThrow(/og:title repeats the site name suffix/);
+    expect(() => inspectShareTitles(html(twice, good), SITE_NAME, "/x")).toThrow(/og:title repeats the site name suffix/);
+    expect(() => inspectShareTitles(html(good, twice), SITE_NAME, "/x")).toThrow(/twitter:title repeats the site name suffix/);
+  });
+  it("본문 중간의 사이트명과 ‘ | ’ 부제는 통과한다", () => {
+    for (const title of ["주식계산기.kr 사용법 | 주식계산기.kr", "수익률 계산기 | 사용 예시 | 주식계산기.kr"]) {
+      expect(inspectShareTitles(html(title), SITE_NAME, "/x")).toEqual({ ogTitle: title, twitterTitle: title });
+      expectSuffixOnce(title, title);
+    }
+  });
+  it("본문에 사이트명이 있어도 끝의 접미사가 없으면 실패한다", () => {
+    expect(() => inspectShareTitles(html("주식계산기.kr 사용법"), SITE_NAME, "/x")).toThrow(/og:title must end/);
+    expect(() => inspectShareTitles(html(good, "주식계산기.kr 사용법"), SITE_NAME, "/x")).toThrow(/twitter:title must end/);
+  });
+  it("og:title 과 twitter:title 의 문구가 서로 달라도 각각 규칙을 지키면 통과한다", () => {
+    expect(inspectShareTitles(html(good, "코인 수익 계산기 | 주식계산기.kr"), SITE_NAME, "/x").twitterTitle).toBe("코인 수익 계산기 | 주식계산기.kr");
   });
   it("태그가 없거나 둘 이상이면 실패한다", () => {
     expect(() => inspectShareTitles(`<meta property="og:title" content="${good}"/>`, SITE_NAME, "/x")).toThrow(/twitter:title count/);
     expect(() => inspectShareTitles(html(good) + `<meta property="og:title" content="${good}"/>`, SITE_NAME, "/x")).toThrow(/og:title count/);
   });
-  it("사이트명만 있는 제목은 실패한다", () => {
-    expect(() => inspectShareTitles(html(" | 주식계산기.kr"), SITE_NAME, "/x")).toThrow(/no page title/);
+  it("제목 본문이 비어 있으면 실패한다(og·twitter 각각)", () => {
+    expect(() => inspectShareTitles(html(" | 주식계산기.kr"), SITE_NAME, "/x")).toThrow(/og:title has no page title/);
+    expect(() => inspectShareTitles(html(good, "  | 주식계산기.kr"), SITE_NAME, "/x")).toThrow(/twitter:title has no page title/);
   });
   it("빌드 검사가 읽는 계산기 경로는 CALCULATORS 의 계산기 항목과 같다", () => {
     expect(calculatorDetailPaths(readFileSync("src/lib/constants.ts", "utf8"))).toEqual(DETAIL_PATHS);

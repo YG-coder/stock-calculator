@@ -50,8 +50,9 @@ export function inspectHtml(html, config, expected) {
   return { canonical, og, images, twitter, cards, jsonLdCount, type: types[0], imageEntries };
 }
 /**
- * 공유 제목 검사. og:title·twitter:title 이 각각 정확히 하나이고,
- * 둘 다 " | 사이트명" 으로 끝나며 사이트명 접미사가 중복되지 않아야 한다.
+ * 공유 제목 검사. og:title·twitter:title 이 각각 정확히 하나이고, 각각 " | 사이트명" 으로 끝나야 한다.
+ * 맨 끝의 접미사를 한 번 떼어 낸 나머지(제목 본문)가 비어 있거나 같은 접미사로 또 끝나면 실패한다.
+ * 본문 중간의 사이트명과 " | " 구분자는 허용한다(예: "주식계산기.kr 사용법 | 주식계산기.kr").
  */
 export function inspectShareTitles(html, siteName, expected) {
   const found = { 'og:title': [], 'twitter:title': [] };
@@ -66,7 +67,7 @@ export function inspectShareTitles(html, siteName, expected) {
     assert(value.endsWith(suffix), `${expected}: ${key} must end with "${suffix}" — ${value}`);
     const body = value.slice(0, -suffix.length);
     assert(body.trim().length > 0, `${expected}: ${key} has no page title — ${value}`);
-    assert(!body.includes(siteName), `${expected}: ${key} repeats the site name — ${value}`);
+    assert(!body.trimEnd().endsWith(suffix), `${expected}: ${key} repeats the site name suffix — ${value}`);
   }
   return { ogTitle: found['og:title'][0], twitterTitle: found['twitter:title'][0] };
 }
