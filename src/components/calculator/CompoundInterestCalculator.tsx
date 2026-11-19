@@ -32,6 +32,8 @@ export default function CompoundInterestCalculator() {
     const [years, setYears] = useState("");
 
     const moneyUnit = currency === "KRW" ? "원" : "USD";
+    // 표시 자릿수: 원화는 정수 원, 달러는 센트(소수 둘째 자리)까지. 반올림은 화면 표시에만 적용한다.
+    const moneyDigits = currency === "KRW" ? 0 : 2;
 
     const result = useMemo(
         () => calculateCompoundInterest({ initial: initial.trim() || "NaN", monthly: monthly.trim() || "NaN", rate: rate.trim() || "NaN", years }),
@@ -110,7 +112,7 @@ export default function CompoundInterestCalculator() {
             >
                 <ResultHighlight
                     label="최종 자산"
-                    value={result.overflow ? "-" : formatNumber(result.total)}
+                    value={result.overflow ? "-" : formatNumber(result.total, moneyDigits)}
                     unit={result.overflow ? undefined : moneyUnit}
                 />
 
@@ -124,12 +126,12 @@ export default function CompoundInterestCalculator() {
                 <div className="grid gap-4 sm:grid-cols-2">
                     <ResultDetail
                         label="총 투자금"
-                        value={formatNumber(result.principal)}
+                        value={formatNumber(result.principal, moneyDigits)}
                         unit={moneyUnit}
                     />
                     <ResultDetail
                         label="총 수익"
-                        value={result.overflow ? "-" : formatNumber(result.profit)}
+                        value={result.overflow ? "-" : formatNumber(result.profit, moneyDigits)}
                         unit={result.overflow ? undefined : moneyUnit}
                     />
                 </div>
