@@ -457,7 +457,7 @@ Codex(AI)가 배포 후 운영의 두 목록에서 링크가 `/crypto/average`�
 
 ## 미국주식 환율 반영 수익 계산기 목록 카드 이름 정리 — 2026-11-19 (로컬 검증)
 
-‘허브 카드·관련 계산기 이름’ 보류 항목 가운데 **`/us-stocks/exchange-profit` 목록 카드 제목 한 건**을 처리했다. 목적지 화면의 제목은 ‘미국주식 환율 반영 수익 계산기’인데 목록 카드에는 ‘환율 반영 수익 계산기’로 나와, 전체 목록에서 어떤 자산을 다루는 계산기인지 바로 알 수 없었다. 수정·로컬 검증은 Claude(AI)가 했고 사람 검수가 아니다. 이 로컬 검증 시점에는 푸시·배포·운영 확인을 하지 않았다.
+‘허브 카드·관련 계산기 이름’ 보류 항목 가운데 **`/us-stocks/exchange-profit` 목록 카드 제목 한 건**을 처리했다. 목적지 화면의 제목은 ‘미국주식 환율 반영 수익 계산기’인데 목록 카드에는 ‘환율 반영 수익 계산기’로 나와, 전체 목록에서 어떤 자산을 다루는 계산기인지 바로 알 수 없었다. 수정·로컬 검증은 Claude(AI)가 했고 사람 검수가 아니다. 이 로컬 검증 시점에는 푸시·배포·운영 확인을 하지 않았다(당시 상태이며, 이후 반영은 이 절 끝의 ‘운영 반영 및 확인 — 2026-11-19’ 참고).
 
 - 수정: `src/lib/constants.ts`의 `CALCULATORS` 가운데 `/us-stocks/exchange-profit` 항목의 `title`을 ‘미국주식 환율 반영 수익 계산기’로 바꿨다. 이 `title`을 카드 제목으로 쓰는 `/calculators`와 `/us-stocks` 두 목록에 함께 반영된다.
 - 그대로 둔 것: 같은 항목의 짧은 탐색 라벨(`label` ‘환율 수익’)·카드 설명·배지, 검색 제목·설명·키워드, 본문 속 링크 문구(`/profit-calculator` 본문의 ‘환율 반영 수익 계산기’ 링크 포함), URL, 계산식.
@@ -470,3 +470,19 @@ Codex(AI)가 배포 후 운영의 두 목록에서 링크가 `/crypto/average`�
 |---|---:|---|---|
 | `/calculators` | 1개 | 미국주식 환율 반영 수익 계산기 | 미국주식 환율 반영 수익 계산기 |
 | `/us-stocks` | 1개 | 미국주식 환율 반영 수익 계산기 | 미국주식 환율 반영 수익 계산기 |
+
+#### 운영 반영 및 확인 — 2026-11-19
+
+운영에 배포된 커밋은 `72d58ee`(`/us-stocks/exchange-profit` 목록 카드 제목 수정)다. 운영 반영 시각은 **2026-11-19 15:40:08 KST**다. [GitHub 배포 성공 기록](https://api.github.com/repos/YG-coder/stock-calculator/deployments/7906078770/statuses) · [Vercel 배포 상세](https://vercel.com/yg-coders-projects/stock-calculator/Gcyfs67sjUKszTrUgpNARfhkbXn4)
+
+- 시각의 근거는 GitHub의 Production 배포 `7906078770`에 `Deployment has completed`가 기록된 시각 `2026-11-19T06:40:08Z`이며, 이를 한국 시간으로 환산했다.
+
+Codex(AI)가 배포 후 운영의 두 목록에서 `/us-stocks/exchange-profit`로 연결되는 카드를 각각 세고, 각 카드를 직접 눌러 도착 경로와 화면 제목(`<h1>`)을 확인했다. 확인자는 모두 Codex(AI)이며 사람 검수가 아니다. 이 기록을 작성한 Claude(AI)는 운영 화면과 배포 기록을 직접 다시 확인하지 않았고, 전달받은 확인 내용을 옮겨 적었다.
+
+| 출발 목록 | 해당 카드 수 | 카드 제목 | 클릭 후 도착 경로 | 목적지 `<h1>` |
+|---|---:|---|---|---|
+| [`/calculators`](https://주식계산기.kr/calculators) | 1개 | 미국주식 환율 반영 수익 계산기 | `/us-stocks/exchange-profit` | 미국주식 환율 반영 수익 계산기 |
+| [`/us-stocks`](https://주식계산기.kr/us-stocks) | 1개 | 미국주식 환율 반영 수익 계산기 | `/us-stocks/exchange-profit` | 미국주식 환율 반영 수익 계산기 |
+
+- 운영에서 확인한 범위는 `/us-stocks/exchange-profit` 목록 카드 한 건이다. 다른 계산기의 목록 카드 이름과 `related[].title`은 확인·수정하지 않았고 보류로 남는다.
+- 실기기 확인과 검색 노출 변화는 확인하지 않았다.
